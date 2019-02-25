@@ -4,8 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
-
-db_path = os.path.join(os.path.dirname(__file__), '../db/syncmeet.db')
+db_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../db/syncmeet.db')
 db_uri = 'sqlite:///{}'.format(db_path)
 
 app = Flask(__name__)
@@ -15,34 +14,34 @@ app.config['SECRET_KEY'] = 'mysecret' #TODO: import from config file
 db = SQLAlchemy(app)
 admin = Admin(app)
 
-class user(db.Model):
+class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
     auth_token = db.Column(db.String(30))
 
-admin.add_view(ModelView(user, db.session))
+admin.add_view(ModelView(User, db.session))
 
-class group_association(db.Model):
-    __tablename__ = "group_association"
-    planning_group_id = db.Column(db.Integer, db.ForeignKey('planning_group.id'), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    user = db.relationship('user')
+association_table = db.Table( 'group_association', db.metadata,
+    db.Column('planning_group_id', db.Integer, db.ForeignKey('planning_group.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
+    )
+# association_table.__name__ = 'group_association'
 
-admin.add_view(ModelView(group_association, db.session))
+# admin.add_view(ModelView(association_table, db.session))
 
-class planning_group(db.Model):
+class Planning_group(db.Model):
     __tablename__ = "planning_group"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30))
-    from_date = db.Date()
-    to_date = db.Date()
-    from_time = db.Time()
-    to_time = db.Time()
-    meeting_length = db.Time()
-    users = db.relationship('group_association')
+    from_date = db.Column(db.Date())
+    to_date = db.Column(db.Date())
+    from_time = db.Column(db.Time())
+    to_time = db.Column(db.Time())
+    meeting_length = db.Column(db.Time())
+    users = db.relationship('User', secondary=association_table)
 
-admin.add_view(ModelView(planning_group, db.session))
+admin.add_view(ModelView(Planning_group, db.session))
 
 
 if __name__ == '__main__':
