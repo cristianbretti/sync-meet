@@ -5,8 +5,8 @@ import '../App.css';
 class OwnerStart extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
+      <div className="text-center">
+        <header className="App-header bg-blue">
           <img src={logo} className="App-logo" alt="logo" />
           <p>
             Edit <code>src/App.tsx</code> and save to relo
