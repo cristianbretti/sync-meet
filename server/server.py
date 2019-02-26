@@ -77,7 +77,8 @@ admin.add_view(ModelView(Planning_group, db.session))
 @app.route('/api/createuser', methods=['POST'])
 @cross_origin() #dev only
 def create_user():
-    new_user = User(request.form['name'], request.form['auth_token'])
+    payload = request.json
+    new_user = User(payload['name'], payload['auth_token'])
     db.session.add(new_user)
     db.session.commit()
     return (jsonify({'id': new_user.id}), 201)
@@ -86,18 +87,37 @@ def create_user():
 @app.route('/api/creategroup', methods=['POST'])
 @cross_origin() #dev only
 def create_group():
+    payload = request.json
     new_group = Planning_group(
-        request.form['name'],
-        datetime.strptime(request.form['from_date'], '%Y-%m-%d').date(),
-        datetime.strptime(request.form['to_date'], '%Y-%m-%d').date(),
-        datetime.strptime(request.form['from_time'], '%H:%M').time(),
-        datetime.strptime(request.form['to_time'], '%H:%M').time(),
-        datetime.strptime(request.form['meeting_length'], '%H:%M').time(),
+        payload['name'],
+        datetime.strptime(payload['from_date'], '%Y-%m-%d').date(),
+        datetime.strptime(payload['to_date'], '%Y-%m-%d').date(),
+        datetime.strptime(payload['from_time'], '%H:%M').time(),
+        datetime.strptime(payload['to_time'], '%H:%M').time(),
+        datetime.strptime(payload['meeting_length'], '%H:%M').time(),
         )
     db.session.add(new_group)
     db.session.commit()
     return (jsonify({'id': new_group.id}), 201)
 
+@app.route('/api/addusertogroup', methods=['POST'])
+@cross_origin() # dev only
+def add_user_to_group():
+    try:
+        payload = request.json
+        user = User.query.filter_by(id= payload['user_id']).first()
+        if user is None:
+            raise ValueError("User not found")
+        group = Planning_group.query.filter_by(id= payload['group_id']).first()
+        if group is None:
+            raise ValueError("Group not found")
+        group.users.append(user)
+        db.session.commit()
+        return "", 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except:
+        return jsonify({'error': "Internal server error"}), 500
 
 # Catch all routes and host index
 # So that we don't need browser router
