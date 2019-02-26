@@ -72,33 +72,53 @@ class Planning_group(db.Model):
 
 admin.add_view(ModelView(Planning_group, db.session))
 
-#TODO: Add try catches to all API routes
-
 @app.route('/api/createuser', methods=['POST'])
 @cross_origin() #dev only
 def create_user():
-    payload = request.json
-    new_user = User(payload['name'], payload['auth_token'])
-    db.session.add(new_user)
-    db.session.commit()
-    return (jsonify({'id': new_user.id}), 201)
+    try:
+        payload = request.json
+        name = payload['name']
+        auth_token = payload['auth_token']
+        if len(name) > 30:
+            raise ValueError("Name too long. Max 30 characters")
+        #TODO: input check auth token
+        new_user = User(name, auth_token)
+        db.session.add(new_user)
+        db.session.commit()
+        return (jsonify({'id': new_user.id}), 201)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except KeyError as e:
+        return jsonify({'error': "Missing parameter: " + str(e)}), 400
+    except:
+        return jsonify({'error': "Internal server error"}), 500
 
 
 @app.route('/api/creategroup', methods=['POST'])
 @cross_origin() #dev only
 def create_group():
-    payload = request.json
-    new_group = Planning_group(
-        payload['name'],
-        datetime.strptime(payload['from_date'], '%Y-%m-%d').date(),
-        datetime.strptime(payload['to_date'], '%Y-%m-%d').date(),
-        datetime.strptime(payload['from_time'], '%H:%M').time(),
-        datetime.strptime(payload['to_time'], '%H:%M').time(),
-        datetime.strptime(payload['meeting_length'], '%H:%M').time(),
-        )
-    db.session.add(new_group)
-    db.session.commit()
-    return (jsonify({'id': new_group.id}), 201)
+    try:
+        payload = request.json
+        name = payload['name']
+        if len(name) > 30:
+            raise ValueError("Name too long. Max 30 characters")
+        new_group = Planning_group(
+            name,
+            datetime.strptime(payload['from_date'], '%Y-%m-%d').date(),
+            datetime.strptime(payload['to_date'], '%Y-%m-%d').date(),
+            datetime.strptime(payload['from_time'], '%H:%M').time(),
+            datetime.strptime(payload['to_time'], '%H:%M').time(),
+            datetime.strptime(payload['meeting_length'], '%H:%M').time(),
+            )
+        db.session.add(new_group)
+        db.session.commit()
+        return (jsonify({'id': new_group.id}), 201)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except KeyError as e:
+        return jsonify({'error': "Missing parameter: " + str(e)}), 400
+    except:
+        return jsonify({'error': "Internal server error"}), 500
 
 @app.route('/api/addusertogroup', methods=['POST'])
 @cross_origin() # dev only
