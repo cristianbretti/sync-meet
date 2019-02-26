@@ -39,7 +39,7 @@ class User(db.Model):
         self.auth_token = auth_token
 
     def __repr__(self):
-        return '<User %d%r>' % (self.id, self.name)
+        return '<User %d %r>' % (self.id, self.name)
 
 admin.add_view(ModelView(User, db.session))
 
@@ -57,7 +57,7 @@ class Planning_group(db.Model):
     from_time = db.Column(db.Time())
     to_time = db.Column(db.Time())
     meeting_length = db.Column(db.Time())
-    users = db.relationship('User', secondary=association_table)
+    users = db.relationship('User', secondary=association_table, backref=db.backref('planning_group', lazy='joined'))
 
     def __init__(self, name, from_date, to_date, from_time, to_time, meeting_length):
         self.name = name
@@ -68,11 +68,11 @@ class Planning_group(db.Model):
         self.meeting_length = meeting_length
 
     def __repr__(self):
-        return '<Group %d%r>' % (self.id, self.name)
+        return '<Group %d %r>' % (self.id, self.name)
 
 admin.add_view(ModelView(Planning_group, db.session))
 
-""" API ENDPOINTS """
+""" HELPERS """
 class APIError(Exception):
     def __init__(self, response, code):
         super(APIError, self).__init__()
@@ -90,6 +90,12 @@ def handle_exceptions():
     except:
         raise APIError(jsonify({'error': "Internal server error"}), 500)
 
+def attempt_delete_user(user):
+    if len(user.planning_group) == 0:
+        db.session.delete(user)
+    
+
+""" API ENDPOINTS """
 # Example payload:
 # {
 # 	"name":"test_user",
@@ -167,10 +173,11 @@ def add_user_to_group():
                 group.users.append(user)
             elif payload['command'] == 'remove':
                 group.users.remove(user)
+                attempt_delete_user(user)
             else:
                 raise ValueError("Unknown command")
             db.session.commit()
-            return jsonify({'group_id': group.id}), 200
+            return jsonify({'id': group.id}), 200
     except APIError as e:
         return e.response, e.code
 
@@ -185,6 +192,24 @@ def get_users_from_group():
                 raise ValueError("Group not found")
             users = [user.name for user in group.users]
             return jsonify({'users': users})
+    except APIError as e:
+        return e.response, e.code
+
+@app.route('/api/deletegroup', methods=['DELETE'])
+@cross_origin() # dev only
+def delete_group():
+    try:
+        with handle_exceptions():
+            group_id = request.args['group_id']
+            group = Planning_group.query.filter_by(id=group_id).first()
+            if group is None:
+                raise ValueError("Group not found")
+            for user in group.users:
+                group.users.remove(user)
+                attempt_delete_user(user)
+            db.session.delete(group)
+            db.session.commit()
+            return "", 202
     except APIError as e:
         return e.response, e.code
 
