@@ -174,17 +174,19 @@ def add_user_to_group():
     except APIError as e:
         return e.response, e.code
 
-# @app.route('/api/getusersfromgroup')
-# @cross_origin() # dev only
-# def get_users_from_group():
-#     try:
-#         with handle_exceptions():
-#             group_id = request.args['user_id']
-#             group = Planning_group.query.filter_by(id=group_id).first()
-#             if group is None:
-#                 raise ValueError("Group not found")
-#     except APIError as e:
-#         return e.response, e.code
+@app.route('/api/getusersfromgroup')
+@cross_origin() # dev only
+def get_users_from_group():
+    try:
+        with handle_exceptions():
+            group_id = request.args['group_id']
+            group = Planning_group.query.filter_by(id=group_id).first()
+            if group is None:
+                raise ValueError("Group not found")
+            users = [user.name for user in group.users]
+            return jsonify({'users': users})
+    except APIError as e:
+        return e.response, e.code
 
 # Catch all routes and host index
 # So that we don't need browser router
