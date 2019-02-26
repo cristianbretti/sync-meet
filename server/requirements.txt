@@ -1,3 +1,5 @@
 flask
 flask-sqlalchemy
 flask-admin
+flask-cors
+json
