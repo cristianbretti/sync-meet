@@ -119,22 +119,22 @@ def require_login(func):
             if user is None:
                 raise Exception
             session['google_id'] = user.google_id
-            return func(*args, **kwargs)
         except:
             return jsonify({'error': "Access denied"}), 403
+        return func(*args, **kwargs)
     return check_login
 
 def require_group_str_id(func):
     @wraps(func) 
     def check_group_str_id(*args, **kwargs):
         try:
-            group = Planning_group.query.filter_by(group_str_id=request.headers['group_str_id']).first()
+            group_str_id = request.headers['group_str_id']
+            group = Planning_group.query.filter_by(group_str_id=group_str_id).first()
             if group is None:
                 raise Exception
-            return func(*args, **kwargs, group=group)
-        except Exception as e:
+        except Exception:
             return jsonify({'error': "unvalid group_str_id header"}), 403
-
+        return func(*args, **kwargs, group=group)
     return check_group_str_id
 
 def create_user(id_token, name, auth_token):
