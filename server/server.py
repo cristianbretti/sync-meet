@@ -40,7 +40,7 @@ class User(db.Model):
     name = db.Column(db.String(30))
     auth_token = db.Column(db.String(30))
 
-    def __init__(self, name, auth_token):
+    def __init__(self, google_id, name, auth_token):
         self.name = name
         self.auth_token = auth_token
 
@@ -104,40 +104,76 @@ def attempt_delete_user(user):
 def require_login(func):
     @wraps(func) 
     def check_login(*args, **kwargs):
-        if 'google_id' in session:
-            if session['google_id'] == request.headers['google_id']:
-                return func(*args, **kwargs)
-        user = User.query(google_id=request.headers['google_id']).first()
-        if user is not None:
+        try:
+            if 'google_id' in session:
+                if session['google_id'] == request.headers['google_id']:
+                    return func(*args, **kwargs)
+            user = User.query.filter_by(google_id=request.headers['google_id']).first()
+            if user is None:
+                raise Exception
+            session['google_id'] = user.google_id
             return func(*args, **kwargs)
-        return jsonify({'error': "Access denied"}), 403
+        except:
+            return jsonify({'error': "Access denied"}), 403
     return check_login
+
+def require_group_str_id(func):
+    @wraps(func) 
+    def check_group_str_id(*args, **kwargs):
+        try:
+            group = Planning_group.query.filter_by(group_str_id=request.headers['group_str_id']).first()
+            if group is None:
+                raise Exception
+            return func(*args, **kwargs, group=group)
+        except Exception as e:
+            return jsonify({'error': "unvalid group_str_id header"}), 403
+
+    return check_group_str_id
+
+def create_user(id_token, name, auth_token):
+    if len(name) > 30:
+        raise ValueError("Name too long. Max 30 characters")
+    # Validate google_id token
+    idinfo = id_token.verify_oauth2_token(token, requests.Request(), CLIENT_ID)
+    if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+        raise ValueError('Wrong issuer.')
+    google_id = idinfo['sub']
+    # Create new user
+    new_user = User(google_id, name, auth_token)
+    db.session.add(new_user)
+    db.session.commit()
+    return new_user
+
 
 
 
 """ API ENDPOINTS """
 # Example payload:
+# headers:
+# {
+#   "group_str_id":"the group str id from the address bar"
+# }
 # {
 # 	"name":"test_user",
-# 	"auth_token":"test_token"
+# 	"auth_token":"test_token",
+#   "id_token":"googles long token id in response.getAuthResponse().id_token"
 # }
 @app.route('/api/createuser', methods=['POST'])
 @cross_origin() #dev only
-def create_user():
+@require_group_str_id
+def create_user(group=None):
     try:
         with handle_exceptions():
             payload = request.json
             name = payload['name']
+            id_token = payload['id_token']
             auth_token = payload['auth_token']
-            if len(name) > 30:
-                raise ValueError("Name too long. Max 30 characters")
-            #TODO: input check auth token https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=accessToken
-            new_user = User(name, auth_token)
-            db.session.add(new_user)
-            db.session.commit()
-            return (jsonify({'user_id': new_user.id}), 201)
+            group_str_id = payload['group_str_id']
+            user = create_user(id_token, name, auth_token)
+            group.users.add(user)
     except APIError as e:
         return e.response, e.code
+
 
 # Example payload
 # {
