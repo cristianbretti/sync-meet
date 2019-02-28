@@ -1,11 +1,13 @@
-import os
-from contextlib import contextmanager
-from flask import Flask, render_template, request, jsonify
+
+from flask import Flask, render_template, request, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+import os
 import json
 from datetime import datetime
+from contextlib import contextmanager
+from functools import wraps
 
 # File paths
 root_path = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
@@ -93,7 +95,16 @@ def handle_exceptions():
 def attempt_delete_user(user):
     if len(user.planning_group) == 0:
         db.session.delete(user)
-    
+
+def require_api_token(func):
+    @wraps(func) 
+    def check_api_token(*args, **kwargs):
+        if 'api_session_token' not in session:
+            return jsonify({'error': "Access denied"}), 403
+        return func(*args, **kwargs)
+    return check_api_token
+
+
 
 """ API ENDPOINTS """
 # Example payload:
@@ -111,11 +122,11 @@ def create_user():
             auth_token = payload['auth_token']
             if len(name) > 30:
                 raise ValueError("Name too long. Max 30 characters")
-            #TODO: input check auth token
+            #TODO: input check auth token https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=accessToken
             new_user = User(name, auth_token)
             db.session.add(new_user)
             db.session.commit()
-            return (jsonify({'id': new_user.id}), 201)
+            return (jsonify({'user_id': new_user.id}), 201)
     except APIError as e:
         return e.response, e.code
 
@@ -144,10 +155,10 @@ def create_group():
                 datetime.strptime(payload['from_time'], '%H:%M').time(),
                 datetime.strptime(payload['to_time'], '%H:%M').time(),
                 datetime.strptime(payload['meeting_length'], '%H:%M').time(),
-                )
+            )
             db.session.add(new_group)
             db.session.commit()
-            return (jsonify({'id': new_group.id}), 201)
+            return (jsonify({'group_id': new_group.id}), 201)
     except APIError as e:
         return e.response, e.code
 
@@ -177,7 +188,7 @@ def add_user_to_group():
             else:
                 raise ValueError("Unknown command")
             db.session.commit()
-            return jsonify({'id': group.id}), 200
+            return jsonify({'group_id': group.id}), 200
     except APIError as e:
         return e.response, e.code
 
@@ -220,6 +231,7 @@ def delete_group():
 @app.route('/<path:path>')
 @cross_origin() #dev only
 def index(path):
+    # session.permanent = True
     return render_template('index.html')
 
 if __name__ == '__main__':
