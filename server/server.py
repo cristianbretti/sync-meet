@@ -8,6 +8,8 @@ import json
 from datetime import datetime
 from contextlib import contextmanager
 from functools import wraps
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 # File paths
 root_path = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
@@ -19,6 +21,7 @@ template_folder_path = os.path.join(root_path, 'client', 'build')
 app = Flask(__name__, static_folder=static_folder_path, template_folder=template_folder_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SECRET_KEY'] = 'mysecret' #TODO: import from config file
+CLIENT_ID = "486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
 
 db = SQLAlchemy(app)
 admin = Admin(app)
@@ -33,6 +36,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 class User(db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
+    google_id = db.Column(db.String(30), unique=True)
     name = db.Column(db.String(30))
     auth_token = db.Column(db.String(30))
 
@@ -53,6 +57,7 @@ association_table = db.Table( 'group_association', db.metadata,
 class Planning_group(db.Model):
     __tablename__ = "planning_group"
     id = db.Column(db.Integer, primary_key=True)
+    group_str_id = db.Column(db.String(16), unique=True)
     name = db.Column(db.String(30))
     from_date = db.Column(db.Date())
     to_date = db.Column(db.Date())
@@ -96,13 +101,17 @@ def attempt_delete_user(user):
     if len(user.planning_group) == 0:
         db.session.delete(user)
 
-def require_api_token(func):
+def require_login(func):
     @wraps(func) 
-    def check_api_token(*args, **kwargs):
-        if 'api_session_token' not in session:
-            return jsonify({'error': "Access denied"}), 403
-        return func(*args, **kwargs)
-    return check_api_token
+    def check_login(*args, **kwargs):
+        if 'google_id' in session:
+            if session['google_id'] == request.headers['google_id']:
+                return func(*args, **kwargs)
+        user = User.query(google_id=request.headers['google_id']).first()
+        if user is not None:
+            return func(*args, **kwargs)
+        return jsonify({'error': "Access denied"}), 403
+    return check_login
 
 
 
