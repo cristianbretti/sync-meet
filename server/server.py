@@ -8,8 +8,10 @@ import json
 from datetime import datetime
 from contextlib import contextmanager
 from functools import wraps
-from google.oauth2 import id_token
+from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests
+import random
+import string
 
 # File paths
 root_path = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
@@ -41,6 +43,7 @@ class User(db.Model):
     auth_token = db.Column(db.String(30))
 
     def __init__(self, google_id, name, auth_token):
+        self.google_id = google_id
         self.name = name
         self.auth_token = auth_token
 
@@ -64,15 +67,19 @@ class Planning_group(db.Model):
     from_time = db.Column(db.Time())
     to_time = db.Column(db.Time())
     meeting_length = db.Column(db.Time())
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    owner = db.relationship('User')
     users = db.relationship('User', secondary=association_table, backref=db.backref('planning_group', lazy='joined'))
 
-    def __init__(self, name, from_date, to_date, from_time, to_time, meeting_length):
+    def __init__(self, group_str_id, name, from_date, to_date, from_time, to_time, meeting_length, owner):
+        self.group_str_id = group_str_id
         self.name = name
         self.from_date = from_date
         self.to_date = to_date
         self.from_time = from_time
         self.to_time = to_time
         self.meeting_length = meeting_length
+        self.owner = owner
 
     def __repr__(self):
         return '<Group %d %r>' % (self.id, self.name)
@@ -94,8 +101,8 @@ def handle_exceptions():
         raise APIError(jsonify({'error': str(e)}), 400)
     except KeyError as e:
         raise APIError(jsonify({'error': "Missing parameter: " + str(e)}), 400)
-    except:
-        raise APIError(jsonify({'error': "Internal server error"}), 500)
+    # except:
+    #     raise APIError(jsonify({'error': "Internal server error"}), 500) #TODO: uncomment!!
 
 def attempt_delete_user(user):
     if len(user.planning_group) == 0:
@@ -132,22 +139,81 @@ def require_group_str_id(func):
 
 def create_user(id_token, name, auth_token):
     if len(name) > 30:
-        raise ValueError("Name too long. Max 30 characters")
+        raise ValueError("User name too long. Max 30 characters")
     # Validate google_id token
-    idinfo = id_token.verify_oauth2_token(token, requests.Request(), CLIENT_ID)
+    idinfo = google_id_token.verify_oauth2_token(id_token, requests.Request(), CLIENT_ID)
     if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
         raise ValueError('Wrong issuer.')
     google_id = idinfo['sub']
     # Create new user
     new_user = User(google_id, name, auth_token)
     db.session.add(new_user)
-    db.session.commit()
     return new_user
 
 
 
 
 """ API ENDPOINTS """
+# Example payload
+# {
+# 	"group_name":"test_group",
+# 	"from_date":"2019-02-20",
+# 	"to_date":"2019-02-21",
+# 	"from_time":"10:00",
+# 	"to_time":"18:00",
+# 	"meeting_length":"01:00",
+#   "user_name":"test_user",
+# 	"auth_token":"test_token",
+#   "id_token":"googles long token id in response.getAuthResponse().id_token"
+# }
+@app.route('/api/creategroup', methods=['POST'])
+@cross_origin() #dev only
+def create_group():
+    try:
+        with handle_exceptions():
+            payload = request.json
+            # get group params
+            group_name = payload['group_name']
+            from_date = datetime.strptime(payload['from_date'], '%Y-%m-%d').date()
+            to_date = datetime.strptime(payload['to_date'], '%Y-%m-%d').date()
+            from_time = datetime.strptime(payload['from_time'], '%H:%M').time()
+            to_time = datetime.strptime(payload['to_time'], '%H:%M').time()
+            meeting_length = datetime.strptime(payload['meeting_length'], '%H:%M').time()
+            # get user params
+            user_name = payload['user_name']
+            id_token = payload['id_token']
+            auth_token = payload['auth_token']
+            # Create or find user
+            user = None
+            if 'google_id' in session:
+                user = User.query.filter_by(google_id=session['google_id'])
+            if user is None:
+                print("Createing user")
+                user = create_user(id_token, user_name, auth_token)
+            session['google_id'] = user.google_id
+            # Create group
+            if len(group_name) > 30:
+                raise ValueError("Group name too long. Max 30 characters")
+            new_group_str_id = ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(16))
+            new_group = Planning_group(
+                new_group_str_id,
+                group_name,
+                from_date,
+                to_date,
+                from_time,
+                to_time,
+                meeting_length,
+                user
+            )
+            db.session.add(new_group)
+            db.session.commit()
+            new_group.users.append(user)
+            db.session.commit()
+            return (jsonify({'group_str_id': new_group.group_str_id}), 201)
+    except APIError as e:
+        return e.response, e.code
+
+
 # Example payload:
 # headers:
 # {
@@ -158,52 +224,19 @@ def create_user(id_token, name, auth_token):
 # 	"auth_token":"test_token",
 #   "id_token":"googles long token id in response.getAuthResponse().id_token"
 # }
-@app.route('/api/createuser', methods=['POST'])
+@app.route('/api/adduser', methods=['POST'])
 @cross_origin() #dev only
 @require_group_str_id
-def create_user(group=None):
+def add_user(group=None):
     try:
         with handle_exceptions():
             payload = request.json
             name = payload['name']
             id_token = payload['id_token']
             auth_token = payload['auth_token']
-            group_str_id = payload['group_str_id']
             user = create_user(id_token, name, auth_token)
-            group.users.add(user)
-    except APIError as e:
-        return e.response, e.code
-
-
-# Example payload
-# {
-# 	"name":"test_group",
-# 	"from_date":"2019-02-20",
-# 	"to_date":"2019-02-21",
-# 	"from_time":"10:00",
-# 	"to_time":"18:00",
-# 	"meeting_length":"01:00"
-# }
-@app.route('/api/creategroup', methods=['POST'])
-@cross_origin() #dev only
-def create_group():
-    try:
-        with handle_exceptions():
-            payload = request.json
-            name = payload['name']
-            if len(name) > 30:
-                raise ValueError("Name too long. Max 30 characters")
-            new_group = Planning_group(
-                name,
-                datetime.strptime(payload['from_date'], '%Y-%m-%d').date(),
-                datetime.strptime(payload['to_date'], '%Y-%m-%d').date(),
-                datetime.strptime(payload['from_time'], '%H:%M').time(),
-                datetime.strptime(payload['to_time'], '%H:%M').time(),
-                datetime.strptime(payload['meeting_length'], '%H:%M').time(),
-            )
-            db.session.add(new_group)
+            group.users.append(user)
             db.session.commit()
-            return (jsonify({'group_id': new_group.id}), 201)
     except APIError as e:
         return e.response, e.code
 
