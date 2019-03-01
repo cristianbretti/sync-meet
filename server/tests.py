@@ -120,7 +120,7 @@ class MyTest(TestCase):
         assert 'google_id' in resp.json
         assert resp.json['google_id'] == grp_resp['google_id']
     
-    def test_adduser_access(self):
+    def test_adduser_missing_grp(self):
         grp_resp = self.test_creategroup_good()
         resp = self.client.post('/api/adduser', json=dict(
             name="test_user",
@@ -143,6 +143,35 @@ class MyTest(TestCase):
         self.assert400(resp)
         assert 'error' in resp.json
         assert 'too long' in resp.json['error']
+
+    """ TEST GETUSERFROMGROUP """ 
+    def test_getusersfromgroup_good(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.get('/api/getusersfromgroup',headers=dict(
+            group_str_id=grp_resp['group_str_id'],
+            google_id=grp_resp['google_id'],
+        ))
+        self.assert200(resp)
+        assert 'owner' in resp.json
+        assert len(resp.json['users']) == 1
+
+    def test_getusersfromgroup_missing_grp(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.get('/api/getusersfromgroup',headers=dict(
+            google_id=grp_resp['google_id'],
+        ))
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'group_str_id' in resp.json['error']
+    
+    def test_getusersfromgroup_access(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.get('/api/getusersfromgroup',headers=dict(
+            group_str_id=grp_resp['group_str_id'],
+        ))
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'Access' in resp.json['error']
 
 if __name__ == "__main__":
     unittest.main(warnings='ignore')
