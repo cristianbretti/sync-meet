@@ -68,7 +68,7 @@ class Planning_group(db.Model):
     to_time = db.Column(db.Time())
     meeting_length = db.Column(db.Time())
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    owner = db.relationship('User')
+    owner = db.relationship('User', backref=db.backref('owner'))
     users = db.relationship('User', secondary=association_table, backref=db.backref('planning_group', lazy='joined'))
 
     def __init__(self, group_str_id, name, from_date, to_date, from_time, to_time, meeting_length, owner):
@@ -107,6 +107,9 @@ def handle_exceptions():
 def attempt_delete_user(user):
     if len(user.planning_group) == 0:
         db.session.delete(user)
+        if user.google_id == session['google_id']:
+            # log out user
+            session.pop('google_id', None)
 
 def require_login(func):
     @wraps(func) 
@@ -133,23 +136,37 @@ def require_group_str_id(func):
             if group is None:
                 raise Exception
         except Exception:
-            return jsonify({'error': "unvalid group_str_id header"}), 403
+            return jsonify({'error': "Invalid group_str_id header"}), 403
         return func(*args, **kwargs, group=group)
     return check_group_str_id
 
-def create_user(id_token, name, auth_token):
+def create_or_find_user(id_token, name, auth_token):
     if len(name) > 30:
         raise ValueError("User name too long. Max 30 characters")
     # Validate google_id token
-    idinfo = google_id_token.verify_oauth2_token(id_token, requests.Request(), CLIENT_ID)
-    if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
-        raise ValueError('Wrong issuer.')
+    try:
+        idinfo = google_id_token.verify_oauth2_token(id_token, requests.Request(), CLIENT_ID)
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            raise ValueError('Wrong issuer.')
+    except:
+        raise ValueError('Could not authenticate id_token')
     google_id = idinfo['sub']
-    # Create new user
-    new_user = User(google_id, name, auth_token)
-    db.session.add(new_user)
+    # Check if user exists
+    new_user = User.query.filter_by(google_id=google_id).first()
+    if new_user is None:
+        # Create new user
+        new_user = User(google_id, name, auth_token)
+        db.session.add(new_user)
+    else:
+        # User found, update auth token
+        new_user.auth_token = auth_token
+    session['google_id'] = new_user.google_id
     return new_user
 
+
+def get_calendar(auth_token):
+    #TODO: get the calendar for a user towards the google API
+    return {'calendar': "temp"}
 
 
 
@@ -184,13 +201,9 @@ def create_group():
             id_token = payload['id_token']
             auth_token = payload['auth_token']
             # Create or find user
-            user = None
-            if 'google_id' in session:
-                user = User.query.filter_by(google_id=session['google_id'])
-            if user is None:
-                print("Createing user")
-                user = create_user(id_token, user_name, auth_token)
-            session['google_id'] = user.google_id
+            user = create_or_find_user(id_token, user_name, auth_token)
+            if len(user.owner) >= 10:
+                raise ValueError("You cannot have more than 10 groups active per user.")
             # Create group
             if len(group_name) > 30:
                 raise ValueError("Group name too long. Max 30 characters")
@@ -209,7 +222,10 @@ def create_group():
             db.session.commit()
             new_group.users.append(user)
             db.session.commit()
-            return (jsonify({'group_str_id': new_group.group_str_id}), 201)
+            return jsonify({
+                'group_str_id': new_group.group_str_id,
+                'user_google_id': user.google_id
+                }), 201
     except APIError as e:
         return e.response, e.code
 
@@ -234,69 +250,79 @@ def add_user(group=None):
             name = payload['name']
             id_token = payload['id_token']
             auth_token = payload['auth_token']
-            user = create_user(id_token, name, auth_token)
+            user = create_or_find_user(id_token, name, auth_token)
+            print(user.planning_group)
+            raise ValueError('temp')
             group.users.append(user)
             db.session.commit()
+            return jsonify({'user_google_id': user.google_id}), 200
     except APIError as e:
         return e.response, e.code
 
 # Example payload
+# headers:
 # {
-# 	"user_id":2,
-# 	"group_id":3,
-# 	"command":"remove" | "add"
+#   "group_str_id":"the group str id from the address bar"
+#   "google_id":"user google id"
 # }
-@app.route('/api/updategroupusers', methods=['PUT'])
-@cross_origin() # dev only
-def add_user_to_group():
-    try:
-        with handle_exceptions():
-            payload = request.json
-            user = User.query.filter_by(id= payload['user_id']).first()
-            if user is None:
-                raise ValueError("User not found")
-            group = Planning_group.query.filter_by(id= payload['group_id']).first()
-            if group is None:
-                raise ValueError("Group not found")
-            if payload['command'] == 'add':
-                group.users.append(user)
-            elif payload['command'] == 'remove':
-                group.users.remove(user)
-                attempt_delete_user(user)
-            else:
-                raise ValueError("Unknown command")
-            db.session.commit()
-            return jsonify({'group_id': group.id}), 200
-    except APIError as e:
-        return e.response, e.code
-
 @app.route('/api/getusersfromgroup')
 @cross_origin() # dev only
-def get_users_from_group():
+@require_login
+@require_group_str_id
+def get_users_from_group(group=None):
     try:
         with handle_exceptions():
-            group_id = request.args['group_id']
-            group = Planning_group.query.filter_by(id=group_id).first()
-            if group is None:
-                raise ValueError("Group not found")
-            users = [user.name for user in group.users]
-            return jsonify({'users': users})
+            users = [ {'name': user.name, 'id': user.id} for user in group.users]
+            return jsonify({
+                'users': users,
+                'owner': {'name': group.owner.name, 'id': group.owner.id}
+                }), 200
     except APIError as e:
         return e.response, e.code
 
-@app.route('/api/deletegroup', methods=['DELETE'])
+
+# Example payload
+# headers:
+# {
+#   "group_str_id":"the group str id from the address bar"
+#   "google_id":"user google id"
+# }
+@app.route('/api/getgroupcalendar')
 @cross_origin() # dev only
-def delete_group():
+@require_login
+@require_group_str_id
+def get_group_calendar(group=None):
     try:
         with handle_exceptions():
-            group_id = request.args['group_id']
-            group = Planning_group.query.filter_by(id=group_id).first()
-            if group is None:
-                raise ValueError("Group not found")
-            for user in group.users:
+            calendars = [get_calendar(user.auth_token) for user in group.users]
+            # TODO: calculate free time and return new calendar
+            return jsonify({'calendar': calendars}), 200
+    except APIError as e:
+        return e.response, e.code
+
+
+# Example payload
+# headers:
+# {
+#   "group_str_id":"the group str id from the address bar"
+#   "google_id":"user google id"
+# }
+@app.route('/api/remove', methods=['DELETE'])
+@cross_origin() # dev only
+@require_login
+@require_group_str_id
+def remove(group=None):
+    try:
+        with handle_exceptions():
+            if group.owner.google_id == session['google_id']:
+                for user in group.users:
+                    group.users.remove(user)
+                    attempt_delete_user(user)
+                db.session.delete(group)
+            else:
+                user = User.query.filter_by(google_id=session['google_id']).first()
                 group.users.remove(user)
                 attempt_delete_user(user)
-            db.session.delete(group)
             db.session.commit()
             return "", 202
     except APIError as e:
