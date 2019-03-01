@@ -173,5 +173,32 @@ class MyTest(TestCase):
         assert 'error' in resp.json
         assert 'Access' in resp.json['error']
 
+    """ TEST GETGROUPCALENDAR """ 
+    def test_getgroupcalendar_good(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.get('/api/getgroupcalendar',headers=dict(
+            group_str_id=grp_resp['group_str_id'],
+            google_id=grp_resp['google_id'],
+        ))
+        raise NotImplemented
+
+    def test_getgroupcalendar_missing_grp(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.get('/api/getgroupcalendar',headers=dict(
+            google_id=grp_resp['google_id'],
+        ))
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'group_str_id' in resp.json['error']
+    
+    def test_getgroupcalendar_access(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.get('/api/getgroupcalendar',headers=dict(
+            group_str_id=grp_resp['group_str_id'],
+        ))
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'Access' in resp.json['error']
+
 if __name__ == "__main__":
     unittest.main(warnings='ignore')
