@@ -34,9 +34,25 @@ class MyTest(TestCase):
             access_token="accessToken",
             id_token=id_token
         ))
+        if resp.status_code != 201:
+            print(resp.json)
         assert resp.status_code == 201
         assert 'group_str_id' in resp.json
         assert 'google_id' in resp.json
+    
+    def test_creategroup_missing(self):
+        resp = self.client.post('/api/creategroup', json=dict(
+            from_date="2019-02-20",
+            to_date="2019-02-21",
+            from_time="10:00",
+            to_time="18:00",
+            meeting_length="01:00",
+            user_name="test_user",
+            access_token="accessToken",
+            id_token=id_token
+        ))
+        assert 'error' in resp.json
+        assert 'Missing' in resp.json['error']
 
 if __name__ == "__main__":
     unittest.main()
