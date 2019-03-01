@@ -19,7 +19,7 @@ class User(db.Model):
         self.access_token = access_token
 
     def __repr__(self):
-        return '<User %d %r>' % (self.id, self.name)
+        return '<User %r %d>' % (self.name, self.google_id)
 
 admin.add_view(ModelView(User, db.session))
 
@@ -53,6 +53,6 @@ class Planning_group(db.Model):
         self.owner = owner
 
     def __repr__(self):
-        return '<Group %d %r>' % (self.id, self.name)
+        return '<Group %r %r>' % (self.name, self.group_str_id)
 
 admin.add_view(ModelView(Planning_group, db.session))

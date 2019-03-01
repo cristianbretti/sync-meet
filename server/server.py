@@ -19,7 +19,6 @@ app = Flask(__name__, static_folder=static_folder_path, template_folder=template
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SECRET_KEY'] = config.MY_SECRET
 
-
 db.init_app(app)
 admin.init_app(app)
 
@@ -28,6 +27,11 @@ from flask_cors import CORS, cross_origin
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 """ end """
+
+def clean_db():
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
 
 """ API ENDPOINTS """
 # Example payload
@@ -196,4 +200,5 @@ def index(path):
     return render_template('index.html')
 
 if __name__ == '__main__':
+    # clean_db()
     app.run(port=5000, debug=True)
