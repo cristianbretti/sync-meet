@@ -22,6 +22,8 @@ class MyTest(TestCase):
         resp = self.client.get('/')
         assert resp.status_code == 200
     
+
+    """ TEST CREATE GROUP """
     def test_creategroup_good(self):
         resp = self.client.post('/api/creategroup', json=dict(
             group_name="test_group",
@@ -39,6 +41,7 @@ class MyTest(TestCase):
         assert resp.status_code == 201
         assert 'group_str_id' in resp.json
         assert 'google_id' in resp.json
+        return resp.json
     
     def test_creategroup_missing(self):
         resp = self.client.post('/api/creategroup', json=dict(
@@ -51,8 +54,95 @@ class MyTest(TestCase):
             access_token="accessToken",
             id_token=id_token
         ))
+        self.assert_400(resp)
         assert 'error' in resp.json
         assert 'Missing' in resp.json['error']
 
+    def test_creategroup_invalid_date(self):
+        resp = self.client.post('/api/creategroup', json=dict(
+            group_name="test_group",
+            from_date="20d19-02-20",
+            to_date="2019-02-21",
+            from_time="10:00",
+            to_time="18:00",
+            meeting_length="01:00",
+            user_name="test_user",
+            access_token="accessToken",
+            id_token=id_token
+        ))
+        self.assert_400(resp)
+        assert 'error' in resp.json
+        assert 'does not match' in resp.json['error']
+
+    def test_creategroup_long_name(self):
+        resp = self.client.post('/api/creategroup', json=dict(
+            group_name="test_group",
+            from_date="2019-02-20",
+            to_date="2019-02-21",
+            from_time="10:00",
+            to_time="18:00",
+            meeting_length="01:00",
+            user_name="this is a vey long name what the hell is going on",
+            access_token="accessToken",
+            id_token=id_token
+        ))
+        self.assert_400(resp)
+        assert 'error' in resp.json
+        assert 'too long' in resp.json['error']
+    
+    def test_creategroup_invalid_id_token(self):
+        resp = self.client.post('/api/creategroup', json=dict(
+            group_name="test_group",
+            from_date="2019-02-20",
+            to_date="2019-02-21",
+            from_time="10:00",
+            to_time="18:00",
+            meeting_length="01:00",
+            user_name="test_user",
+            access_token="accessToken",
+            id_token="invalid"
+        ))
+        self.assert_400(resp)
+        assert 'error' in resp.json
+        assert 'Could not authenticate' in resp.json['error']
+
+    """ TEST ADDUSER """ 
+    def test_adduser_good(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.post('/api/adduser',headers=dict(
+            group_str_id=grp_resp['group_str_id'],
+        ), json=dict(
+            name="test_user",
+            access_token="accesstoekn",
+            id_token=id_token
+        ))
+        self.assert200(resp)
+        assert 'google_id' in resp.json
+        assert resp.json['google_id'] == grp_resp['google_id']
+    
+    def test_adduser_access(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.post('/api/adduser', json=dict(
+            name="test_user",
+            access_token="accesstoekn",
+            id_token=id_token
+        ))
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'group_str_id' in resp.json['error']
+
+    def test_adduser_too_long(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.post('/api/adduser',headers=dict(
+            group_str_id=grp_resp['group_str_id'],
+        ), json=dict(
+            name="test_user with a name that is waaaay too long",
+            access_token="accesstoekn",
+            id_token=id_token
+        ))
+        self.assert400(resp)
+        assert 'error' in resp.json
+        assert 'too long' in resp.json['error']
+
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(warnings='ignore')
