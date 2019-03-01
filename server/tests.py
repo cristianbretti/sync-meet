@@ -1,10 +1,10 @@
 import os
 from flask_testing import TestCase
-from server import app, db, create_test_app
+from server import app, db, create_test_app, User, Planning_group
 import unittest
 
 
-id_token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImYyNGQ2YTE5MzA2NjljYjc1ZjE5NzBkOGI3NTRhYTE5M2YwZDkzMWYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiNDg2MTUxMDM3NzkxLXE1YXZnamY2cGM3M2QzOXYxdWFhbHRhOWgzaTBoYTJkLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiNDg2MTUxMDM3NzkxLXE1YXZnamY2cGM3M2QzOXYxdWFhbHRhOWgzaTBoYTJkLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE3ODMyMDczMTM1OTMyNjcwMTI4IiwiZW1haWwiOiJhbnRvbnN0YWdnZTk1QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiWUtsQWlBM0k1VHoya1VpaVktZHViQSIsIm5hbWUiOiJBbnRvbiBTdGFnZ2UiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy03VFpGNmRXVkZoZy9BQUFBQUFBQUFBSS9BQUFBQUFBQUFBQS9BQ0hpM3JkRkFnd3FxeFV6TGhVLUQyQWhlNzdUVUc5NTRRL3M5Ni1jL3Bob3RvLmpwZyIsImdpdmVuX25hbWUiOiJBbnRvbiIsImZhbWlseV9uYW1lIjoiU3RhZ2dlIiwibG9jYWxlIjoic3YiLCJpYXQiOjE1NTE0NTc2OTYsImV4cCI6MTU1MTQ2MTI5NiwianRpIjoiOTA1NmQzMzYxODA0ZjM4YzI4M2QxYmI5Yjc1YzJiN2E1MDMwMjVjYyJ9.ThrLubKw42dmyMMip4Nt77LapX6AGJNQ7MHVnnlOSyr68pDqAZ6Q49G9xnnruuPTt1yD4qCdRK-eF0WcFU6UNxlOg2VKtc88XQNzK-gyb1oxRqWOeqgRBbUQp4DMJzalSmASRDVyZSxsEmVd93a8RDaJr4n7_7sB0nHnZ3CbXc1l2-rgFn1qnNk4aDrn1rxrz9KVX5TYAIpxJECenZPw450jhFfw7gpPLeqGp08xqz1fmt5iw1Sf7gzwNYv6PVhSm92GpukaYRqFfI4uZMlNh-vgl4SIzz2Z0s7Zaumqs-Cb0fjnCSDHXA57ELxiXSZVvDp2fJ78Rrk1N_KZBWKyjQ"
+id_token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImYyNGQ2YTE5MzA2NjljYjc1ZjE5NzBkOGI3NTRhYTE5M2YwZDkzMWYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiNDg2MTUxMDM3NzkxLXE1YXZnamY2cGM3M2QzOXYxdWFhbHRhOWgzaTBoYTJkLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiNDg2MTUxMDM3NzkxLXE1YXZnamY2cGM3M2QzOXYxdWFhbHRhOWgzaTBoYTJkLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE3ODMyMDczMTM1OTMyNjcwMTI4IiwiZW1haWwiOiJhbnRvbnN0YWdnZTk1QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiM2tZZnR0WEJ6alJWaUpLdDRlVjV6USIsIm5hbWUiOiJBbnRvbiBTdGFnZ2UiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy03VFpGNmRXVkZoZy9BQUFBQUFBQUFBSS9BQUFBQUFBQUFBQS9BQ0hpM3JkRkFnd3FxeFV6TGhVLUQyQWhlNzdUVUc5NTRRL3M5Ni1jL3Bob3RvLmpwZyIsImdpdmVuX25hbWUiOiJBbnRvbiIsImZhbWlseV9uYW1lIjoiU3RhZ2dlIiwibG9jYWxlIjoic3YiLCJpYXQiOjE1NTE0NjE5MTYsImV4cCI6MTU1MTQ2NTUxNiwianRpIjoiYjYyMjVjMjM5OTc4N2I5YTJhNGE4ZDUzZTRiNTE3ZGFiMmE0NmE0ZiJ9.B9jUgY4xsHIFmxY3FMFelcWYkvNNUCySYG4TfO8V-C_XbgIblGv9IDdnQiPgJJTN0zWpDF9IXU2iewIV6ra0p1tZXM-rbEzpxtg_F603Bk2k-zHK92ipnLushup-TneY_t1v4IyuV-Tqo62ROgCoXmuAcknRqyRxZpviCeOzP7ORS8Qj7WmnFnyqK-VsfTVeXYNS0CLdUwy6-hcZhj_R8afQPuQObZTtZMUJCNugRi1Q9EF0p4iXgdlQfuTtBNvqeeZfkDoAuzC4gG4fhFuT6_l_kSPoKO8wECsvzcEFyN_J4yr4AhqC_5oloxhrvI86xZF5GBi6QRe1QEzDa8stew"
 
 class MyTest(TestCase):
     
@@ -20,7 +20,8 @@ class MyTest(TestCase):
 
     def test_index(self):
         resp = self.client.get('/')
-        assert resp.status_code == 200
+        assert b'html' in resp.data
+        self.assert200(resp)
     
 
     """ TEST CREATE GROUP """
@@ -41,6 +42,11 @@ class MyTest(TestCase):
         assert resp.status_code == 201
         assert 'group_str_id' in resp.json
         assert 'google_id' in resp.json
+        group = Planning_group.query.filter_by(group_str_id=resp.json['group_str_id']).first()
+        assert group is not None
+        assert group.name == 'test_group'
+        user = User.query.filter_by(name='test_user').first()
+        assert user is not None
         return resp.json
     
     def test_creategroup_missing(self):
@@ -113,18 +119,21 @@ class MyTest(TestCase):
             group_str_id=grp_resp['group_str_id'],
         ), json=dict(
             name="test_user",
-            access_token="accesstoekn",
+            access_token="access_token_new",
             id_token=id_token
         ))
         self.assert200(resp)
         assert 'google_id' in resp.json
         assert resp.json['google_id'] == grp_resp['google_id']
+        user = User.query.filter_by(name='test_user').first()
+        assert user is not None
+        assert user.access_token == 'access_token_new'
     
     def test_adduser_missing_grp(self):
         grp_resp = self.test_creategroup_good()
         resp = self.client.post('/api/adduser', json=dict(
             name="test_user",
-            access_token="accesstoekn",
+            access_token="access_token",
             id_token=id_token
         ))
         self.assert403(resp)
@@ -137,7 +146,7 @@ class MyTest(TestCase):
             group_str_id=grp_resp['group_str_id'],
         ), json=dict(
             name="test_user with a name that is waaaay too long",
-            access_token="accesstoekn",
+            access_token="access_token",
             id_token=id_token
         ))
         self.assert400(resp)
@@ -172,16 +181,23 @@ class MyTest(TestCase):
         self.assert403(resp)
         assert 'error' in resp.json
         assert 'Access' in resp.json['error']
+    
+    def test_getusersfromgroup_no_header(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.get('/api/getusersfromgroup')
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'Access' in resp.json['error']
 
     """ TEST GETGROUPCALENDAR """ 
     def test_getgroupcalendar_good(self):
         grp_resp = self.test_creategroup_good()
+        raise NotImplementedError
         resp = self.client.get('/api/getgroupcalendar',headers=dict(
             group_str_id=grp_resp['group_str_id'],
             google_id=grp_resp['google_id'],
         ))
-        raise NotImplemented
-
+        
     def test_getgroupcalendar_missing_grp(self):
         grp_resp = self.test_creategroup_good()
         resp = self.client.get('/api/getgroupcalendar',headers=dict(
@@ -196,6 +212,51 @@ class MyTest(TestCase):
         resp = self.client.get('/api/getgroupcalendar',headers=dict(
             group_str_id=grp_resp['group_str_id'],
         ))
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'Access' in resp.json['error']
+
+    def test_getgroupcalendar_no_header(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.get('/api/getgroupcalendar')
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'Access' in resp.json['error']
+
+    """ TEST REMOVE """ 
+    def test_remove_good(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.delete('/api/remove',headers=dict(
+            group_str_id=grp_resp['group_str_id'],
+            google_id=grp_resp['google_id'],
+        ))
+        assert resp.status_code == 202
+        group = Planning_group.query.filter_by(group_str_id=grp_resp['group_str_id']).first()
+        assert group is None
+        user = User.query.filter_by(name='test_user').first()
+        assert user is None
+    
+    def test_remove_missing_grp(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.delete('/api/remove',headers=dict(
+            google_id=grp_resp['google_id'],
+        ))
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'group_str_id' in resp.json['error']
+
+    def test_remove_access(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.delete('/api/remove',headers=dict(
+            group_str_id=grp_resp['group_str_id'],
+        ))
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'Access' in resp.json['error']
+
+    def test_remove_no_header(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.delete('/api/remove')
         self.assert403(resp)
         assert 'error' in resp.json
         assert 'Access' in resp.json['error']

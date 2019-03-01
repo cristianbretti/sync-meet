@@ -193,7 +193,7 @@ def remove(group=None):
                 group.users.remove(user)
                 attempt_delete_user(user)
             db.session.commit()
-            return "", 202
+            return (jsonify(""), 202)
     except APIError as e:
         return e.response, e.code
 
