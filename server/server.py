@@ -10,6 +10,8 @@ from contextlib import contextmanager
 from functools import wraps
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests
+from googleapiclient.discovery import build
+from oauth2client.client import AccessTokenCredentials
 import random
 import string
 
@@ -116,12 +118,13 @@ def require_login(func):
     def check_login(*args, **kwargs):
         try:
             if 'google_id' in session:
-                if session['google_id'] == request.headers['google_id']:
-                    return func(*args, **kwargs)
-            user = User.query.filter_by(google_id=request.headers['google_id']).first()
-            if user is None:
-                raise Exception
-            session['google_id'] = user.google_id
+                if session['google_id'] != request.headers['google_id']:
+                    raise Exception
+            else:
+                user = User.query.filter_by(google_id=request.headers['google_id']).first()
+                if user is None:
+                    raise Exception
+                session['google_id'] = user.google_id
         except:
             return jsonify({'error': "Access denied"}), 403
         return func(*args, **kwargs)
@@ -166,7 +169,12 @@ def create_or_find_user(id_token, name, auth_token):
 
 def get_calendar(auth_token):
     #TODO: get the calendar for a user towards the google API
-    return {'calendar': "temp"}
+    credentials = AccessTokenCredentials(auth_token, 'my-user-agent/1.0')
+    service = build('calendar', 'v3', credentials=credentials)
+    collection = service.calendarList()
+    google_request = collection.list()
+    response = google_request.execute()
+    return {'calendar': response}
 
 
 
