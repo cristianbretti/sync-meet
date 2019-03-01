@@ -62,3 +62,5 @@ typings/
 
 __pycache__
 *.pyc
+
+server/config.py
