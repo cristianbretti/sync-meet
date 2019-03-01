@@ -117,13 +117,14 @@ def require_login(func):
     @wraps(func) 
     def check_login(*args, **kwargs):
         try:
-            if 'google_id' in session:
-                if session['google_id'] != request.headers['google_id']:
-                    raise Exception
+            if 'google_id' in session and session['google_id'] == request.headers['google_id']:
+                # Authenticated by cookie
+                pass
             else:
                 user = User.query.filter_by(google_id=request.headers['google_id']).first()
                 if user is None:
                     raise Exception
+                # Authenticated by database, update cookie
                 session['google_id'] = user.google_id
         except:
             return jsonify({'error': "Access denied"}), 403
@@ -171,10 +172,8 @@ def get_calendar(auth_token):
     #TODO: get the calendar for a user towards the google API
     credentials = AccessTokenCredentials(auth_token, 'my-user-agent/1.0')
     service = build('calendar', 'v3', credentials=credentials)
-    collection = service.calendarList()
-    google_request = collection.list()
-    response = google_request.execute()
-    return {'calendar': response}
+    all_calendars = service.calendarList().list().execute()
+    return {'calendar': all_calendars}
 
 
 
