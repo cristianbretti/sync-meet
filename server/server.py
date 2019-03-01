@@ -251,8 +251,6 @@ def add_user(group=None):
             id_token = payload['id_token']
             auth_token = payload['auth_token']
             user = create_or_find_user(id_token, name, auth_token)
-            print(user.planning_group)
-            raise ValueError('temp')
             group.users.append(user)
             db.session.commit()
             return jsonify({'user_google_id': user.google_id}), 200
