@@ -19,7 +19,7 @@ class User(db.Model):
         self.access_token = access_token
 
     def __repr__(self):
-        return '<User %r %d>' % (self.name, self.google_id)
+        return '<User %r %r>' % (self.name, self.google_id)
 
 admin.add_view(ModelView(User, db.session))
 

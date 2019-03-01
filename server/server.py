@@ -3,10 +3,12 @@ from model import db, admin, User, Planning_group
 import config
 from helpers import *
 import os
+import tempfile
 import json
 from datetime import datetime
 import random
 import string
+from flask_cors import CORS, cross_origin # DEV ONLY
 
 # File paths
 root_path = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
@@ -17,21 +19,25 @@ template_folder_path = os.path.join(root_path, 'client', 'build')
 
 app = Flask(__name__, static_folder=static_folder_path, template_folder=template_folder_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = config.MY_SECRET
 
-db.init_app(app)
-admin.init_app(app)
-
 """ dev only """
-from flask_cors import CORS, cross_origin
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 """ end """
 
-def clean_db():
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
+def create_test_app(app):
+    app.config['TESTING'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(os.path.join(root_path, 'db', 'test.db'))
+    app.config['SECRET_KEY'] = "testsecret"
+
+    db.init_app(app)
+    return app
+
+def create_prod_app(app):
+    db.init_app(app)
+    admin.init_app(app)
 
 """ API ENDPOINTS """
 # Example payload
@@ -52,6 +58,8 @@ def create_group():
     try:
         with handle_exceptions():
             payload = request.json
+            if payload is None:
+                raise ValueError("Missing json body in post")
             # get group params
             group_name = payload['group_name']
             from_date = datetime.strptime(payload['from_date'], '%Y-%m-%d').date()
@@ -87,7 +95,7 @@ def create_group():
             db.session.commit()
             return jsonify({
                 'group_str_id': new_group.group_str_id,
-                'user_google_id': user.google_id
+                'google_id': user.google_id
                 }), 201
     except APIError as e:
         return e.response, e.code
@@ -116,7 +124,7 @@ def add_user(group=None):
             user = create_or_find_user(id_token, name, access_token)
             group.users.append(user)
             db.session.commit()
-            return jsonify({'user_google_id': user.google_id}), 200
+            return jsonify({'google_id': user.google_id}), 200
     except APIError as e:
         return e.response, e.code
 
@@ -199,6 +207,10 @@ def index(path):
     # session.permanent = True
     return render_template('index.html')
 
+
 if __name__ == '__main__':
-    # clean_db()
+    create_prod_app(app)
+    # with app.app_context():
+    #     db.drop_all()
+    #     db.create_all()
     app.run(port=5000, debug=True)
