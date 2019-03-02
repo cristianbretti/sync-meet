@@ -17,6 +17,12 @@ class APIError(Exception):
 
 @contextmanager
 def handle_exceptions():
+    """ Create a context that allows us to catch API
+    errors and handle them correctly.
+    Usage: 
+    with handle_exceptions():
+        do stuff
+    """
     try:
         yield
     except ValueError as e:
@@ -28,6 +34,9 @@ def handle_exceptions():
 
 
 def attempt_delete_user(user):
+    """ Deletes the user if it does
+    not belong to any group.
+    """
     if len(user.planning_group) == 0:
         db.session.delete(user)
         if user.google_id == session['google_id']:
@@ -35,6 +44,10 @@ def attempt_delete_user(user):
             session.pop('google_id', None)
 
 def require_login(func):
+    """ Function wrapper that authenticate the user by first 
+    checking session cookie. If not authenticated by cookie, 
+    authenticate with database.
+    """
     @wraps(func) 
     def check_login(*args, **kwargs):
         try:
@@ -53,6 +66,11 @@ def require_login(func):
     return check_login
 
 def require_group_str_id(func):
+    """ Function wrapper that finds the group
+    identified by the group_str_id in the 
+    request header. If no header is found, or the 
+    group is not found, return 403. 
+    """
     @wraps(func) 
     def check_group_str_id(*args, **kwargs):
         try:
@@ -67,6 +85,12 @@ def require_group_str_id(func):
 
 
 def create_or_find_user(id_token, name, access_token):
+    """ Input checking and id_token authentication towards
+    googles api to verify user identity. If the user already 
+    exists in the database, update the access_token and return 
+    said user. Otherwise create a new user. 
+    Also sets the sessios cookie for future authentication. 
+    """
     if len(name) > 30:
         raise ValueError("User name too long. Max 30 characters")
     # Validate google_id token
@@ -89,7 +113,10 @@ def create_or_find_user(id_token, name, access_token):
     session['google_id'] = new_user.google_id
     return new_user
 
-def get_calendar(access_token):
+def get_events(access_token, group):
+    """ Return all the events on ?all? calendars that matches the
+    time interval defined by group parameter. 
+    """
     #TODO: get the calendar for a user towards the google API
     credentials = AccessTokenCredentials(access_token, 'my-user-agent/1.0')
     service = build('calendar', 'v3', credentials=credentials)

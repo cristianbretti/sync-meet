@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 import random
 import string
-from flask_cors import CORS, cross_origin # DEV ONLY
+
 
 # File paths
 root_path = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
@@ -19,25 +19,32 @@ template_folder_path = os.path.join(root_path, 'client', 'build')
 
 app = Flask(__name__, static_folder=static_folder_path, template_folder=template_folder_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # To supress a warning
 app.config['SECRET_KEY'] = config.MY_SECRET
 
 """ dev only """
+from flask_cors import CORS, cross_origin
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 """ end """
 
+def create_prod_app(app):
+    """ Initialize the database and admin.
+    """
+    db.init_app(app)
+    admin.init_app(app)
+
 def create_test_app(app):
+    """ Sets up the correct config
+    for testing the app. 
+    Change the database used to test.db
+    and initialize it. 
+    """
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(os.path.join(root_path, 'db', 'test.db'))
     app.config['SECRET_KEY'] = "testsecret"
-
     db.init_app(app)
     return app
-
-def create_prod_app(app):
-    db.init_app(app)
-    admin.init_app(app)
 
 """ API ENDPOINTS """
 # Example payload
@@ -55,6 +62,13 @@ def create_prod_app(app):
 @app.route('/api/creategroup', methods=['POST'])
 @cross_origin() #dev only
 def create_group():
+    """ Creates a group with the owner being the user
+    that is included in the POST. 
+
+    Returns a json with:
+    group_str_id: 16 chars identifies the newly created group 
+    google_id: identifies the owner of the new group
+    """
     try:
         with handle_exceptions():
             payload = request.json
@@ -115,6 +129,12 @@ def create_group():
 @cross_origin() #dev only
 @require_group_str_id
 def add_user(group=None):
+    """ Adds a user to the group identified by
+    the group_str_id in the request header.
+
+    Returns json with:
+    google_id that identifies the user added to the group
+    """
     try:
         with handle_exceptions():
             payload = request.json
@@ -139,6 +159,12 @@ def add_user(group=None):
 @require_login
 @require_group_str_id
 def get_users_from_group(group=None):
+    """ Returns all the users in the group identified by 
+    the group_str_id in the request headers.
+    Id refers to id in our database, not google_id. 
+    This is because we use google_id as identification,
+    and can therefore not share it. 
+    """
     try:
         with handle_exceptions():
             users = [ {'name': user.name, 'id': user.id} for user in group.users]
@@ -161,9 +187,12 @@ def get_users_from_group(group=None):
 @require_login
 @require_group_str_id
 def get_group_calendar(group=None):
+    """ Returns time slots were all group
+    memebers are free. 
+    """
     try:
         with handle_exceptions():
-            calendars = [get_calendar(user.access_token) for user in group.users]
+            calendars = [get_events(user.access_token, group) for user in group.users]
             # TODO: calculate free time and return new calendar
             return jsonify({'calendar': calendars}), 200
     except APIError as e:
@@ -181,6 +210,13 @@ def get_group_calendar(group=None):
 @require_login
 @require_group_str_id
 def remove(group=None):
+    """ If the user is the owner of the group
+    remove all users from the group, delete users
+    if they don't belong to any other group, and 
+    then delete the group.
+    If the user is just a member, remove the user
+    from the group and try to delete the user. 
+    """
     try:
         with handle_exceptions():
             if group.owner.google_id == session['google_id']:
@@ -204,7 +240,8 @@ def remove(group=None):
 @app.route('/<path:path>')
 @cross_origin() #dev only
 def index(path):
-    # session.permanent = True
+    """ Renders the actual react webpage.
+    """
     return render_template('index.html')
 
 
