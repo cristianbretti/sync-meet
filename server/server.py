@@ -50,8 +50,8 @@ def create_test_app(app):
 # Example payload
 # {
 # 	"group_name":"test_group",
-# 	"from_date":"2019-02-20",
-# 	"to_date":"2019-02-21",
+# 	"from_date":"2019-11-20",
+# 	"to_date":"2019-11-21",
 # 	"from_time":"10:00",
 # 	"to_time":"18:00",
 # 	"meeting_length":"01:00",
@@ -81,6 +81,8 @@ def create_group():
             from_time = datetime.strptime(payload['from_time'], '%H:%M').time()
             to_time = datetime.strptime(payload['to_time'], '%H:%M').time()
             meeting_length = datetime.strptime(payload['meeting_length'], '%H:%M').time()
+            # input checking
+            validate_datetimes(from_date, to_date, from_time, to_time, meeting_length)
             # get user params
             user_name = payload['user_name']
             id_token = payload['id_token']

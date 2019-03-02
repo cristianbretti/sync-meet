@@ -1,6 +1,8 @@
 from flask import jsonify, session, request
 from model import db, User, Planning_group
 import config
+from datetime import datetime
+from datetime import timedelta
 from contextlib import contextmanager
 from functools import wraps
 from google.oauth2 import id_token as google_id_token
@@ -83,6 +85,14 @@ def require_group_str_id(func):
         return func(*args, **kwargs, group=group)
     return check_group_str_id
 
+
+def validate_datetimes(from_date, to_date, from_time, to_time, meeting_length):
+    if from_date < datetime.now().date():
+        raise ValueError("Cannot plan a meeting in the past")
+    if to_date < from_date or to_time <= from_time:
+        raise ValueError("Cannot plan a meeting going backwards in time")
+    if to_date > datetime.now().date() + timedelta(days=360):
+        raise ValueError("Cannot plan a meeting more than a year from now")
 
 def create_or_find_user(id_token, name, access_token):
     """ Input checking and id_token authentication towards
