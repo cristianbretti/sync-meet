@@ -193,7 +193,7 @@ def get_group_calendar(user=None, group=None):
     """
     try:
         with handle_exceptions():
-            calendars = [get_events(user.access_token, group) for user in group.users]
+            calendars = [get_events(g_user.access_token, group) for g_user in group.users]
             # TODO: calculate free time and return new calendar
             return jsonify({'calendar': calendars}), 200
     except APIError as e:
@@ -221,9 +221,9 @@ def remove(user=None, group=None):
     try:
         with handle_exceptions():
             if group.owner.google_id == user.google_id:
-                for user in group.users:
-                    group.users.remove(user)
-                    attempt_delete_user(user)
+                for g_user in group.users:
+                    group.users.remove(g_user)
+                    attempt_delete_user(g_user)
                 db.session.delete(group)
             else:
                 group.users.remove(user)
@@ -241,12 +241,15 @@ def remove(user=None, group=None):
 # {
 # 	"access_token":"test_token",
 # }
-@app.route('/api/updateaccesstoken', methods=['POST'])
+@app.route('/api/updateaccesstoken', methods=['PUT'])
 @require_login
 def update_access_token(user=None):
     try:
         with handle_exceptions():
-            user.access_token = request.json['access_token']
+            payload = request.json
+            if payload is None:
+                raise ValueError("Missing json body in post")
+            user.access_token = payload['access_token']
             return "", 200
     except APIError as e:
         return e.response, e.code

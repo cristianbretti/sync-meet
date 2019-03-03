@@ -331,5 +331,47 @@ class MyTest(TestCase):
         assert 'error' in resp.json
         assert 'Access' in resp.json['error']
 
+    """ UPDATEACCESSTOKEN TEST """
+    def test_update_access_token_good(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.put('/api/updateaccesstoken', headers=dict(
+            google_id=grp_resp['google_id']
+        ), json=dict(
+            access_token="new_access_token"
+        ))
+        self.assert200(resp)
+        user = User.query.filter_by(google_id=grp_resp['google_id']).first()
+        assert user is not None
+        assert user.access_token == "new_access_token"
+    
+    def test_update_access_token_access(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.put('/api/updateaccesstoken',json=dict(
+            access_token="new_access_token"
+        ))
+        self.assert403(resp)
+        assert 'error' in resp.json
+        assert 'Access' in resp.json['error']
+    
+    def test_update_access_token_missing(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.put('/api/updateaccesstoken', headers=dict(
+            google_id=grp_resp['google_id']
+        ))
+        self.assert400(resp)
+        assert 'error' in resp.json
+        assert 'Missing' in resp.json['error']
+
+    def test_update_access_token_wrong(self):
+        grp_resp = self.test_creategroup_good()
+        resp = self.client.put('/api/updateaccesstoken', headers=dict(
+            google_id=grp_resp['google_id']
+        ), json=dict(
+            accccccess_token="new_access_token"
+        ))
+        self.assert400(resp)
+        assert 'error' in resp.json
+        assert 'Missing' in resp.json['error']
+
 if __name__ == "__main__":
     unittest.main(warnings='ignore')
