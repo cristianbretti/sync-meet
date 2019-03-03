@@ -231,7 +231,27 @@ def remove(group=None):
                 group.users.remove(user)
                 attempt_delete_user(user)
             db.session.commit()
-            return (jsonify(""), 202)
+            return "", 202
+    except APIError as e:
+        return e.response, e.code
+
+# Example payload:
+# headers:
+# {
+#   "google_id":"user google id"
+# }
+# {
+# 	"access_token":"test_token",
+# }
+@app.route('/api/updateaccesstoken', methods=['POST'])
+@require_login
+def update_access_token():
+    try:
+        with handle_exceptions():
+            new_access_token = request.json['access_token']
+            user = User.query.filter_by(google_id=session['google_id']).first()
+            user.access_token = new_access_token
+            return "", 200
     except APIError as e:
         return e.response, e.code
 

@@ -53,6 +53,7 @@ def require_login(func):
     @wraps(func) 
     def check_login(*args, **kwargs):
         try:
+            print(session)
             if 'google_id' in session and session['google_id'] == request.headers['google_id']:
                 # Authenticated by cookie
                 pass
