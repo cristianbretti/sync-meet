@@ -1,4 +1,4 @@
-from flask import jsonify, session, request
+from flask import jsonify, request
 from model import db, User, Planning_group
 import config
 from datetime import datetime
@@ -41,31 +41,22 @@ def attempt_delete_user(user):
     """
     if len(user.planning_group) == 0:
         db.session.delete(user)
-        if user.google_id == session['google_id']:
-            # log out user
-            session.pop('google_id', None)
 
 def require_login(func):
-    """ Function wrapper that authenticate the user by first 
-    checking session cookie. If not authenticated by cookie, 
-    authenticate with database.
+    """ Function wrapper that finds the 
+    user is in the database. 
+    Returns 403 if user does not exist.
     """
     @wraps(func) 
     def check_login(*args, **kwargs):
         try:
-            print(session)
-            if 'google_id' in session and session['google_id'] == request.headers['google_id']:
-                # Authenticated by cookie
-                pass
-            else:
-                user = User.query.filter_by(google_id=request.headers['google_id']).first()
-                if user is None:
-                    raise Exception
-                # Authenticated by database, update cookie
-                session['google_id'] = user.google_id
+            # Authenticated with database
+            user = User.query.filter_by(google_id=request.headers['google_id']).first()
+            if user is None:
+                raise Exception
         except:
             return jsonify({'error': "Access denied"}), 403
-        return func(*args, **kwargs)
+        return func(*args, **kwargs, user=user)
     return check_login
 
 def require_group_str_id(func):
@@ -100,7 +91,6 @@ def create_or_find_user(id_token, name, access_token):
     googles api to verify user identity. If the user already 
     exists in the database, update the access_token and return 
     said user. Otherwise create a new user. 
-    Also sets the sessios cookie for future authentication. 
     """
     if len(name) > 30:
         raise ValueError("User name too long. Max 30 characters")
@@ -121,7 +111,6 @@ def create_or_find_user(id_token, name, access_token):
     else:
         # User found, update auth token
         new_user.access_token = access_token
-    session['google_id'] = new_user.google_id
     return new_user
 
 def get_events(access_token, group):

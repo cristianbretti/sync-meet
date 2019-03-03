@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify
 from model import db, admin, User, Planning_group
 import config
 from helpers import *
@@ -8,7 +8,6 @@ import json
 from datetime import datetime
 import random
 import string
-
 
 # File paths
 root_path = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
@@ -160,7 +159,7 @@ def add_user(group=None):
 @cross_origin() # dev only
 @require_login
 @require_group_str_id
-def get_users_from_group(group=None):
+def get_users_from_group(user=None, group=None):
     """ Returns all the users in the group identified by 
     the group_str_id in the request headers.
     Id refers to id in our database, not google_id. 
@@ -188,7 +187,7 @@ def get_users_from_group(group=None):
 @cross_origin() # dev only
 @require_login
 @require_group_str_id
-def get_group_calendar(group=None):
+def get_group_calendar(user=None, group=None):
     """ Returns time slots were all group
     memebers are free. 
     """
@@ -211,7 +210,7 @@ def get_group_calendar(group=None):
 @cross_origin() # dev only
 @require_login
 @require_group_str_id
-def remove(group=None):
+def remove(user=None, group=None):
     """ If the user is the owner of the group
     remove all users from the group, delete users
     if they don't belong to any other group, and 
@@ -221,13 +220,12 @@ def remove(group=None):
     """
     try:
         with handle_exceptions():
-            if group.owner.google_id == session['google_id']:
+            if group.owner.google_id == user.google_id:
                 for user in group.users:
                     group.users.remove(user)
                     attempt_delete_user(user)
                 db.session.delete(group)
             else:
-                user = User.query.filter_by(google_id=session['google_id']).first()
                 group.users.remove(user)
                 attempt_delete_user(user)
             db.session.commit()
@@ -245,12 +243,10 @@ def remove(group=None):
 # }
 @app.route('/api/updateaccesstoken', methods=['POST'])
 @require_login
-def update_access_token():
+def update_access_token(user=None):
     try:
         with handle_exceptions():
-            new_access_token = request.json['access_token']
-            user = User.query.filter_by(google_id=session['google_id']).first()
-            user.access_token = new_access_token
+            user.access_token = request.json['access_token']
             return "", 200
     except APIError as e:
         return e.response, e.code
