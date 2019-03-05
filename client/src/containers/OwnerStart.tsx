@@ -1,12 +1,15 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import logo from '../logo.svg';
 import '../App.css';
 import GoogleLogin from 'react-google-login';
 
 export const OwnerStart = () => {
+    const [googleAccessToken, setGoogleAccessToken] = useState("")
 
     const responseGoogle = (response: any) => {
-        console.log(response.Zi.access_token);
+        let token: string = response.Zi.access_token;
+        console.log(token);
+        setGoogleAccessToken(token)
     }
 
     return (
