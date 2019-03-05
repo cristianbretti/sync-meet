@@ -3,9 +3,12 @@ import logo from '../logo.svg';
 import '../App.css';
 import GoogleLogin from 'react-google-login';
 
-class OwnerStart extends Component {
+export const OwnerStart = () => {
 
-  render() {
+    const responseGoogle = (response: any) => {
+        console.log(response.Zi.access_token);
+    }
+
     return (
     <div className="text-center min-h-screen flex flex-col items-center justify-center bg-blue">
         <div className="p-5 text-white uppercase text-2xl">
@@ -21,12 +24,4 @@ class OwnerStart extends Component {
 
       </div>
     );
-  }
 }
-
-const responseGoogle = (response: any) => {
-  console.log(response.Zi.access_token);
-
-}
-
-export default OwnerStart;
