@@ -7,29 +7,18 @@ class OwnerStart extends Component {
 
   render() {
     return (
-      <div className="text-center">
-        <header className="App-header bg-blue">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to relo
-          </p>
-          <GoogleLogin
+    <div className="text-center min-h-screen flex flex-col items-center justify-center bg-blue">
+        <div className="p-5 text-white uppercase text-2xl">
+            Welcome to Sync Meet!
+        </div>
+        <GoogleLogin
             clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
-            buttonText="Login"
+            buttonText="Give access to Google Calendar"
             onSuccess={responseGoogle}
             onFailure={responseGoogle}
             cookiePolicy={'single_host_origin'}
-            scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}
-  />
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+            scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}/>
+
       </div>
     );
   }
