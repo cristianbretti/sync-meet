@@ -111,6 +111,7 @@ def create_or_find_user(id_token, name, access_token):
     else:
         # User found, update auth token
         new_user.access_token = access_token
+        new_user.name = name
     return new_user
 
 def get_events(access_token, group):
