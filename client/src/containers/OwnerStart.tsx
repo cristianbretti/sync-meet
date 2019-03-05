@@ -3,13 +3,22 @@ import logo from '../logo.svg';
 import '../App.css';
 import GoogleLogin from 'react-google-login';
 import {InputLabel} from '../components';
+import DatePicker from "react-datepicker";
+import { registerLocale, setDefaultLocale } from "react-datepicker";
+import sv from 'date-fns/locale/sv';
+import "react-datepicker/dist/react-datepicker.css";
+
+registerLocale('sv', sv);
+setDefaultLocale('sv');
 
 export const OwnerStart = () => {
     const [googleAccessToken, setGoogleAccessToken] = useState("")
     const [formValues, setFormValues] = useState({
         eventName: "",
-        eventStartDate: "",
-        eventEndDate: "",
+        startDate: new Date(),
+        endDate: new Date(),
+        startTime: new Date(),
+        endTime: new Date(),
     });
 
     const responseGoogle = (response: any) => {
@@ -45,9 +54,47 @@ export const OwnerStart = () => {
             <InputLabel text="Enter event name"/>
             <input className="p-2" type="text" name="eventName" value={formValues.eventName} onChange={handleChange}/>
             <InputLabel text="Enter start date"/>
-            <input className="p-2" type="text" name="eventDate" value={formValues.eventStartDate} onChange={handleChange}/>
+            <DatePicker
+                className="p-2"
+                selected={formValues.startDate}
+                selectsStart
+                startDate={formValues.startDate}
+                endDate={formValues.endDate}
+                dateFormat="yyyy/MM/dd"
+                onChange={(date: Date) => setFormValues({...formValues, ["startDate"]:date})}
+            />
             <InputLabel text="Enter end date"/>
-            <input className="p-2" type="text" name="eventDate" value={formValues.eventEndDate} onChange={handleChange}/>
+            <DatePicker
+                className="p-2"
+                selected={formValues.endDate}
+                selectsStart
+                startDate={formValues.startDate}
+                endDate={formValues.endDate}
+                dateFormat="yyyy/MM/dd"
+                onChange={(date: Date) => setFormValues({...formValues, ["endDate"]:date})}
+            />
+            <InputLabel text="Enter start time"/>
+            <DatePicker
+                className="p-2"
+                selected={formValues.startTime}
+                onChange={(date: Date) => setFormValues({...formValues, ["startTime"]:date})}
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={30}
+                dateFormat="HH:mm"
+                timeCaption="Time"
+            />
+            <InputLabel text="Enter end time"/>
+            <DatePicker
+                className="p-2"
+                selected={formValues.endTime}
+                onChange={(date: Date) => setFormValues({...formValues, ["endTime"]:date})}
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={30}
+                dateFormat="HH:mm"
+                timeCaption="Time"
+            />
             <button className="bg-white p-2 m-5" type="submit">Create Event</button>
         </form>
       </div>
