@@ -21,12 +21,13 @@ class API {
     }
 
     setReciveCallback = (callback: (msg: String) => void) => {
+        this.socket.off('message'); // remove all other listeners
         this.socket.on('message', callback);
     }
 
     request = (endpoint: String, method: "GET"|"POST"|"PUT"|"DELETE", body: any, callback: (responsObj: any) => void, errorCallback?: (error: any) => void) => {
         //TODO: change to just '/api/' + endpoint
-        fetch('http://localhost:5000/api/' + endpoint, {
+        fetch('http://localhost:5000' + '/api/' + endpoint, {
             method: method,
             headers: {
                 'Accept': 'application/json',
@@ -34,8 +35,8 @@ class API {
             },
             body: JSON.stringify(body),
 
-            credentials: 'include', // This is for dev only, user same-origin otherwise
-            mode: "cors", // This is for dev only, delete in prod
+            credentials: 'include', //TODO: dev only, use same-origin otherwise
+            mode: "cors", //TODO: dev only, delete otherwise
         })
         .then(handleErrors)
         .then(response => response.json())
