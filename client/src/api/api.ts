@@ -36,8 +36,6 @@ class API {
             method: method,
             headers: headers,
             body: JSON.stringify(body),
-
-            credentials: 'include', //TODO: dev only, use same-origin otherwise
             mode: "cors", //TODO: dev only, delete otherwise
         })
         .then(handleErrors)
