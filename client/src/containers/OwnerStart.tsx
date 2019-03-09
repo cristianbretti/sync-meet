@@ -49,7 +49,7 @@ class OwnerStart extends Component {
             id_token: response.getAuthResponse().id_token
         }
         
-        api.request('creategroup', "POST", data, response => {
+        api.request('creategroup', 'POST', {}, data, response => {
             console.log(response);
             api.join(response.group_str_id);
         },

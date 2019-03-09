@@ -15,24 +15,26 @@ class API {
     constructor() {
         console.log(location.href);
         this.socket = io.connect('http://localhost:5000'); // change to location.href
-        this.socket.on('message', (msg: String) => {
+        this.socket.on('message', (msg: string) => {
             console.log(msg);
         });
     }
 
-    setReciveCallback = (callback: (msg: String) => void) => {
+    setReciveCallback = (callback: (msg: string) => void) => {
         this.socket.off('message'); // remove all other listeners
         this.socket.on('message', callback);
     }
 
-    request = (endpoint: String, method: "GET"|"POST"|"PUT"|"DELETE", body: any, callback: (responsObj: any) => void, errorCallback?: (error: any) => void) => {
+    request = (endpoint: string, method: "GET"|"POST"|"PUT"|"DELETE", authentication: {google_id?: string, group_str_id?: string}, body: any, callback: (responsObj: any) => void, errorCallback?: (error: any) => void) => {
+        const headers = new Headers();
+        headers.append('Accept', 'application/json');
+        headers.append('Content-Type', 'application/json');
+        headers.append('google_id', authentication.google_id !== undefined ? authentication.google_id : '');
+        headers.append('group_str_id', authentication.group_str_id !== undefined ? authentication.group_str_id : '');
         //TODO: change to just '/api/' + endpoint
         fetch('http://localhost:5000' + '/api/' + endpoint, {
             method: method,
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
+            headers: headers,
             body: JSON.stringify(body),
 
             credentials: 'include', //TODO: dev only, use same-origin otherwise
@@ -47,9 +49,9 @@ class API {
     /**
      * Socket-io event emitters
      */
-    join = (group_str_id: String) => this.socket.emit('join', group_str_id);
-    leave = (group_str_id: String) => this.socket.emit('leave', group_str_id);
-    delete = (group_str_id: String) => this.socket.emit('delete', group_str_id);
+    join = (group_str_id: string) => this.socket.emit('join', group_str_id);
+    leave = (group_str_id: string) => this.socket.emit('leave', group_str_id);
+    delete = (group_str_id: string) => this.socket.emit('delete', group_str_id);
 }
 const api = new API();
 export default api;
