@@ -1,6 +1,5 @@
-from flask import Flask, render_template, request, jsonify, session
-from flask_session import Session
-from flask_socketio import SocketIO, send, join_room, leave_room, close_room
+from flask import Flask, render_template, request, jsonify
+from socket_io import sio
 from model import db, admin, User, Planning_group
 import config
 from helpers import *
@@ -22,12 +21,6 @@ app = Flask(__name__, static_folder=static_folder_path, template_folder=template
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # To supress a warning
 app.config['SECRET_KEY'] = config.MY_SECRET
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config['SESSION_COOKIE_NAME'] = 'session_id'
-
-Session(app)
-sio = SocketIO(manage_session=False)
-
 
 """ dev only """
 from flask_cors import CORS, cross_origin
@@ -54,27 +47,8 @@ def create_test_app(app):
     db.init_app(app)
     return app
 
-""" SOCKET IO """
-# @sio.on('message')
-# def handleMessage(msg):
-#     print('Message: ' + msg)
-#     send(msg, broadcast=True)
-
-@sio.on('connect')
-def connect_user():
-    session['sid'] = request.sid
-    session['namespace'] = request.namespace
-    print(session)
 
 """ API ENDPOINTS """
-
-@app.route('/api/test', methods=['POST'])
-def test():
-    print("IN HERE")
-    print(session)
-    session['test'] = request.json['test']
-    return jsonify("test"), 200
-
 # Example payload
 # {
 # 	"group_name":"test_group",
@@ -98,8 +72,6 @@ def create_group():
     """
     try:
         with handle_exceptions():
-            sid = session['sid']
-            namespace = session['namespace']
             payload = request.json
             if payload is None:
                 raise ValueError("Missing json body in post")
@@ -138,8 +110,6 @@ def create_group():
             db.session.commit()
             new_group.users.append(user)
             db.session.commit()
-            # Join the socket-io room 
-            join_room(new_group.group_str_id, sid=sid, namespace=namespace)
             return jsonify({
                 'group_str_id': new_group.group_str_id,
                 'google_id': user.google_id
@@ -169,10 +139,6 @@ def add_user(group=None):
     """
     try:
         with handle_exceptions():
-            if 'sid' not in session or 'namespace' not in session:
-                raise ValueError("Missing session values")
-            sid = session['sid']
-            namespace = session['namespace']
             payload = request.json
             if payload is None:
                 raise ValueError("Missing json body in post")
@@ -182,10 +148,6 @@ def add_user(group=None):
             user = create_or_find_user(id_token, name, access_token)
             group.users.append(user)
             db.session.commit()
-            # Join the socket-io room group_str_id
-            join_room(group.group_str_id, sid=sid, namespace=namespace)
-            # Notify all in that room
-            send("New user joined", room=group.group_str_id, sid=sid, namespace=namespace)
             return jsonify({'google_id': user.google_id}), 200
     except APIError as e:
         return e.response, e.code
@@ -258,22 +220,14 @@ def remove(user=None, group=None):
     """
     try:
         with handle_exceptions():
-            if 'sid' not in session or 'namespace' not in session:
-                raise ValueError("Missing session values")
-            sid = session['sid']
-            namespace = session['namespace']
             if group.owner.google_id == user.google_id:
                 for g_user in group.users:
                     group.users.remove(g_user)
                     attempt_delete_user(g_user)
                 db.session.delete(group)
-                # Close socket-io room 
-                close_room(group.group_str_id, sid=sid, namespace=namespace)
             else:
                 group.users.remove(user)
                 attempt_delete_user(user)
-                # Leave socket-io room
-                leave_room(group.group_str_id, sid=sid, namespace=namespace)
             db.session.commit()
             return "", 202
     except APIError as e:
