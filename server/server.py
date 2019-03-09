@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from flask_socketio import SocketIO, send, join_room, leave_room
 from model import db, admin, User, Planning_group
 import config
 from helpers import *
@@ -21,6 +22,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # To supress a warning
 app.config['SECRET_KEY'] = config.MY_SECRET
 
+sio = SocketIO()
+
 """ dev only """
 from flask_cors import CORS, cross_origin
 cors = CORS(app)
@@ -32,6 +35,7 @@ def create_prod_app(app):
     """
     db.init_app(app)
     admin.init_app(app)
+    sio.init_app(app)
 
 def create_test_app(app):
     """ Sets up the correct config
@@ -44,6 +48,13 @@ def create_test_app(app):
     app.config['SECRET_KEY'] = "testsecret"
     db.init_app(app)
     return app
+
+""" SOCKET IO """
+@sio.on('message')
+def handleMessage(msg):
+    print('Message: ' + msg)
+    send(msg, broadcast=True)
+
 
 """ API ENDPOINTS """
 # Example payload

@@ -36,7 +36,7 @@ class OwnerStart extends Component {
 }
 
 const responseGoogle = (response: any) => {
-  console.log(response.Zi.access_token);
+  console.log(response);
 
 }
 
