@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from socket_io import sio
 from model import db, admin, User, Planning_group
 import config
 from helpers import *
@@ -23,8 +24,8 @@ app.config['SECRET_KEY'] = config.MY_SECRET
 
 """ dev only """
 from flask_cors import CORS, cross_origin
-cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+cors = CORS(app, supports_credentials=True)
 """ end """
 
 def create_prod_app(app):
@@ -32,6 +33,7 @@ def create_prod_app(app):
     """
     db.init_app(app)
     admin.init_app(app)
+    sio.init_app(app)
 
 def create_test_app(app):
     """ Sets up the correct config
@@ -44,6 +46,7 @@ def create_test_app(app):
     app.config['SECRET_KEY'] = "testsecret"
     db.init_app(app)
     return app
+
 
 """ API ENDPOINTS """
 # Example payload
@@ -59,7 +62,6 @@ def create_test_app(app):
 #   "id_token":"googles long token id in response.getAuthResponse().id_token"
 # }
 @app.route('/api/creategroup', methods=['POST'])
-@cross_origin() #dev only
 def create_group():
     """ Creates a group with the owner being the user
     that is included in the POST. 
@@ -127,7 +129,6 @@ def create_group():
 #   "id_token":"googles long token id in response.getAuthResponse().id_token"
 # }
 @app.route('/api/adduser', methods=['POST'])
-@cross_origin() #dev only
 @require_group_str_id
 def add_user(group=None):
     """ Adds a user to the group identified by
@@ -139,6 +140,8 @@ def add_user(group=None):
     try:
         with handle_exceptions():
             payload = request.json
+            if payload is None:
+                raise ValueError("Missing json body in post")
             name = payload['name']
             id_token = payload['id_token']
             access_token = payload['access_token']
@@ -156,7 +159,6 @@ def add_user(group=None):
 #   "google_id":"user google id"
 # }
 @app.route('/api/getusersfromgroup')
-@cross_origin() # dev only
 @require_login
 @require_group_str_id
 def get_users_from_group(user=None, group=None):
@@ -184,7 +186,6 @@ def get_users_from_group(user=None, group=None):
 #   "google_id":"user google id"
 # }
 @app.route('/api/getgroupcalendar')
-@cross_origin() # dev only
 @require_login
 @require_group_str_id
 def get_group_calendar(user=None, group=None):
@@ -207,7 +208,6 @@ def get_group_calendar(user=None, group=None):
 #   "google_id":"user google id"
 # }
 @app.route('/api/remove', methods=['DELETE'])
-@cross_origin() # dev only
 @require_login
 @require_group_str_id
 def remove(user=None, group=None):
@@ -259,7 +259,6 @@ def update_access_token(user=None):
 # Has to be last route!
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-@cross_origin() #dev only
 def index(path):
     """ Renders the actual react webpage.
     """
@@ -271,4 +270,5 @@ if __name__ == '__main__':
     # with app.app_context():
     #     db.drop_all()
     #     db.create_all()
-    app.run(port=5000, debug=True)
+    # app.run(port=5000, debug=True)
+    sio.run(app, port=5000, debug=True)
