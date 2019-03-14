@@ -40,9 +40,9 @@ class OwnerStart extends Component {
         let data = {
             group_name:"test_group",
             from_date:"2019-03-20",
-            to_date:"2020-01-20",
-            from_time:"10:00",
-            to_time:"10:01",
+            to_date:"2019-03-24",
+            from_time:"08:00",
+            to_time:"18:01",
             meeting_length:"01:00",
             user_name:"test_user",
             access_token: response.getAuthResponse().access_token,

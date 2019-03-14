@@ -3,8 +3,8 @@ from socket_io import sio
 from model import db, admin, User, Planning_group
 import config
 from helpers import *
-import os
 import tempfile
+import os
 import json
 from datetime import datetime
 import random
@@ -179,6 +179,7 @@ def get_users_from_group(user=None, group=None):
         return e.response, e.code
 
 
+
 # Example payload
 # headers:
 # {
@@ -194,9 +195,11 @@ def get_group_calendar(user=None, group=None):
     """
     try:
         with handle_exceptions():
-            calendars = [get_events(g_user.access_token, group) for g_user in group.users]
-            # TODO: calculate free time and return new calendar
-            return jsonify({'calendar': calendars}), 200
+            all_events = []
+            for g_user in group.users:
+                all_events += get_events(g_user.access_token, group)
+            free_times = find_free_time(all_events, group)
+            return jsonify({'events': free_times}), 200
     except APIError as e:
         return e.response, e.code
 
