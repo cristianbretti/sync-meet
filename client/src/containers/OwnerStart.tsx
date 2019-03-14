@@ -3,7 +3,7 @@ import logo from '../logo.svg';
 import '../App.css';
 import GoogleLogin from 'react-google-login';
 import api from '../api/api';
-import {ErrorResponse, CreateGroupBody, Time, MyDate} from '../api/models';
+import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse} from '../api/models';
 
 class OwnerStart extends Component {
     render() {
@@ -49,7 +49,7 @@ class OwnerStart extends Component {
             access_token: response.getAuthResponse().access_token,
             id_token: response.getAuthResponse().id_token
         }
-        api.createGroup(data).then(resp => {
+        api.createGroup(data).then((resp: CreateGroupResponse) => {
             console.log(resp)
         })
         .catch((error: ErrorResponse) => {

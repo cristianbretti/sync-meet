@@ -61,14 +61,6 @@ export interface AddUserResponse {
     google_id: string;
 }
 
-interface localUser {
-    id: number;
-    name: string;
-}
-export interface GetUsersFromGroupResponse {
-    owner: localUser;
-    users: localUser[];
-}
 
 export interface CalendarEvent {
     date: MyDate;
@@ -76,8 +68,16 @@ export interface CalendarEvent {
     to_time: Time; 
 }
 
+export interface DBUser {
+    id: number;
+    name: string;
+}
+
 export interface GetGroupCalendarResponse {
     events: CalendarEvent[];
+    owner: DBUser;
+    users: DBUser[];
+    you: number;
 }
 
 export interface EmptyResponse {}

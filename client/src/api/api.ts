@@ -6,7 +6,6 @@ import {Time,
     CreateGroupBody,
     AddUserBody,
     AddUserResponse,
-    GetUsersFromGroupResponse,
     GetGroupCalendarResponse,
     EmptyResponse,
     UpdateAccessTokenBody,
@@ -82,10 +81,6 @@ class API {
                 this.join(group_str_id);
                 return resp;
             });
-    }
-
-    getUsersFromGroup = (google_id: string, group_str_id: string): Promise<GetUsersFromGroupResponse> => {
-        return this.request('getusersfromgroup', 'GET', {google_id: google_id, group_str_id: group_str_id}, {})
     }
 
     getGroupCalendar = (google_id: string, group_str_id: string): Promise<GetGroupCalendarResponse> => {

@@ -158,34 +158,6 @@ def add_user(group=None):
 #   "group_str_id":"the group str id from the address bar"
 #   "google_id":"user google id"
 # }
-@app.route('/api/getusersfromgroup')
-@require_login
-@require_group_str_id
-def get_users_from_group(user=None, group=None):
-    """ Returns all the users in the group identified by 
-    the group_str_id in the request headers.
-    Id refers to id in our database, not google_id. 
-    This is because we use google_id as identification,
-    and can therefore not share it. 
-    """
-    try:
-        with handle_exceptions():
-            users = [ {'name': user.name, 'id': user.id} for user in group.users]
-            return jsonify({
-                'users': users,
-                'owner': {'name': group.owner.name, 'id': group.owner.id}
-                }), 200
-    except APIError as e:
-        return e.response, e.code
-
-
-
-# Example payload
-# headers:
-# {
-#   "group_str_id":"the group str id from the address bar"
-#   "google_id":"user google id"
-# }
 @app.route('/api/getgroupcalendar')
 @require_login
 @require_group_str_id
@@ -195,11 +167,17 @@ def get_group_calendar(user=None, group=None):
     """
     try:
         with handle_exceptions():
+            users = [ {'name': user.name, 'id': user.id} for user in group.users]
             all_events = []
             for g_user in group.users:
                 all_events += get_events(g_user.access_token, group, user)
             free_times = find_free_time(all_events, group)
-            return jsonify({'events': free_times}), 200
+            return jsonify({
+                'events': free_times,
+                'users': users,
+                'owner': {'name': group.owner.name, 'id': group.owner.id},
+                'you': user.id,
+                }), 200
     except APIError as e:
         return e.response, e.code
 

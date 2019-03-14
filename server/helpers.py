@@ -148,7 +148,7 @@ def get_events(access_token, group, user):
                     'end': end,
                 })
     except:
-        raise ValueError("Access token expired for user: " + user.name)
+        raise ValueError("Access token expired for user: " + str(user.id))
     return all_events
 
 
