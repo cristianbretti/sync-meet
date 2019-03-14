@@ -173,6 +173,7 @@ def get_group_calendar(user=None, group=None):
                 all_events += get_events(g_user.access_token, group, user)
             free_times = find_free_time(all_events, group)
             return jsonify({
+                'group': group.to_json(),
                 'events': free_times,
                 'users': users,
                 'owner': {'name': group.owner.name, 'id': group.owner.id},
@@ -210,7 +211,7 @@ def remove(user=None, group=None):
                 group.users.remove(user)
                 attempt_delete_user(user)
             db.session.commit()
-            return "", 202
+            return jsonify({}), 202
     except APIError as e:
         return e.response, e.code
 
@@ -231,7 +232,7 @@ def update_access_token(user=None):
             if payload is None:
                 raise ValueError("Missing json body in post")
             user.access_token = payload['access_token']
-            return "", 200
+            return jsonify({}), 200
     except APIError as e:
         return e.response, e.code
 

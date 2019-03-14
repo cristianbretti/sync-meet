@@ -3,7 +3,7 @@ import logo from '../logo.svg';
 import '../App.css';
 import GoogleLogin from 'react-google-login';
 import api from '../api/api';
-import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse} from '../api/models';
+import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse, GetGroupCalendarResponse, EmptyResponse} from '../api/models';
 
 class OwnerStart extends Component {
     render() {
@@ -36,8 +36,8 @@ class OwnerStart extends Component {
     }
     }
 
-    const responseGoogle = (response: any) => {
-        console.log(response);
+    const responseGoogle = (googleResponse: any) => {
+        console.log(googleResponse);
         let data: CreateGroupBody = {
             group_name:"test_group",
             from_date: new MyDate("2019-03-20"),
@@ -46,11 +46,20 @@ class OwnerStart extends Component {
             to_time: new Time("18:01"),
             meeting_length: new Time("01:00"),
             user_name:"test_user",
-            access_token: response.getAuthResponse().access_token,
-            id_token: response.getAuthResponse().id_token
+            access_token: googleResponse.getAuthResponse().access_token,
+            id_token: googleResponse.getAuthResponse().id_token
         }
-        api.createGroup(data).then((resp: CreateGroupResponse) => {
-            console.log(resp)
+        api.createGroup(data)
+        .then((createGroupResponse: CreateGroupResponse) => {
+            console.log(createGroupResponse)
+            api.getGroupCalendar(createGroupResponse.google_id, createGroupResponse.group_str_id)
+            .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
+                console.log(getGroupCalendarResponse);
+                api.remove(true, createGroupResponse.google_id, createGroupResponse.group_str_id)
+                .then((removeResponse: EmptyResponse) => {
+                    console.log(removeResponse);
+                })
+            })
         })
         .catch((error: ErrorResponse) => {
             console.error(error)

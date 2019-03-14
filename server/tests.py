@@ -236,6 +236,13 @@ class MyTest(TestCase):
         assert len(resp.json['users']) == 1
         assert 'events' in resp.json
         assert 'you' in resp.json
+        assert 'group' in resp.json
+        assert resp.json['group']['name'] == "test_group"
+        assert resp.json['group']['from_date'] == from_date
+        assert resp.json['group']['from_time'] == from_time
+        assert resp.json['group']['to_date'] == to_date
+        assert resp.json['group']['to_time'] == to_time
+        assert resp.json['group']['meeting_length'] == meeting_length
 
     def test_getgroupcalendar_missing_grp(self):
         grp_resp = self.test_creategroup_good()

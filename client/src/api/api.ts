@@ -41,19 +41,25 @@ class API {
         this.socket.on('message', callback);
     }
 
-    request = (endpoint: string, method: "GET"|"POST"|"PUT"|"DELETE", authentication: {google_id?: string, group_str_id?: string}, body: any) => {
+    request = (endpoint: string, method: "GET"|"POST"|"PUT"|"DELETE", authentication: {google_id?: string, group_str_id?: string}, body?: any) => {
         const headers = new Headers();
         headers.append('Accept', 'application/json');
         headers.append('Content-Type', 'application/json');
         headers.append('google_id', authentication.google_id !== undefined ? authentication.google_id : '');
         headers.append('group_str_id', authentication.group_str_id !== undefined ? authentication.group_str_id : '');
-        //TODO: change to just '/api/' + endpoint
-        return fetch('http://localhost:5000' + '/api/' + endpoint, {
+
+        let options: RequestInit = {
             method: method,
             headers: headers,
-            body: JSON.stringify(body),
             mode: "cors", //TODO: dev only, delete otherwise
-        })
+        }
+
+        if (body !== undefined) {
+            options = {...options, body: JSON.stringify(body)}
+        }
+
+        //TODO: change to just '/api/' + endpoint
+        return fetch('http://localhost:5000' + '/api/' + endpoint, options)
         .then(handleErrors)
         .then(response => response.json())
     }
@@ -84,11 +90,11 @@ class API {
     }
 
     getGroupCalendar = (google_id: string, group_str_id: string): Promise<GetGroupCalendarResponse> => {
-        return this.request('getgroupcalendar', 'GET', {google_id: google_id, group_str_id: group_str_id}, {})
+        return this.request('getgroupcalendar', 'GET', {google_id: google_id, group_str_id: group_str_id})
     }
 
     remove = (owner: boolean, google_id: string, group_str_id: string): Promise<EmptyResponse> => {
-        return this.request('remove', 'DELETE', {google_id: google_id, group_str_id: group_str_id}, {})
+        return this.request('remove', 'DELETE', {google_id: google_id, group_str_id: group_str_id})
             .then(resp => {
                 if (owner) {
                     this.delete(group_str_id);

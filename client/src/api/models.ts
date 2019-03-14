@@ -73,11 +73,21 @@ export interface DBUser {
     name: string;
 }
 
+export interface Group {
+    name: string;
+    from_date: MyDate;
+    to_date: MyDate;
+    from_time: Time;
+    to_time: Time;
+    meeting_length: Time;
+}
+
 export interface GetGroupCalendarResponse {
     events: CalendarEvent[];
     owner: DBUser;
     users: DBUser[];
     you: number;
+    group: Group;
 }
 
 export interface EmptyResponse {}
