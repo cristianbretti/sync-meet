@@ -3,6 +3,7 @@ import logo from '../logo.svg';
 import '../App.css';
 import GoogleLogin from 'react-google-login';
 import api from '../api/api';
+import {ErrorResponse, CreateGroupBody, Time, MyDate} from '../api/models';
 
 class OwnerStart extends Component {
     render() {
@@ -37,24 +38,22 @@ class OwnerStart extends Component {
 
     const responseGoogle = (response: any) => {
         console.log(response);
-        let data = {
+        let data: CreateGroupBody = {
             group_name:"test_group",
-            from_date:"2019-03-20",
-            to_date:"2019-03-24",
-            from_time:"08:00",
-            to_time:"18:01",
-            meeting_length:"01:00",
+            from_date: new MyDate("2019-03-20"),
+            to_date: new MyDate("2019-03-24"),
+            from_time: new Time("08:00"),
+            to_time: new Time("18:01"),
+            meeting_length: new Time("01:00"),
             user_name:"test_user",
             access_token: response.getAuthResponse().access_token,
             id_token: response.getAuthResponse().id_token
         }
-        
-        api.request('creategroup', 'POST', {}, data, response => {
-            console.log(response);
-            api.join(response.group_str_id);
-        },
-        error => {
-            console.log(error)
+        api.createGroup(data).then(resp => {
+            console.log(resp)
+        })
+        .catch((error: ErrorResponse) => {
+            console.error(error)
         })
     }
 

@@ -11,7 +11,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     google_id = db.Column(db.String(30), unique=True)
     name = db.Column(db.String(30))
-    access_token = db.Column(db.String(30))
+    access_token = db.Column(db.String(250))
 
     def __init__(self, google_id, name, access_token):
         self.google_id = google_id

@@ -17,3 +17,7 @@ def on_leave(group_str_id):
 def on_delete(group_str_id):
     send("Group is deleted", room=group_str_id)
     close_room(group_str_id)
+
+@sio.on('update')
+def on_update(group_str_id):
+    send("User updated access_token", room=group_str_id)

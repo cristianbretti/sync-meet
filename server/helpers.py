@@ -116,7 +116,7 @@ def create_or_find_user(id_token, name, access_token):
         new_user.name = name
     return new_user
 
-def get_events(access_token, group):
+def get_events(access_token, group, user):
     """ Return all the events on calendars that matches the
     time interval defined by group parameter. 
     """
@@ -148,7 +148,7 @@ def get_events(access_token, group):
                     'end': end,
                 })
     except:
-        raise ValueError("Access token expired")
+        raise ValueError("Access token expired for user: " + user.name)
     return all_events
 
 

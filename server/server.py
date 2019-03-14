@@ -197,7 +197,7 @@ def get_group_calendar(user=None, group=None):
         with handle_exceptions():
             all_events = []
             for g_user in group.users:
-                all_events += get_events(g_user.access_token, group)
+                all_events += get_events(g_user.access_token, group, user)
             free_times = find_free_time(all_events, group)
             return jsonify({'events': free_times}), 200
     except APIError as e:
