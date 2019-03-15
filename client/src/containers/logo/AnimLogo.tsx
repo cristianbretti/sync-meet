@@ -8,8 +8,12 @@ import N from '../../resources/images/N.png';
 import E from '../../resources/images/E.png';
 import E2 from '../../resources/images/E2.png';
 
-const AnimLogo: React.SFC = () => {
-    return <div className="test">
+interface AnimLogoProps {
+    className?: string;
+}
+
+const AnimLogo: React.SFC<AnimLogoProps> = ({className}) => {
+    return <div className={className + " flex flex-col items-center"}>
         <div className="logo-top"><img src={top} alt="top"/></div>
         <div className="flex justify-center">
             <div><img src={left} alt="left"/></div>

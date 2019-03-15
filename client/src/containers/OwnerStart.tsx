@@ -3,11 +3,12 @@ import GoogleLogin from 'react-google-login';
 import api from '../api/api';
 import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse, GetGroupCalendarResponse, EmptyResponse} from '../api/models';
 import AnimLogo from './logo/AnimLogo';
+import Logo from './logo/Logo';
 
 class OwnerStart extends Component {
     render() {
         return (
-        <div className="text-center">
+        <div className="flex flex-col items-center">
             <AnimLogo />
             <GoogleLogin
                 clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
@@ -17,10 +18,10 @@ class OwnerStart extends Component {
                 cookiePolicy={'single_host_origin'}
                 scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}
             />
-        </div>
-        );
+            <Logo className="w-16"/>
+        </div>);
     }
-    }
+}
 
     const responseGoogle = (googleResponse: any) => {
         console.log(googleResponse);
