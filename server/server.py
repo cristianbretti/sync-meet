@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from socket_io import sio
 from model import db, admin, User, Planning_group
 import config
@@ -235,6 +235,10 @@ def update_access_token(user=None):
             return jsonify({}), 200
     except APIError as e:
         return e.response, e.code
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(template_folder_path, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # Catch all routes and host index
 # So that we don't need browser router
