@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from socket_io import sio
 from model import db, admin, User, Planning_group
 import config
 from helpers import *
-import os
 import tempfile
+import os
 import json
 from datetime import datetime
 import random
@@ -158,33 +158,6 @@ def add_user(group=None):
 #   "group_str_id":"the group str id from the address bar"
 #   "google_id":"user google id"
 # }
-@app.route('/api/getusersfromgroup')
-@require_login
-@require_group_str_id
-def get_users_from_group(user=None, group=None):
-    """ Returns all the users in the group identified by 
-    the group_str_id in the request headers.
-    Id refers to id in our database, not google_id. 
-    This is because we use google_id as identification,
-    and can therefore not share it. 
-    """
-    try:
-        with handle_exceptions():
-            users = [ {'name': user.name, 'id': user.id} for user in group.users]
-            return jsonify({
-                'users': users,
-                'owner': {'name': group.owner.name, 'id': group.owner.id}
-                }), 200
-    except APIError as e:
-        return e.response, e.code
-
-
-# Example payload
-# headers:
-# {
-#   "group_str_id":"the group str id from the address bar"
-#   "google_id":"user google id"
-# }
 @app.route('/api/getgroupcalendar')
 @require_login
 @require_group_str_id
@@ -194,9 +167,18 @@ def get_group_calendar(user=None, group=None):
     """
     try:
         with handle_exceptions():
-            calendars = [get_events(g_user.access_token, group) for g_user in group.users]
-            # TODO: calculate free time and return new calendar
-            return jsonify({'calendar': calendars}), 200
+            users = [ {'name': user.name, 'id': user.id} for user in group.users]
+            all_events = []
+            for g_user in group.users:
+                all_events += get_events(g_user.access_token, group, user)
+            free_times = find_free_time(all_events, group)
+            return jsonify({
+                'group': group.to_json(),
+                'events': free_times,
+                'users': users,
+                'owner': {'name': group.owner.name, 'id': group.owner.id},
+                'you': user.id,
+                }), 200
     except APIError as e:
         return e.response, e.code
 
@@ -229,7 +211,7 @@ def remove(user=None, group=None):
                 group.users.remove(user)
                 attempt_delete_user(user)
             db.session.commit()
-            return "", 202
+            return jsonify({}), 202
     except APIError as e:
         return e.response, e.code
 
@@ -250,9 +232,13 @@ def update_access_token(user=None):
             if payload is None:
                 raise ValueError("Missing json body in post")
             user.access_token = payload['access_token']
-            return "", 200
+            return jsonify({}), 200
     except APIError as e:
         return e.response, e.code
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(template_folder_path, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # Catch all routes and host index
 # So that we don't need browser router

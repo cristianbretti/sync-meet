@@ -5,7 +5,8 @@ import unittest
 from datetime import datetime
 from datetime import timedelta
 
-id_token = "eyJhbGciOiJSUzI1NiIsImtpZCI6ImNmMDIyYTQ5ZTk3ODYxNDhhZDBlMzc5Y2M4NTQ4NDRlMzZjM2VkYzEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiNDg2MTUxMDM3NzkxLXE1YXZnamY2cGM3M2QzOXYxdWFhbHRhOWgzaTBoYTJkLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiNDg2MTUxMDM3NzkxLXE1YXZnamY2cGM3M2QzOXYxdWFhbHRhOWgzaTBoYTJkLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE3ODMyMDczMTM1OTMyNjcwMTI4IiwiZW1haWwiOiJhbnRvbnN0YWdnZTk1QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoibmxxX0xBUnVveXA5WUE5U2I3d2MyZyIsIm5hbWUiOiJBbnRvbiBTdGFnZ2UiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy03VFpGNmRXVkZoZy9BQUFBQUFBQUFBSS9BQUFBQUFBQUFBQS9BQ0hpM3JkRkFnd3FxeFV6TGhVLUQyQWhlNzdUVUc5NTRRL3M5Ni1jL3Bob3RvLmpwZyIsImdpdmVuX25hbWUiOiJBbnRvbiIsImZhbWlseV9uYW1lIjoiU3RhZ2dlIiwibG9jYWxlIjoic3YiLCJpYXQiOjE1NTIxNDA2OTIsImV4cCI6MTU1MjE0NDI5MiwianRpIjoiMDM0OWJhNDk2NDFlODFiNzA1OGMwYjU5ZjlkZTRjYWRlMDA4MzE3OCJ9.SKSlKud1iQrXDoZvaH1cCOClpZojRRlzOOafwHcSMgA6RAfIInEJ2RFfefsDyazvTqz4rGc2CwQ8uymSoaCnutDL5BSztkUHIF5JYP5_ueP5n1Dh1eL49Z5fVO5vO7m31_cigGD25gSMBrUT_uaBB1MRpgiTUo6FBF0xqcVGZs8rLjoItid5h12PLkTXg2VLVSmQiKeJK6Nv-I2GaUqGNP4sOPEgTnMNcc7ogn9i-WEtPgUbPFG14KG965Ww8vr9GUlfv7f3lnQZ3jzQPpnALZu0vkspsERULc1RrvPaFMHpkgXiX4pn8-L0z7ocduSCdP2jjHWuU6QB4MydJHJ8ag"
+id_token = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjVmZTJkNTQxYTQyODJiN2FlMzYyOGZhMDc0ZGQ4YmVhNmRhNWIxOWIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiNDg2MTUxMDM3NzkxLXE1YXZnamY2cGM3M2QzOXYxdWFhbHRhOWgzaTBoYTJkLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiNDg2MTUxMDM3NzkxLXE1YXZnamY2cGM3M2QzOXYxdWFhbHRhOWgzaTBoYTJkLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTE3ODMyMDczMTM1OTMyNjcwMTI4IiwiZW1haWwiOiJhbnRvbnN0YWdnZTk1QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdF9oYXNoIjoiVnJmLUJEdmNaUnp3VmRtNlRfanNlUSIsIm5hbWUiOiJBbnRvbiBTdGFnZ2UiLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy03VFpGNmRXVkZoZy9BQUFBQUFBQUFBSS9BQUFBQUFBQUFBQS9BQ0hpM3JkRkFnd3FxeFV6TGhVLUQyQWhlNzdUVUc5NTRRL3M5Ni1jL3Bob3RvLmpwZyIsImdpdmVuX25hbWUiOiJBbnRvbiIsImZhbWlseV9uYW1lIjoiU3RhZ2dlIiwibG9jYWxlIjoic3YiLCJpYXQiOjE1NTI1NTkzMTksImV4cCI6MTU1MjU2MjkxOSwianRpIjoiMTQwN2FiZjZhMTMzYjcwYjViMmM5ODUwZWVkNjJjNDNmNjg2NWRkMSJ9.ORsadW67Uz_CBP1DCjqyE0y8eDRxFN-B7R17y52VV7kV5KOpPcf0yOTXFvJDlqO75mXDQGrSViI-A5VB3jBnwbixnyBLvuZbzLavR7XURik-gTBffsUHJaSrcMpZaadRbxxO5J47S5GrSukv3SvqyB37pycCQLyWgbny15jy84c98PtsR7Rg_mAvlXEUqpPyqfozrU0_VJPW7wtglHKOFoEHbAh6rrjGmj8V8i38NG_RwSObgAA2MshCjSqdEC_rWcGQz0wr3uqz2vkhW0nu-9TuoYLQSgzE-Uf8SSMfFVnbe5z-eAF4398XYjnLL8ULvXXsA0BYp15H9BRfMF_U8Q"
+access_token = "ya29.GmXMBlouLRX-uQEabXa_hEjDRbJeMYa6hATcub166f8gnt4cDRgCGQt70VMvRFMfjLRmgfKlLttAdhogPK6Eh7mB8QPT2i4bmrbdcpq5vIOeWMg72rcRBHuOJyrG6iNWx10PVBoLuw"
 from_date = str(datetime.now().date())
 to_date = str((datetime.now() + timedelta(days=1)).date())
 from_time = str(datetime.now().time())[:5]
@@ -40,7 +41,7 @@ class MyTest(TestCase):
             to_time=to_time,
             meeting_length=meeting_length,
             user_name="test_user",
-            access_token="accessToken",
+            access_token=access_token,
             id_token=id_token
         ))
         if resp.status_code != 201:
@@ -63,7 +64,7 @@ class MyTest(TestCase):
             to_time=to_time,
             meeting_length=meeting_length,
             user_name="test_user",
-            access_token="accessToken",
+            access_token=access_token,
             id_token=id_token
         ))
         self.assert_400(resp)
@@ -79,7 +80,7 @@ class MyTest(TestCase):
             to_time=to_time,
             meeting_length=meeting_length,
             user_name="test_user",
-            access_token="accessToken",
+            access_token=access_token,
             id_token=id_token
         ))
         self.assert_400(resp)
@@ -95,7 +96,7 @@ class MyTest(TestCase):
             to_time=to_time,
             meeting_length=meeting_length,
             user_name="this is a vey long name what the hell is going on",
-            access_token="accessToken",
+            access_token=access_token,
             id_token=id_token
         ))
         self.assert_400(resp)
@@ -111,7 +112,7 @@ class MyTest(TestCase):
             to_time=to_time,
             meeting_length=meeting_length,
             user_name="test_user",
-            access_token="accessToken",
+            access_token=access_token,
             id_token="invalid"
         ))
         self.assert_400(resp)
@@ -127,7 +128,7 @@ class MyTest(TestCase):
             to_time=to_time,
             meeting_length=meeting_length,
             user_name="test_user",
-            access_token="accessToken",
+            access_token=access_token,
             id_token=id_token
         ))
         self.assert400(resp)
@@ -143,7 +144,7 @@ class MyTest(TestCase):
             to_time=to_time,
             meeting_length=meeting_length,
             user_name="test_user",
-            access_token="accessToken",
+            access_token=access_token,
             id_token=id_token
         ))
         self.assert400(resp)
@@ -159,7 +160,7 @@ class MyTest(TestCase):
             to_time="11:59",
             meeting_length=meeting_length,
             user_name="test_user",
-            access_token="accessToken",
+            access_token=access_token,
             id_token=id_token
         ))
         self.assert400(resp)
@@ -175,7 +176,7 @@ class MyTest(TestCase):
             to_time=to_time,
             meeting_length=meeting_length,
             user_name="test_user",
-            access_token="accessToken",
+            access_token=access_token,
             id_token=id_token
         ))
         self.assert400(resp)
@@ -223,51 +224,26 @@ class MyTest(TestCase):
         assert 'error' in resp.json
         assert 'too long' in resp.json['error']
 
-    """ TEST GETUSERFROMGROUP """ 
-    def test_getusersfromgroup_good(self):
+    """ TEST GETGROUPCALENDAR """ 
+    def test_getgroupcalendar_good(self):
         grp_resp = self.test_creategroup_good()
-        resp = self.client.get('/api/getusersfromgroup',headers=dict(
+        resp = self.client.get('/api/getgroupcalendar',headers=dict(
             group_str_id=grp_resp['group_str_id'],
             google_id=grp_resp['google_id'],
         ))
         self.assert200(resp)
         assert 'owner' in resp.json
         assert len(resp.json['users']) == 1
+        assert 'events' in resp.json
+        assert 'you' in resp.json
+        assert 'group' in resp.json
+        assert resp.json['group']['name'] == "test_group"
+        assert resp.json['group']['from_date'] == from_date
+        assert resp.json['group']['from_time'] == from_time
+        assert resp.json['group']['to_date'] == to_date
+        assert resp.json['group']['to_time'] == to_time
+        assert resp.json['group']['meeting_length'] == meeting_length
 
-    def test_getusersfromgroup_missing_grp(self):
-        grp_resp = self.test_creategroup_good()
-        resp = self.client.get('/api/getusersfromgroup',headers=dict(
-            google_id=grp_resp['google_id'],
-        ))
-        self.assert403(resp)
-        assert 'error' in resp.json
-        assert 'group_str_id' in resp.json['error']
-    
-    def test_getusersfromgroup_access(self):
-        grp_resp = self.test_creategroup_good()
-        resp = self.client.get('/api/getusersfromgroup',headers=dict(
-            group_str_id=grp_resp['group_str_id'],
-        ))
-        self.assert403(resp)
-        assert 'error' in resp.json
-        assert 'Access' in resp.json['error']
-    
-    def test_getusersfromgroup_no_header(self):
-        grp_resp = self.test_creategroup_good()
-        resp = self.client.get('/api/getusersfromgroup')
-        self.assert403(resp)
-        assert 'error' in resp.json
-        assert 'Access' in resp.json['error']
-
-    """ TEST GETGROUPCALENDAR """ 
-    def test_getgroupcalendar_good(self):
-        grp_resp = self.test_creategroup_good()
-        raise NotImplementedError
-        resp = self.client.get('/api/getgroupcalendar',headers=dict(
-            group_str_id=grp_resp['group_str_id'],
-            google_id=grp_resp['google_id'],
-        ))
-        
     def test_getgroupcalendar_missing_grp(self):
         grp_resp = self.test_creategroup_good()
         resp = self.client.get('/api/getgroupcalendar',headers=dict(
@@ -292,6 +268,26 @@ class MyTest(TestCase):
         self.assert403(resp)
         assert 'error' in resp.json
         assert 'Access' in resp.json['error']
+
+    def test_getgroupcalendar_access_token_bad(self):
+        grp_resp = self.client.post('/api/creategroup', json=dict(
+            group_name="test_group",
+            from_date=from_date,
+            to_date=to_date,
+            from_time=from_time,
+            to_time=to_time,
+            meeting_length=meeting_length,
+            user_name="test_user",
+            access_token="access_token_bad",
+            id_token=id_token
+        )).json
+        resp = self.client.get('/api/getgroupcalendar',headers=dict(
+            group_str_id=grp_resp['group_str_id'],
+            google_id=grp_resp['google_id'],
+        ))
+        self.assert400(resp)
+        assert 'error' in resp.json
+        assert 'expired' in resp.json['error']
 
     """ TEST REMOVE """ 
     def test_remove_good(self):

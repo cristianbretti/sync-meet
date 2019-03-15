@@ -12,3 +12,41 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+.logo-top {
+  margin-bottom: -4px;
+}
+
+.logo-letter {
+  margin-top: 4px;
+  animation: letter 3s ease-in-out infinite;
+}
+
+.logo-letter-containter {
+  animation: letterContainer 3s ease-in-out infinite;
+}
+
+@keyframes letterContainer {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes letter {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
