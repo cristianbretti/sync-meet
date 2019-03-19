@@ -27,12 +27,6 @@ export const OwnerStart = () => {
         lengthMinutes: 0,
     });
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        console.log("PRESS")
-        if (event) event.preventDefault();
-        console.log(formValues)
-    };
-
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         event.persist();
         setFormValues(values => ({ ...values, [event.target.name]: event.target.value }));
@@ -73,14 +67,7 @@ export const OwnerStart = () => {
         <div className="text-center min-h-screen flex flex-col items-center justify-center bg-blue">
             <AnimLogo />
             <Logo className="w-16"/>
-            <GoogleLogin
-                clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
-                buttonText="Give access to Google Calendar"
-                onSuccess={responseGoogle}
-                onFailure={responseGoogle}
-                cookiePolicy={'single_host_origin'}
-                scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}/>
-            <form className="flex flex-col justify-center items-center" onSubmit={handleSubmit}>
+            <div className="m-8 flex flex-col justify-center items-center">
                 <InputLabel text="Enter name"/>
                 <input className="p-2" type="text" name="name" value={formValues.name} onChange={handleChange}/>
                 <InputLabel text="Enter event name"/>
@@ -145,8 +132,14 @@ export const OwnerStart = () => {
                         onChange={handleChange}/>
                     <div className="text-white align-middle">M</div>
                 </div>
-                <button className="bg-white p-2 m-5" type="submit">Create Event</button>
-            </form>
+                <GoogleLogin
+                    clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
+                    buttonText="Give access and create event"
+                    onSuccess={responseGoogle}
+                    onFailure={responseGoogle}
+                    cookiePolicy={'single_host_origin'}
+                    scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}/>
+            </div>
         </div>
     );
 }
