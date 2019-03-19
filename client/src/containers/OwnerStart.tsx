@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import logo from '../logo.svg';
 import '../App.css';
 import GoogleLogin from 'react-google-login';
 import {InputLabel} from '../components';
@@ -7,12 +6,15 @@ import DatePicker from "react-datepicker";
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import sv from 'date-fns/locale/sv';
 import "react-datepicker/dist/react-datepicker.css";
+import api from '../api/api';
+import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse, GetGroupCalendarResponse, EmptyResponse} from '../api/models';
+import AnimLogo from './logo/AnimLogo';
+import Logo from './logo/Logo';
 
 registerLocale('sv', sv);
 setDefaultLocale('sv');
 
 export const OwnerStart = () => {
-    const [googleAccessToken, setGoogleAccessToken] = useState('')
     const [formValues, setFormValues] = useState({
         name: "",
         eventName: "",
@@ -23,12 +25,6 @@ export const OwnerStart = () => {
         lengthHours: 0,
         lengthMinutes: 0,
     });
-
-    const responseGoogle = (response: any) => {
-        let token: string = response.Zi.access_token;
-        console.log(token);
-        setGoogleAccessToken(token)
-    }
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         console.log("PRESS")
@@ -41,11 +37,41 @@ export const OwnerStart = () => {
         setFormValues(values => ({ ...values, [event.target.name]: event.target.value }));
     };
 
+
+    const responseGoogle = (googleResponse: any) => {
+        console.log(googleResponse);
+        let data: CreateGroupBody = {
+            group_name:"test_group",
+            from_date: new MyDate("2019-03-20"),
+            to_date: new MyDate("2019-03-24"),
+            from_time: new Time("08:00"),
+            to_time: new Time("18:01"),
+            meeting_length: new Time("01:00"),
+            user_name:"test_user",
+            access_token: googleResponse.getAuthResponse().access_token,
+            id_token: googleResponse.getAuthResponse().id_token
+        }
+        api.createGroup(data)
+        .then((createGroupResponse: CreateGroupResponse) => {
+            console.log(createGroupResponse)
+            api.getGroupCalendar(createGroupResponse.google_id, createGroupResponse.group_str_id)
+            .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
+                console.log(getGroupCalendarResponse);
+                api.remove(true, createGroupResponse.google_id, createGroupResponse.group_str_id)
+                .then((removeResponse: EmptyResponse) => {
+                    console.log(removeResponse);
+                })
+            })
+        })
+        .catch((error: ErrorResponse) => {
+            console.error(error)
+        })
+    }
+
     return (
         <div className="text-center min-h-screen flex flex-col items-center justify-center bg-blue">
-            <div className="p-5 text-white uppercase text-2xl">
-                Welcome to Sync Meet!
-            </div>
+            <AnimLogo />
+            <Logo className="w-16"/>
             <GoogleLogin
                 clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
                 buttonText="Give access to Google Calendar"

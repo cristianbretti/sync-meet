@@ -2,7 +2,8 @@ flask
 flask-sqlalchemy
 flask-admin
 flask-cors
-json
 google-api-python-client
 oauth2client
 Flask-Testing
+flask-socketio
+eventlet
