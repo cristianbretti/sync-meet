@@ -66,7 +66,6 @@ export const OwnerStart = () => {
     return (
         <div className="text-center min-h-screen flex flex-col items-center justify-center bg-blue">
             <AnimLogo />
-            <Logo className="w-16"/>
             <div className="m-8 flex flex-col justify-center items-center">
                 <InputLabel text="Enter name"/>
                 <input className="p-2" type="text" name="name" value={formValues.name} onChange={handleChange}/>
@@ -140,6 +139,7 @@ export const OwnerStart = () => {
                     cookiePolicy={'single_host_origin'}
                     scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}/>
             </div>
+            <Logo className="w-16"/>
         </div>
     );
 }
