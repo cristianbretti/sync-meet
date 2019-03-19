@@ -10,6 +10,7 @@ import api from '../api/api';
 import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse, GetGroupCalendarResponse, EmptyResponse} from '../api/models';
 import AnimLogo from './logo/AnimLogo';
 import Logo from './logo/Logo';
+import {DateToYYYYMMDD, DateToHHMM, HourAndMinuteToHHMM} from '../utils/helpers'
 
 registerLocale('sv', sv);
 setDefaultLocale('sv');
@@ -41,13 +42,13 @@ export const OwnerStart = () => {
     const responseGoogle = (googleResponse: any) => {
         console.log(googleResponse);
         let data: CreateGroupBody = {
-            group_name:"test_group",
-            from_date: new MyDate("2019-03-20"),
-            to_date: new MyDate("2019-03-24"),
-            from_time: new Time("08:00"),
-            to_time: new Time("18:01"),
-            meeting_length: new Time("01:00"),
-            user_name:"test_user",
+            group_name: formValues.eventName,
+            from_date: new MyDate(DateToYYYYMMDD(formValues.startDate)),
+            to_date: new MyDate(DateToYYYYMMDD(formValues.endDate)),
+            from_time: new Time(DateToHHMM(formValues.startTime)),
+            to_time: new Time(DateToHHMM(formValues.endTime)),
+            meeting_length: new Time(HourAndMinuteToHHMM(formValues.lengthHours, formValues.lengthMinutes)),
+            user_name: formValues.name,
             access_token: googleResponse.getAuthResponse().access_token,
             id_token: googleResponse.getAuthResponse().id_token
         }
