@@ -5,11 +5,16 @@ import { BrowserRouter } from 'react-router-dom';
 import {OwnerStart} from './containers/OwnerStart'
 import { Route } from 'react-router-dom';
 import './css/tailwind.css';
+import Calendar from './containers/Calendar';
 
 
 ReactDOM.render(
+
     <BrowserRouter>
-        <Route exact path="/" component={OwnerStart}/>
+        <div>
+            <Route exact path="/" component={OwnerStart}/>
+            <Route path="/calendar" component={Calendar}/>
+        </div>
     </BrowserRouter>, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change

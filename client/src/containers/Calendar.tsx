@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import '../App.css';
 import Sidebar from './Sidebar'
 import Day from './Day'
 import Timebar from './Timebar'
@@ -21,7 +20,7 @@ class Calendar extends Component {
     }
   }
 
-  
+
   
   render() {
     return (
