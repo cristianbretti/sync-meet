@@ -10,6 +10,7 @@ from google.auth.transport import requests
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenCredentials
 from sympy import Interval, Union, Complement
+import sympy as sp
 import re
 
 """ HELPERS """
@@ -208,8 +209,16 @@ def find_free_time(all_events, group):
     # The free time is A - B where A is the whole day and B are the events
     free_time_intervals = Complement(Union(whole_day_intervals), event_union)
 
+    # If only one interval, convert to list
+    free_time_list = []
+    if isinstance(free_time_intervals.args[0], sp.numbers.Integer):
+        free_time_list.append(Interval(free_time_intervals.args[0],free_time_intervals.args[1]))
+    else:
+        for interval in free_time_intervals.args:
+            free_time_list.append(interval)
+
     result = []
-    for time_slot in free_time_intervals.args:
+    for time_slot in free_time_list:
         free_event = interval_to_datetime(time_slot)
         diff = free_event['end'] - free_event['start']
         meeting_len = timedelta(hours=group.meeting_length.hour, minutes=group.meeting_length.minute)

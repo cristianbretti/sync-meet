@@ -63,6 +63,10 @@ export const OwnerStart = () => {
         })
     }
 
+    const onGoogleFailure = (error:any) => {
+        console.log(error)
+    }
+
     return (
         <div className="text-center min-h-screen flex flex-col items-center justify-center bg-blue">
             <AnimLogo />
@@ -135,7 +139,7 @@ export const OwnerStart = () => {
                     clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
                     buttonText="Give access and create event"
                     onSuccess={responseGoogle}
-                    onFailure={responseGoogle}
+                    onFailure={onGoogleFailure}
                     cookiePolicy={'single_host_origin'}
                     scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}/>
             </div>
