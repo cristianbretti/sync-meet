@@ -121,7 +121,7 @@ def get_events(access_token, group, user):
     """ Return all the events on calendars that matches the
     time interval defined by group parameter. 
     """
-    try: 
+    try:
         credentials = AccessTokenCredentials(access_token, 'my-user-agent/1.0')
         service = build('calendar', 'v3', credentials=credentials)
         
@@ -142,12 +142,13 @@ def get_events(access_token, group, user):
                 timeZone="CET"
                 ).execute()
             for event in events.get('items'):
-                start = datetime.strptime(event['start']['dateTime'][:-9], "%Y-%m-%dT%H:%M%S")
-                end = datetime.strptime(event['end']['dateTime'][:-9], "%Y-%m-%dT%H:%M%S")
-                all_events.append({
-                    'start': start,
-                    'end': end,
-                })
+                if 'start' in event.keys() and 'end' in event.keys() and 'dateTime' in event['start'].keys():
+                    start = datetime.strptime(event['start']['dateTime'][:-9], "%Y-%m-%dT%H:%M%S")
+                    end = datetime.strptime(event['end']['dateTime'][:-9], "%Y-%m-%dT%H:%M%S")
+                    all_events.append({
+                        'start': start,
+                        'end': end,
+                    })
     except:
         raise ValueError("Access token expired for user: " + str(user.id))
     return all_events
@@ -211,7 +212,7 @@ def find_free_time(all_events, group):
 
     # If only one interval, convert to list
     free_time_list = []
-    if isinstance(free_time_intervals.args[0], sp.numbers.Integer):
+    if len(free_time_intervals.args) > 0 and isinstance(free_time_intervals.args[0], sp.numbers.Integer):
         free_time_list.append(Interval(free_time_intervals.args[0],free_time_intervals.args[1]))
     else:
         for interval in free_time_intervals.args:
