@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body {
     margin: 0;
     padding: 0;
@@ -54,3 +55,15 @@ body {
       transform: rotate(-360deg);
     }
   }
+
+.w-1\/7 {
+    width: 14.285714285%;
+}
+
+.w-1\/40 {
+    width: 2.5%;
+}
+
+.w-39\/40 {
+    width: 97.5%;
+}

@@ -6277,6 +6277,18 @@ code {
   }
 }
 
+.w-1\/7 {
+  width: 14.285714285%;
+}
+
+.w-1\/40 {
+  width: 2.5%;
+}
+
+.w-39\/40 {
+  width: 97.5%;
+}
+
 @media (min-width: 576px) {
   .sm\:list-reset {
     list-style: none;
