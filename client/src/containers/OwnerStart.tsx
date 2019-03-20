@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import '../App.css';
 import GoogleLogin from 'react-google-login';
 import {InputLabel} from '../components';
 import DatePicker from "react-datepicker";
