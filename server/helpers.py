@@ -4,11 +4,14 @@ import config
 from datetime import datetime
 from datetime import timedelta
 from contextlib import contextmanager
-from functools import wraps
+from functools import wraps, cmp_to_key
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenCredentials
+from sympy import Interval, Union, Complement
+import sympy as sp
+import re
 
 """ HELPERS """
 class APIError(Exception):
@@ -114,12 +117,116 @@ def create_or_find_user(id_token, name, access_token):
         new_user.name = name
     return new_user
 
-def get_events(access_token, group):
-    """ Return all the events on ?all? calendars that matches the
+def get_events(access_token, group, user):
+    """ Return all the events on calendars that matches the
     time interval defined by group parameter. 
     """
-    #TODO: get the calendar for a user towards the google API
-    credentials = AccessTokenCredentials(access_token, 'my-user-agent/1.0')
-    service = build('calendar', 'v3', credentials=credentials)
-    all_calendars = service.calendarList().list().execute()
-    return {'calendar': all_calendars}
+    try: 
+        credentials = AccessTokenCredentials(access_token, 'my-user-agent/1.0')
+        service = build('calendar', 'v3', credentials=credentials)
+        
+        all_calendars = service.calendarList().list().execute()
+        all_calendars = all_calendars.get('items', [])
+        calendar_ids = [cal['id'] for cal in all_calendars]
+        
+        # Find all events between timeMin and timeMax in timezone CET +01:00
+        timeMin = datetime.combine(group.from_date, group.from_time).isoformat() + "+01:00"
+        timeMax = datetime.combine(group.to_date, group.to_time).isoformat() + "+01:00"
+
+        # For every calenderId, find all relevant events
+        all_events = []
+        for cal_id in calendar_ids:
+            events = service.events().list(calendarId=cal_id,
+                timeMin=timeMin,
+                timeMax=timeMax,
+                timeZone="CET"
+                ).execute()
+            for event in events.get('items'):
+                start = datetime.strptime(event['start']['dateTime'][:-9], "%Y-%m-%dT%H:%M%S")
+                end = datetime.strptime(event['end']['dateTime'][:-9], "%Y-%m-%dT%H:%M%S")
+                all_events.append({
+                    'start': start,
+                    'end': end,
+                })
+    except:
+        raise ValueError("Access token expired for user: " + str(user.id))
+    return all_events
+
+
+def create_interval(event):
+    """ Convert an event dict 
+    {
+        start: datetime,
+        end: datetime
+    }
+    to an Sympy Interval
+    """
+    start_str = str(event['start'])
+    end_str = str(event['end'])
+    start_str = re.sub("[-\s:]", "", start_str)[:-2]
+    end_str = re.sub("[-\s:]", "", end_str)[:-2]
+    return Interval(int(start_str), int(end_str))
+
+def interval_to_datetime(interval):
+    """ Convert a Sympy Inverval 
+    to an dict 
+    {
+        start: datetime,
+        end: datetime
+    }
+    """
+    return {
+        'start': datetime.strptime(str(interval.start), "%Y%m%d%H%M"),
+        'end': datetime.strptime(str(interval.end), "%Y%m%d%H%M")
+    }
+
+def find_free_time(all_events, group):
+    """ Calculates all the free time slots
+    by taking the union of all events (B),
+    and then taking the complement A - B 
+    where A is the Interval of the whole day. 
+    Return a list of free time slots on the form
+    {
+        date: YYYY-MM-DD,
+        from_time: HH:MM
+        to_time: HH:MM
+    }
+    """
+    intervals = [create_interval(event) for event in all_events]
+
+    # Take the union of all events
+    event_union = Union(intervals)
+
+    # Create one whole interval for each day
+    whole_day_intervals = []
+    current_day = group.from_date
+    while current_day != group.to_date + timedelta(days=1):
+        start = datetime.combine(current_day, group.from_time)
+        end = datetime.combine(current_day, group.to_time)
+        whole_day_intervals.append(create_interval({'start': start, 'end': end}))
+        current_day = current_day + timedelta(days=1)
+
+    # The free time is A - B where A is the whole day and B are the events
+    free_time_intervals = Complement(Union(whole_day_intervals), event_union)
+
+    # If only one interval, convert to list
+    free_time_list = []
+    if isinstance(free_time_intervals.args[0], sp.numbers.Integer):
+        free_time_list.append(Interval(free_time_intervals.args[0],free_time_intervals.args[1]))
+    else:
+        for interval in free_time_intervals.args:
+            free_time_list.append(interval)
+
+    result = []
+    for time_slot in free_time_list:
+        free_event = interval_to_datetime(time_slot)
+        diff = free_event['end'] - free_event['start']
+        meeting_len = timedelta(hours=group.meeting_length.hour, minutes=group.meeting_length.minute)
+        # Check that the free interval is long enought for the meeting
+        if diff > meeting_len:
+            result.append({
+                'date': str(free_event['start'].date()),
+                'from_time': str(free_event['start'].time())[:-3],
+                'to_time': str(free_event['end'].time())[:-3]
+            })
+    return result

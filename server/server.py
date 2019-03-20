@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
+from socket_io import sio
 from model import db, admin, User, Planning_group
 import config
 from helpers import *
-import os
 import tempfile
+import os
 import json
 from datetime import datetime
 import random
@@ -23,8 +24,8 @@ app.config['SECRET_KEY'] = config.MY_SECRET
 
 """ dev only """
 from flask_cors import CORS, cross_origin
-cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
+cors = CORS(app, supports_credentials=True)
 """ end """
 
 def create_prod_app(app):
@@ -32,6 +33,7 @@ def create_prod_app(app):
     """
     db.init_app(app)
     admin.init_app(app)
+    sio.init_app(app)
 
 def create_test_app(app):
     """ Sets up the correct config
@@ -44,6 +46,7 @@ def create_test_app(app):
     app.config['SECRET_KEY'] = "testsecret"
     db.init_app(app)
     return app
+
 
 """ API ENDPOINTS """
 # Example payload
@@ -59,7 +62,6 @@ def create_test_app(app):
 #   "id_token":"googles long token id in response.getAuthResponse().id_token"
 # }
 @app.route('/api/creategroup', methods=['POST'])
-@cross_origin() #dev only
 def create_group():
     """ Creates a group with the owner being the user
     that is included in the POST. 
@@ -127,7 +129,6 @@ def create_group():
 #   "id_token":"googles long token id in response.getAuthResponse().id_token"
 # }
 @app.route('/api/adduser', methods=['POST'])
-@cross_origin() #dev only
 @require_group_str_id
 def add_user(group=None):
     """ Adds a user to the group identified by
@@ -139,6 +140,8 @@ def add_user(group=None):
     try:
         with handle_exceptions():
             payload = request.json
+            if payload is None:
+                raise ValueError("Missing json body in post")
             name = payload['name']
             id_token = payload['id_token']
             access_token = payload['access_token']
@@ -155,23 +158,26 @@ def add_user(group=None):
 #   "group_str_id":"the group str id from the address bar"
 #   "google_id":"user google id"
 # }
-@app.route('/api/getusersfromgroup')
-@cross_origin() # dev only
+@app.route('/api/getgroupcalendar')
 @require_login
 @require_group_str_id
-def get_users_from_group(user=None, group=None):
-    """ Returns all the users in the group identified by 
-    the group_str_id in the request headers.
-    Id refers to id in our database, not google_id. 
-    This is because we use google_id as identification,
-    and can therefore not share it. 
+def get_group_calendar(user=None, group=None):
+    """ Returns time slots were all group
+    memebers are free. 
     """
     try:
         with handle_exceptions():
             users = [ {'name': user.name, 'id': user.id} for user in group.users]
+            all_events = []
+            for g_user in group.users:
+                all_events += get_events(g_user.access_token, group, user)
+            free_times = find_free_time(all_events, group)
             return jsonify({
+                'group': group.to_json(),
+                'events': free_times,
                 'users': users,
-                'owner': {'name': group.owner.name, 'id': group.owner.id}
+                'owner': {'name': group.owner.name, 'id': group.owner.id},
+                'you': user.id,
                 }), 200
     except APIError as e:
         return e.response, e.code
@@ -183,31 +189,7 @@ def get_users_from_group(user=None, group=None):
 #   "group_str_id":"the group str id from the address bar"
 #   "google_id":"user google id"
 # }
-@app.route('/api/getgroupcalendar')
-@cross_origin() # dev only
-@require_login
-@require_group_str_id
-def get_group_calendar(user=None, group=None):
-    """ Returns time slots were all group
-    memebers are free. 
-    """
-    try:
-        with handle_exceptions():
-            calendars = [get_events(g_user.access_token, group) for g_user in group.users]
-            # TODO: calculate free time and return new calendar
-            return jsonify({'calendar': calendars}), 200
-    except APIError as e:
-        return e.response, e.code
-
-
-# Example payload
-# headers:
-# {
-#   "group_str_id":"the group str id from the address bar"
-#   "google_id":"user google id"
-# }
 @app.route('/api/remove', methods=['DELETE'])
-@cross_origin() # dev only
 @require_login
 @require_group_str_id
 def remove(user=None, group=None):
@@ -229,7 +211,7 @@ def remove(user=None, group=None):
                 group.users.remove(user)
                 attempt_delete_user(user)
             db.session.commit()
-            return "", 202
+            return jsonify({}), 202
     except APIError as e:
         return e.response, e.code
 
@@ -250,16 +232,19 @@ def update_access_token(user=None):
             if payload is None:
                 raise ValueError("Missing json body in post")
             user.access_token = payload['access_token']
-            return "", 200
+            return jsonify({}), 200
     except APIError as e:
         return e.response, e.code
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(template_folder_path, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # Catch all routes and host index
 # So that we don't need browser router
 # Has to be last route!
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
-@cross_origin() #dev only
 def index(path):
     """ Renders the actual react webpage.
     """
@@ -271,4 +256,5 @@ if __name__ == '__main__':
     # with app.app_context():
     #     db.drop_all()
     #     db.create_all()
-    app.run(port=5000, debug=True)
+    # app.run(port=5000, debug=True)
+    sio.run(app, port=5000, debug=True)

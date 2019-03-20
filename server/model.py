@@ -11,7 +11,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     google_id = db.Column(db.String(30), unique=True)
     name = db.Column(db.String(30))
-    access_token = db.Column(db.String(30))
+    access_token = db.Column(db.String(250))
 
     def __init__(self, google_id, name, access_token):
         self.google_id = google_id
@@ -54,5 +54,16 @@ class Planning_group(db.Model):
 
     def __repr__(self):
         return '<Group %r %r>' % (self.name, self.group_str_id)
+
+    def to_json(self):
+        ret_dict = {}
+        ret_dict['name'] = self.name
+        ret_dict['from_date'] = str(self.from_date)
+        ret_dict['from_time'] = str(self.from_time)[:-3]
+        ret_dict['to_date'] = str(self.to_date)
+        ret_dict['to_time'] = str(self.to_time)[:-3]
+        ret_dict['meeting_length'] = str(self.meeting_length)[:-3]
+        return ret_dict
+
 
 admin.add_view(ModelView(Planning_group, db.session))
