@@ -39,7 +39,7 @@ class Sidebar extends Component<SideBarProps, SidebarState> {
 
   render() {
     return (
-      <div className="bg-red-dark">
+      <div>
         <div className="text-center">
             <h3 className= "py-1 px-1 mx-1 text-center">Group Name</h3>
         </div>
@@ -48,7 +48,7 @@ class Sidebar extends Component<SideBarProps, SidebarState> {
             <h4>From date</h4>
           </div>
           
-          <div className="flex-1">
+          <div className="flex-1 text-center">
             <h4>{this.state.fromDate}</h4>
           </div>
         </div>
@@ -58,7 +58,7 @@ class Sidebar extends Component<SideBarProps, SidebarState> {
             <h4>To date</h4>
           </div>
           
-          <div className="flex-1">
+          <div className="flex-1 text-center">
             <h4>{this.state.toDate}</h4>
           </div>
         </div>
@@ -68,7 +68,7 @@ class Sidebar extends Component<SideBarProps, SidebarState> {
             <h4>From time</h4>
           </div>
           
-          <div className="flex-1">
+          <div className="flex-1 text-center">
             <h4>{this.state.fromTime}</h4>
         
           </div>
@@ -79,7 +79,7 @@ class Sidebar extends Component<SideBarProps, SidebarState> {
             <h4>To time</h4>
           </div>
           
-          <div className="flex-1">
+          <div className="flex-1 text-center">
             <h4>{this.state.toTime}</h4>
         
           </div>
@@ -90,7 +90,7 @@ class Sidebar extends Component<SideBarProps, SidebarState> {
             <h4>Meeting time</h4>
           </div>
           
-          <div className="flex-1">
+          <div className="flex-1 text-center">
             <h4>{this.state.meetingTime + " min"}</h4>
         
           </div>

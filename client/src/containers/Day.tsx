@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
 import '../App.css';
+import Event from './Event'
+interface DayProps {}
+
+interface DayState {
+    date: string,
+    weekday: string,
+    isMajority: boolean
+}
 
 class Day extends Component {
-    constructor(props: any) {
+    constructor(props: DayProps) {
         super(props);
         this.state = {
-          date: 0,
+          date: "",
           weekday: "",
           isMajority: false
     
@@ -14,10 +22,19 @@ class Day extends Component {
     
     render() {
         return (
-            <div className="bg-blue-dark text-center h-screen">
-                <div className= "py-1 mx-1 px-1">
-                    <h3>Monday</h3>
+            <div className="text-center h-screen">
+                <div className=" h-16">
+                    <div className= "px-1">
+                        <h3>Monday</h3>
+                    </div>
+                    <div className= "px-1">
+                        <h3>25</h3>
+                    </div>
+                    
                 </div>
+                <Event></Event>
+                <div className="h-24"></div>
+                <Event></Event>
             </div>
         
         );
