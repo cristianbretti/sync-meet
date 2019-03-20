@@ -10,11 +10,12 @@ import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse, GetGr
 import AnimLogo from './logo/AnimLogo';
 import Logo from './logo/Logo';
 import {DateToYYYYMMDD, DateToHHMM, HourAndMinuteToHHMM} from '../utils/helpers'
+import { RouteComponentProps } from 'react-router-dom';
 
 registerLocale('sv', sv);
 setDefaultLocale('sv');
 
-export const OwnerStart = () => {
+export const OwnerStart: React.SFC<RouteComponentProps<any>> = ({history}) => {
     const [formValues, setFormValues] = useState({
         name: "",
         eventName: "",
@@ -48,14 +49,19 @@ export const OwnerStart = () => {
         api.createGroup(data)
         .then((createGroupResponse: CreateGroupResponse) => {
             console.log(createGroupResponse)
-            api.getGroupCalendar(createGroupResponse.google_id, createGroupResponse.group_str_id)
-            .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
-                console.log(getGroupCalendarResponse);
-                api.remove(true, createGroupResponse.google_id, createGroupResponse.group_str_id)
-                .then((removeResponse: EmptyResponse) => {
-                    console.log(removeResponse);
-                })
-            })
+            localStorage.setItem("google_id", createGroupResponse.google_id)
+            history.push("/group/" + createGroupResponse.group_str_id)
+
+        
+
+            // api.getGroupCalendar(createGroupResponse.google_id, createGroupResponse.group_str_id)
+            // .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
+            //     console.log(getGroupCalendarResponse);
+            //     api.remove(true, createGroupResponse.google_id, createGroupResponse.group_str_id)
+            //     .then((removeResponse: EmptyResponse) => {
+            //         console.log(removeResponse);
+            //     })
+            // })
         })
         .catch((error: ErrorResponse) => {
             console.error(error)
@@ -137,7 +143,7 @@ export const OwnerStart = () => {
                 <GoogleLogin
                     clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
                     buttonText="Give access and create event"
-                    onSuccess={responseGoogle}
+                    onSuccess={responseGoogle }
                     onFailure={onGoogleFailure}
                     cookiePolicy={'single_host_origin'}
                     scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}/>
