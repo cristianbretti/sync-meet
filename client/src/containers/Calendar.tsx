@@ -5,7 +5,7 @@ import Timebar from './Timebar';
 import api from '../api/api';
 import { RouteComponentProps } from 'react-router';
 import { GetGroupCalendarResponse, EmptyResponse, MyDate, Time, CalendarEvent } from '../api/models';
-import {getUniqueDaysFromListOfEvents} from '../utils/helpers'
+import {getUniqueDaysFromListOfEvents, getEarliestTimeFromDates, getLatestTimeFromDates} from '../utils/helpers'
 
 
 
@@ -70,8 +70,10 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
 
   renderDays = (state:GroupInfo) => {
     const uniqueDays = getUniqueDaysFromListOfEvents(state.events)
+    const earliestTime = getEarliestTimeFromDates(state.events)
+    const latestTime = getLatestTimeFromDates(state.events)
     return uniqueDays.map((day) =>
-      <Day events={state.events} thisDay={day}/>
+      <Day events={state.events} thisDay={day} earliest={earliestTime} latest={latestTime}/>
     )
   }
   

@@ -1,4 +1,4 @@
-import { CalendarEvent, MyDate } from "../api/models";
+import { CalendarEvent, MyDate, Time } from "../api/models";
 
 export const DateToYYYYMMDD = (date: Date):string => {
     return date.toISOString().substring(0,10)
@@ -28,4 +28,28 @@ export const getUniqueDaysFromListOfEvents = (events: CalendarEvent[]):MyDate[] 
         }
     }
     return listOfUniqueDays;
+}
+
+export const getEarliestTimeFromDates = (events: CalendarEvent[]):Time => {
+    let earliestTime = events[0].from_time;
+
+    for(let event of events){
+        if (event.from_time < earliestTime){
+            earliestTime = event.from_time
+        }
+    }
+    return earliestTime;
+
+}
+
+export const getLatestTimeFromDates = (events: CalendarEvent[]):Time => {
+    let latestTime = events[0].from_time;
+
+    for(let event of events){
+        if (event.from_time > latestTime){
+            latestTime = event.from_time
+        }
+    }
+    return latestTime;
+
 }

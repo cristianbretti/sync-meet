@@ -36,6 +36,10 @@ export class Time extends Date {
     public toJSON() {
         return this.time.toTimeString().substr(0,5);
     }
+
+    public valueOf() {
+        return this.time.valueOf();
+    }
 }
 
 export interface ErrorResponse {

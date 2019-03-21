@@ -1,15 +1,18 @@
 import React from 'react';
 import Event from './Event'
-import { CalendarEvent, MyDate } from '../api/models';
+import { CalendarEvent, MyDate, Time } from '../api/models';
 
 
 interface DayProps {
     events: CalendarEvent[],
-    thisDay: MyDate
+    thisDay: MyDate,
+    earliest: Time,
+    latest: Time,
 }
 
-const Day:React.FC<DayProps> = ({events, thisDay}) =>  {
-
+const Day:React.FC<DayProps> = ({events, thisDay, earliest, latest}) =>  {
+    console.log(earliest)
+    console.log(latest)
     return (
         <div className="w-1/7 flex-none border border-black">
             <div className="text-center h-screen">
