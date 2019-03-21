@@ -20,7 +20,16 @@ The user is now the owner of the group/meeting and gets redirected to the calend
 4. The owner finds a suitable time for the meeting and Sync-Meet is closed. 
 
 # What has been done
+  1. Backend server is set up with the basic support of creating an event, finding all empty time intervalls for a user and removing the event afterwards.
+  2. O-Auth 2 authentication protocol is set up on the client side for Google authentication.
+  3. Support for creating an event within the specified date and time interval on the client side.
+  4. Basic layout for the calendar/event page where all possible time slots will be shown.
+  5. Socket I/O for notifying the client that another user has joined the event.
 
 # Future plans
+  1. Add support for adding another user into an already created event.
+  2. Create a separate homepage before a page for event creation.
+  3. Display all available time slots in a UI friendly way.
+  4. Potentially add support for adding an event to all users calendar.
 
 # Project file structure
