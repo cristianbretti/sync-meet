@@ -74,7 +74,7 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
       <div>
         <div className="flex">
           <div className="w-1/5 h-screen border border-black">
-            <Sidebar {...{group: tempState.group, events: tempState.events, owner: tempState.owner, users: tempState.users, you: tempState.you}}></Sidebar>
+            <Sidebar {... tempState}></Sidebar>
           </div>  
           
           <div className="w-4/5 h-screen">  {/* The calendar goes in here */}
