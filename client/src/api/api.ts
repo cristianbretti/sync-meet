@@ -66,7 +66,7 @@ class API {
             options = {...options, body: JSON.stringify(body)}
         }
 
-        return fetch('/api/' + endpoint, options)
+        return fetch(baseURLEndpoint + '/api/' + endpoint, options)
         .then(handleErrors)
         .then(response => response.json())
     }
