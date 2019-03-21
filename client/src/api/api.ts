@@ -11,6 +11,12 @@ import {Time,
     UpdateAccessTokenBody,
 } from './models';
 
+//Use this when running client on localhost:3000
+const baseURLEndpoint = 'http://localhost:5000/';
+
+//Use this when running client served from server
+//const baseURLEndpoint = location.href;
+
 /**
  * Convert bad requests into errors
  */
@@ -30,7 +36,7 @@ class API {
     socket: SocketIOClient.Socket
     constructor() {
         console.log(location.href);
-        this.socket = io.connect('http://localhost:5000'); // change to location.href
+        this.socket = io.connect(baseURLEndpoint); // change to location.href
         this.socket.on('message', (msg: string) => {
             console.log(msg);
         });
@@ -59,7 +65,7 @@ class API {
         }
 
         //TODO: change to just '/api/' + endpoint
-        return fetch('http://localhost:5000' + '/api/' + endpoint, options)
+        return fetch(baseURLEndpoint + 'api/' + endpoint, options)
         .then(handleErrors)
         .then(response => response.json())
     }

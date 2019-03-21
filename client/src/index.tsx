@@ -13,7 +13,7 @@ ReactDOM.render(
     <BrowserRouter>
         <div>
             <Route exact path="/" component={OwnerStart}/>
-            <Route path="/calendar" component={Calendar}/>
+            <Route path="/group/:group_str_id" component={Calendar}/>
         </div>
     </BrowserRouter>, document.getElementById('root'));
 
