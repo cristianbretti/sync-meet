@@ -209,7 +209,7 @@ def find_free_time(all_events, group):
 
     # The free time is A - B where A is the whole day and B are the events
     free_time_intervals = Complement(Union(whole_day_intervals), event_union)
-
+    
     # If only one interval, convert to list
     free_time_list = []
     if len(free_time_intervals.args) > 0 and isinstance(free_time_intervals.args[0], sp.numbers.Integer):
@@ -224,7 +224,7 @@ def find_free_time(all_events, group):
         diff = free_event['end'] - free_event['start']
         meeting_len = timedelta(hours=group.meeting_length.hour, minutes=group.meeting_length.minute)
         # Check that the free interval is long enought for the meeting
-        if diff > meeting_len:
+        if diff >= meeting_len:
             result.append({
                 'date': str(free_event['start'].date()),
                 'from_time': str(free_event['start'].time())[:-3],
