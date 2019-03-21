@@ -43,11 +43,11 @@ export const getEarliestTimeFromDates = (events: CalendarEvent[]):Time => {
 }
 
 export const getLatestTimeFromDates = (events: CalendarEvent[]):Time => {
-    let latestTime = events[0].from_time;
+    let latestTime = events[0].to_time;
 
     for(let event of events){
-        if (event.from_time > latestTime){
-            latestTime = event.from_time
+        if (event.to_time > latestTime){
+            latestTime = event.to_time
         }
     }
     return latestTime;
