@@ -5,6 +5,7 @@ import Timebar from './Timebar';
 import api from '../api/api';
 import { RouteComponentProps } from 'react-router';
 import { GetGroupCalendarResponse, EmptyResponse } from '../api/models';
+import {getUniqueDaysFromListOfEvents} from '../utils/helpers'
 
 
 
@@ -69,6 +70,7 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
       )
     }
     const tempState = this.state as GroupInfo;
+    const uniqueDays = getUniqueDaysFromListOfEvents(tempState.events)
     console.log(tempState)
     return (
       <div>
