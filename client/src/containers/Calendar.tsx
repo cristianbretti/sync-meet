@@ -60,6 +60,13 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
     })
 
   }
+
+  renderDays = (state:GroupInfo) => {
+    const uniqueDays = getUniqueDaysFromListOfEvents(state.events)
+    return uniqueDays.map(() => 
+      <Day/>
+    )
+  }
   
   render() {
     if(Object.entries(this.state).length === 0 && this.state.constructor === Object){
@@ -70,7 +77,6 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
       )
     }
     const tempState = this.state as GroupInfo;
-    const uniqueDays = getUniqueDaysFromListOfEvents(tempState.events)
     console.log(tempState)
     return (
       <div>
@@ -88,13 +94,8 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
               </div> 
 
               <div className="w-39/40 overflow-x-auto flex flex-no-wrap">
-                <Day/> {/* One day takes up one seventh of the space*/}
+                {this.renderDays(tempState)}
               </div>
-              
-              
-              
-
-
             </div>
           </div>
         </div>
