@@ -33,3 +33,23 @@ The user is now the owner of the group/meeting and gets redirected to the calend
   4. Potentially add support for adding an event to all users calendar.
 
 # Project file structure
+The root folder contains three folders; `db`, `client` and `server`.
+
+### db
+In this folder, the SQLite file for the database is located. SQLite lets us have a single file containing the entire database
+
+### client
+In the client folder we find the files needed for the front-end parts of the project. `package.json` specifies which node packages are needed for this project. The files `tsconfig.json` and `tailwind.js` are config files for Typescript and Tailwind respectively.
+
+The `src` folder contains the actual source code for the front end. The front end is built in React with Typescript for type safety
+
+The `public` folder contains the empty `index.html` file and a `favicon`
+
+### server
+In this folder, the different python files needed for our back-end exists. We use _flask_ together with _socket IO_ for our back-end server.
+
+`server.py` sets up a server and creates the all endpoints in the back-end. It uses functions from the `helpers.py` to do some logic, like finding free times, getting the users events, login the user etc.
+
+`socket-io.py` creates the socket events used for when users join and leave and for when groups are deleted and updated.
+
+`model.py` contains the database models for our SQLite database.
