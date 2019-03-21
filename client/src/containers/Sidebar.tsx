@@ -30,7 +30,7 @@ const Sidebar: React.FC<SiderbarProps>  = ({group, users, you, owner}: SiderbarP
         </div>
         
         <div className="flex-1 text-center">
-          <h4>{group.from_date}</h4>
+          <h4>{group.to_date}</h4>
         </div>
       </div>
 
