@@ -98,8 +98,7 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
             <div className="flex">
 
               <div className="w-2/40 h-screen border-t border-black"> {/* The timebar component goes in here */}
-                <Timebar></Timebar>
-              
+                <Timebar events={tempState.events}/>
               </div> 
 
               <div className="w-38/40 overflow-x-auto flex flex-no-wrap">
