@@ -88,10 +88,7 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
               </div> 
 
               <div className="w-39/40 overflow-x-auto flex flex-no-wrap">
-              
-                <div className="w-1/7 flex-none border border-black">
-                  <Day></Day> {/* One day takes up one seventh of the space*/}
-                </div>
+                <Day/> {/* One day takes up one seventh of the space*/}
               </div>
               
               
