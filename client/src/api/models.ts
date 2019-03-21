@@ -11,7 +11,16 @@ export class MyDate extends Date {
 
     public toJSON() {
         return this.date.toJSON().substr(0,10);
-    }   
+    }
+
+    public getDate() {
+        return this.date.getDate()
+    }
+
+    public getDayString() {
+        return this.date.toLocaleDateString('en-us', {  weekday: 'long' })
+    }
+
 }
 
 export class Time extends Date {
@@ -68,6 +77,12 @@ export interface CalendarEvent {
     to_time: Time; 
 }
 
+export interface CalendarEventResponse {
+    date: string;
+    from_time: string;
+    to_time: string; 
+}
+
 export interface DBUser {
     id: number;
     name: string;
@@ -83,7 +98,7 @@ export interface Group {
 }
 
 export interface GetGroupCalendarResponse {
-    events: CalendarEvent[];
+    events: CalendarEventResponse[];
     owner: DBUser;
     users: DBUser[];
     you: number;

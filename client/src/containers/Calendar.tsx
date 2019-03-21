@@ -4,14 +4,14 @@ import Day from './Day';
 import Timebar from './Timebar';
 import api from '../api/api';
 import { RouteComponentProps } from 'react-router';
-import { GetGroupCalendarResponse, EmptyResponse } from '../api/models';
+import { GetGroupCalendarResponse, EmptyResponse, MyDate, Time, CalendarEvent } from '../api/models';
 import {getUniqueDaysFromListOfEvents} from '../utils/helpers'
 
 
 
 export interface GroupInfo {
   group: GetGroupCalendarResponse["group"]
-  events: GetGroupCalendarResponse["events"]
+  events: CalendarEvent[]
   owner: GetGroupCalendarResponse["owner"]
   users: GetGroupCalendarResponse["users"]
   you: GetGroupCalendarResponse["you"]
@@ -39,9 +39,16 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
     console.log(group_str_id)
     api.getGroupCalendar(google_id, group_str_id)
     .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
+      const events = getGroupCalendarResponse.events.map(calEventResponse => {
+        return {
+          date: new MyDate(calEventResponse.date),
+          from_time: new Time(calEventResponse.from_time),
+          to_time: new Time(calEventResponse.to_time), 
+        } as CalendarEvent
+      })
       this.setState({
         group: getGroupCalendarResponse.group,
-        events: getGroupCalendarResponse.events,
+        events: events,
         owner: getGroupCalendarResponse.owner,
         users: getGroupCalendarResponse.users,
         you: getGroupCalendarResponse.you
@@ -63,8 +70,8 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
 
   renderDays = (state:GroupInfo) => {
     const uniqueDays = getUniqueDaysFromListOfEvents(state.events)
-    return uniqueDays.map(() => 
-      <Day/>
+    return uniqueDays.map((day) =>
+      <Day events={state.events} thisDay={day}/>
     )
   }
   
