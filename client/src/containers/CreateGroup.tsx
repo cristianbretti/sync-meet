@@ -12,6 +12,7 @@ import {DateToYYYYMMDD, DateToHHMM, HourAndMinuteToHHMM} from '../utils/helpers'
 import { RouteComponentProps } from 'react-router-dom';
 import HelpHover from '../components/HelpHover';
 import DateInput from '../components/DateInput';
+import TimeInput from '../components/TimeInput';
 
 registerLocale('sv', sv);
 setDefaultLocale('sv');
@@ -91,53 +92,55 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                 <div className="flex items-center">
                     <DateInput
                         className="mr-4 my-2"
-                        label="Start date"
+                        label="From date"
                         name={"startDate"}
-                        value={formValues.startDate}
+                        value={formValues.startDate.date}
+                        selectsStart={true}
+                        selectsEnd={false}
                         startDate={formValues.startDate}
                         endDate={formValues.endDate}
                         onChange={(name,value) => {setDateChanged(true); handleChange(name, value);}}
                         valid={formValues.endDate >= formValues.startDate}
                         changed={dateChanged}
                     />
-                    <HelpHover className="pl-4 pt-2" text="This value marks the start from which to look for available time slots." />
+                    <HelpHover className="pl-4 pt-2" text="Look for available time slots from this day and forward." />
                 </div>
                 <div className="flex items-center">
                     <DateInput
                         className="mr-4 my-2"
-                        label="End date"
+                        label="To date"
                         name={"endDate"}
-                        value={formValues.endDate}
+                        value={formValues.endDate.date}
+                        selectsStart={false}
+                        selectsEnd={true}
                         startDate={formValues.startDate}
                         endDate={formValues.endDate}
                         onChange={(name,value) => {setDateChanged(true); handleChange(name, value);}}
                         valid={formValues.endDate >= formValues.startDate}
                         changed={dateChanged}
                     />
-                    <HelpHover className="pl-4 pt-2" text="This value marks the end of when to look for available time slots." />
+                    <HelpHover className="pl-4 pt-2" text="Look for available time slots up to this day. This day is included as the last day." />
                 </div>
-                <div> text="Enter start time"/></div>
-                <DatePicker
-                    className="p-2"
-                    selected={formValues.startTime}
-                    onChange={(date: Date) => setFormValues({...formValues, ["startTime"]:date})}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={30}
-                    dateFormat="HH:mm"
-                    timeCaption="Time"
-                />
-                <div> text="Enter end time"/></div>
-                <DatePicker
-                    className="p-2"
-                    selected={formValues.endTime}
-                    onChange={(date: Date) => setFormValues({...formValues, ["endTime"]:date})}
-                    showTimeSelect
-                    showTimeSelectOnly
-                    timeIntervals={30}
-                    dateFormat="HH:mm"
-                    timeCaption="Time"
-                />
+                <div className="flex items-center">
+                    <TimeInput
+                        className="mr-4 my-2"
+                        label="From time"
+                        name={"startTime"}
+                        value={formValues.startTime}
+                        onChange={handleChange}
+                    />
+                    <HelpHover className="pl-4 pt-2" text="From which time on the day to look for available time slots." />
+                </div>
+                <div className="flex items-center">
+                    <TimeInput
+                        className="mr-4 my-2"
+                        label="To time"
+                        name={"endTime"}
+                        value={formValues.endTime}
+                        onChange={handleChange}
+                    />
+                    <HelpHover className="pl-4 pt-2" text="From which time on the day to look for available time slots." />
+                </div>
                 <div> text="Length" /></div>
                 <div className="p-2 flex flex-row items-center">
                     <input

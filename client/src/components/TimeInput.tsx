@@ -3,21 +3,15 @@ import DatePicker from "react-datepicker";
 import { MyDate } from '../api/models';
 import InputWrapper from './InputWrapper';
 
-interface DateInputProps {
+interface TimeInputProps {
     className?: string;
     label: string;
     name: string;
     value: Date;
-    startDate: Date;
-    endDate: Date;
-    selectsStart: boolean;
-    selectsEnd: boolean;
-    valid: boolean;
-    changed: boolean;
     onChange(name:string, value: Date): void;
 }
 
-const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate, endDate, selectsStart, selectsEnd, valid, changed, onChange}) => {
+const TimeInput: FC<TimeInputProps> = ({className, label, name, value, onChange}) => {
     const [active, setActive] = useState(false);
     return (
         <InputWrapper
@@ -25,17 +19,17 @@ const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate
             label={label}
             name={name}
             active={active}
-            valid={valid}
-            changed={changed}
+            valid={true}
+            changed={false}
         >
             <DatePicker
                 className="bg-inherit py-2 text-inherit outline-none"
                 selected={value}
-                selectsStart={selectsStart}
-                selectsEnd={selectsEnd}
-                startDate={startDate}
-                endDate={endDate}
-                dateFormat="yyyy-MM-dd"
+                showTimeSelect
+                showTimeSelectOnly
+                timeIntervals={30}
+                dateFormat="HH:mm"
+                timeCaption="Time"
                 onChange={(date: Date) => onChange(name, date)}
                 onFocus={() => setActive(true)}
                 onBlur={() => setActive(false)}
@@ -44,4 +38,4 @@ const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate
     )
 }
 
-export default DateInput;
+export default TimeInput;

@@ -1,6 +1,6 @@
 
 export class MyDate extends Date {
-    private date: Date;
+    public date: Date;
     constructor(init: {date_str?:string, date?: Date}) {
         super();
         if (init.date_str !== undefined) {
