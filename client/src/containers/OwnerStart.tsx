@@ -7,8 +7,8 @@ import sv from 'date-fns/locale/sv';
 import "react-datepicker/dist/react-datepicker.css";
 import api from '../api/api';
 import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse, GetGroupCalendarResponse, EmptyResponse} from '../api/models';
-import AnimLogo from './logo/AnimLogo';
-import Logo from './logo/Logo';
+import AnimLogo from '../components/logo/AnimLogo';
+import Logo from '../components/logo/Logo';
 import {DateToYYYYMMDD, DateToHHMM, HourAndMinuteToHHMM} from '../utils/helpers'
 import { RouteComponentProps } from 'react-router-dom';
 
