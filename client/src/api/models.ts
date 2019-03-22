@@ -1,9 +1,15 @@
 
 export class MyDate extends Date {
     private date: Date;
-    constructor(date_str: string) {
+    constructor(init: {date_str?:string, date?: Date}) {
         super();
-        this.date = new Date(date_str)
+        if (init.date_str !== undefined) {
+            this.date = new Date(init.date_str)
+        } else if (init.date !== undefined) {
+            this.date = init.date;
+        } else {
+            this.date = new Date();
+        }
     }
     public toString() {
         return this.date.toJSON().substr(0,10);

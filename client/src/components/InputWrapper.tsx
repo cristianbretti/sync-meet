@@ -6,14 +6,18 @@ interface InputWrapperProps {
     name: string;
     active: boolean;
     valid: boolean;
+    changed: boolean;
 } 
 
-const InputWrapper: React.FC<InputWrapperProps> = ({className, label, name, active, valid, children}) => {
+const InputWrapper: React.FC<InputWrapperProps> = ({className, label, name, active, valid, changed, children}) => {
     return (
         <div className={className}>
             <div className={"relative mt-2"}>
                 {children}
-                <label className={"absolute pin-x pin-b mb-2 cursor-auto pointer-events-none"  + " " + (active || valid ? "text-xs mb-8 text-green" : "")}
+                <label className={"absolute pin-x pin-b mb-2 cursor-auto pointer-events-none"  
+                    + " " + (active || valid 
+                        ? "text-xs mb-8 text-green"
+                        : changed && !valid ? "text-xs mb-8 text-red" : "")}
                     htmlFor={name}
                     style={{
                         transition: ".25s ease all"

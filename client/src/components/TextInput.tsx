@@ -12,6 +12,7 @@ interface TextInputProps {
 const TextInput: React.FC<TextInputProps> = ({className, label, name, value, onChange}) => {
     const [active, setActive] = useState(false);
     const [valid, setValid] = useState(false);
+    const [changed, setChanged] = useState(false);
     return (
         <InputWrapper
             className={className}
@@ -19,12 +20,14 @@ const TextInput: React.FC<TextInputProps> = ({className, label, name, value, onC
             name={name}
             active={active}
             valid={valid}
+            changed={changed}
         >
             <input className="bg-inherit py-2 text-inherit outline-none" 
                 type="text" 
                 name={name} 
                 value={value} 
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    setChanged(true);
                     setValid(event.target.value !== "");
                     onChange(event.target.name, event.target.value)}
                 }

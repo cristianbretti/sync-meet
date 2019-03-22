@@ -25,7 +25,7 @@ const HelpHover: FC<HelpHoverProps> = ({className, text}) => {
             </div>
         </div>
         <div 
-            className={"absolute pin-b pointer-events-none mb-8 ml-6 z-10 bg-grey p-2 rounded-sm text-xs shadow-md"}
+            className={"absolute pin-b pointer-events-none mb-8 ml-6 z-10 bg-grey p-2 rounded-sm text-xs shadow-md min-w-32"}
             style={{
                 transition: ".25s ease all",
                 transitionDelay: ".1s",

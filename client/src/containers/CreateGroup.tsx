@@ -11,23 +11,27 @@ import Logo from '../components/logo/Logo';
 import {DateToYYYYMMDD, DateToHHMM, HourAndMinuteToHHMM} from '../utils/helpers'
 import { RouteComponentProps } from 'react-router-dom';
 import HelpHover from '../components/HelpHover';
+import DateInput from '../components/DateInput';
 
 registerLocale('sv', sv);
 setDefaultLocale('sv');
+const nextWeek = new Date();
+nextWeek.setDate(nextWeek.getDate() + 7);
 
 const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
     const [formValues, setFormValues] = useState({
         userName: "",
         groupName: "",
-        startDate: new Date(),
-        endDate: new Date(),
+        startDate: new MyDate({date: new Date()}),
+        endDate: new MyDate({date: nextWeek}),
         startTime: new Date(),
         endTime: new Date(),
-        lengthHours: 0,
+        lengthHours: 1,
         lengthMinutes: 0,
     });
+    const [dateChanged, setDateChanged] = useState(false);
 
-    const handleChange = (name: string, value: string) => {
+    const handleChange = (name: string, value: string | Date) => {
         setFormValues(values => ({ ...values, [name]: value }));
     };
 
@@ -36,8 +40,8 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
         console.log(googleResponse);
         let newGroup: CreateGroupBody = {
             group_name: formValues.groupName,
-            from_date: new MyDate(DateToYYYYMMDD(formValues.startDate)),
-            to_date: new MyDate(DateToYYYYMMDD(formValues.endDate)),
+            from_date: formValues.startDate,
+            to_date: formValues.endDate,
             from_time: new Time(DateToHHMM(formValues.startTime)),
             to_time: new Time(DateToHHMM(formValues.endTime)),
             meeting_length: new Time(HourAndMinuteToHHMM(formValues.lengthHours, formValues.lengthMinutes)),
@@ -63,7 +67,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
     return (
         <div className="h-screen flex flex-col items-center justify-center">
             <div className="flex flex-col justify-center items-center bg-grey-darker">
-                <h2 className="text-blue-dark w-full bg-grey-darkest pr-12 pb-2">Creating a new meeting</h2>
+                <h2 className="text-blue-dark w-full bg-grey-darkest pr-16 pb-2">Creating a new meeting</h2>
                 <div className="flex items-center">
                     <TextInput 
                         className="mr-4 mb-2 mt-4"
@@ -72,7 +76,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                         value={formValues.userName} 
                         onChange={handleChange}
                     />
-                    <HelpHover className="pt-2" text="This is the name that you will be represented with to your colleagues." />
+                    <HelpHover className="pl-4 pt-2" text="This is the name that you will be represented with to your colleagues." />
                 </div>
                 <div className="flex items-center">
                     <TextInput 
@@ -82,28 +86,36 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                         value={formValues.groupName} 
                         onChange={handleChange}
                     />
-                    <HelpHover className="pt-2" text="This is the name this meeting will be represented with." />
+                    <HelpHover className="pl-4 pt-2" text="This is the name this meeting will be represented with." />
                 </div>
-                <div>Enter start date"</div>
-                <DatePicker
-                    className="p-2"
-                    selected={formValues.startDate}
-                    selectsStart
-                    startDate={formValues.startDate}
-                    endDate={formValues.endDate}
-                    dateFormat="yyyy/MM/dd"
-                    onChange={(date: Date) => setFormValues({...formValues, ["startDate"]:date})}
+                <div className="flex items-center">
+                    <DateInput
+                        className="mr-4 my-2"
+                        label="Start date"
+                        name={"startDate"}
+                        value={formValues.startDate}
+                        startDate={formValues.startDate}
+                        endDate={formValues.endDate}
+                        onChange={(name,value) => {setDateChanged(true); handleChange(name, value);}}
+                        valid={formValues.endDate >= formValues.startDate}
+                        changed={dateChanged}
                     />
-                <div> text="Enter end date"/></div>
-                <DatePicker
-                    className="p-2"
-                    selected={formValues.endDate}
-                    selectsStart
-                    startDate={formValues.startDate}
-                    endDate={formValues.endDate}
-                    dateFormat="yyyy/MM/dd"
-                    onChange={(date: Date) => setFormValues({...formValues, ["endDate"]:date})}
-                />
+                    <HelpHover className="pl-4 pt-2" text="This value marks the start from which to look for available time slots." />
+                </div>
+                <div className="flex items-center">
+                    <DateInput
+                        className="mr-4 my-2"
+                        label="End date"
+                        name={"endDate"}
+                        value={formValues.endDate}
+                        startDate={formValues.startDate}
+                        endDate={formValues.endDate}
+                        onChange={(name,value) => {setDateChanged(true); handleChange(name, value);}}
+                        valid={formValues.endDate >= formValues.startDate}
+                        changed={dateChanged}
+                    />
+                    <HelpHover className="pl-4 pt-2" text="This value marks the end of when to look for available time slots." />
+                </div>
                 <div> text="Enter start time"/></div>
                 <DatePicker
                     className="p-2"
