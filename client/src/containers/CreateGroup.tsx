@@ -35,7 +35,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
 
     const responseGoogle = (googleResponse: any) => {
         console.log(googleResponse);
-        let data: CreateGroupBody = {
+        let newGroup: CreateGroupBody = {
             group_name: formValues.eventName,
             from_date: new MyDate(DateToYYYYMMDD(formValues.startDate)),
             to_date: new MyDate(DateToYYYYMMDD(formValues.endDate)),
@@ -46,22 +46,11 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
             access_token: googleResponse.getAuthResponse().access_token,
             id_token: googleResponse.getAuthResponse().id_token
         }
-        api.createGroup(data)
+        api.createGroup(newGroup)
         .then((createGroupResponse: CreateGroupResponse) => {
             console.log(createGroupResponse)
             localStorage.setItem("google_id", createGroupResponse.google_id)
             history.push("/group/" + createGroupResponse.group_str_id)
-
-        
-
-            // api.getGroupCalendar(createGroupResponse.google_id, createGroupResponse.group_str_id)
-            // .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
-            //     console.log(getGroupCalendarResponse);
-            //     api.remove(true, createGroupResponse.google_id, createGroupResponse.group_str_id)
-            //     .then((removeResponse: EmptyResponse) => {
-            //         console.log(removeResponse);
-            //     })
-            // })
         })
         .catch((error: ErrorResponse) => {
             console.error(error)
@@ -73,8 +62,8 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
     }
 
     return (
-        <div className="text-center min-h-screen flex flex-col items-center justify-center bg-blue">
-            <div className="m-8 flex flex-col justify-center items-center">
+        <div className="text-center h-screen flex flex-col items-center justify-center">
+            <div className="py-6 px-24 flex flex-col justify-center items-center bg-grey-darker">
                 <InputLabel text="Enter name"/>
                 <input className="p-2" type="text" name="name" value={formValues.name} onChange={handleChange}/>
                 <InputLabel text="Enter event name"/>
@@ -140,6 +129,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                     <div className="text-white align-middle">M</div>
                 </div>
                 <GoogleLogin
+                    className="m-2"
                     clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
                     buttonText="Give access and create event"
                     onSuccess={responseGoogle }
@@ -147,7 +137,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                     cookiePolicy={'single_host_origin'}
                     scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}/>
             </div>
-            <Logo className="w-16"/>
+            <Logo className="w-16 fixed pin-t pin-l m-6"/>
         </div>
     );
 }
