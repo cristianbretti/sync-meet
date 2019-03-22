@@ -29,12 +29,13 @@ class CustomInput extends React.Component<any> {
 }
 
 const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate, endDate, selectsStart, selectsEnd, valid, changed, onChange}) => {
+    const [active, setActive] = useState(false);
     return (
         <InputWrapper
             className={className}
             label={label}
             name={name}
-            active={false}
+            active={active}
             valid={valid}
             changed={changed}
         >
@@ -47,7 +48,20 @@ const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate
                 startDate={startDate.date}
                 endDate={endDate.date}
                 dateFormat="yyyy-MM-dd"
-                onChange={(date: Date) => onChange(name, new MyDate({date: date}))}
+                onChange={(date: Date) => {
+                    setActive(false);
+                    onChange(name, new MyDate({date: date}))
+                }}
+                dayClassName={(date: Date) => {
+                    if (date >= startDate.date && date <= endDate.date) {
+                        return "bg-blue-dark rounded text-white"
+                    }
+                    return "text-white";
+                }}
+                calendarClassName="bg-grey"
+                onFocus={() => setActive(true)}
+                onBlur={() => setActive(false)}
+                onClickOutside={() => setActive(false)}
             />
         </InputWrapper>
     )
