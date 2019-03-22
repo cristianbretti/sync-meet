@@ -15,7 +15,7 @@ import { RouteComponentProps } from 'react-router-dom';
 registerLocale('sv', sv);
 setDefaultLocale('sv');
 
-export const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
+const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
     const [formValues, setFormValues] = useState({
         name: "",
         eventName: "",
@@ -74,7 +74,6 @@ export const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
 
     return (
         <div className="text-center min-h-screen flex flex-col items-center justify-center bg-blue">
-            <AnimLogo />
             <div className="m-8 flex flex-col justify-center items-center">
                 <InputLabel text="Enter name"/>
                 <input className="p-2" type="text" name="name" value={formValues.name} onChange={handleChange}/>
@@ -152,3 +151,4 @@ export const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
         </div>
     );
 }
+export default CreateGroup;

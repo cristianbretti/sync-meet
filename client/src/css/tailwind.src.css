@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
     margin: 0;
     padding: 0;
@@ -24,7 +23,7 @@ body {
   }
   
   .logo-letter {
-    margin-top: 4px;
+    margin-top: 2px;
     animation: letter 3s ease-in-out infinite;
   }
   
@@ -66,4 +65,21 @@ body {
 
 .w-39\/40 {
     width: 97.5%;
+}
+
+.text-inherit {
+  color: inherit;
+}
+
+.flex-2 {
+  flex-grow: 2;
+  flex-shrink: 1;
+  flex-basis: 0%;
+}
+
+.dot {
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  display: inline-block;
 }
