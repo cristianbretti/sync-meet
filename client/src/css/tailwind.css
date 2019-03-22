@@ -839,6 +839,10 @@ table {
   background-color: #ffebef;
 }
 
+.bg-inherit {
+  background-color: inherit;
+}
+
 .hover\:bg-transparent:hover {
   background-color: transparent;
 }
@@ -1131,6 +1135,10 @@ table {
   background-color: #ffebef;
 }
 
+.hover\:bg-inherit:hover {
+  background-color: inherit;
+}
+
 .focus\:bg-transparent:focus {
   background-color: transparent;
 }
@@ -1421,6 +1429,10 @@ table {
 
 .focus\:bg-pink-lightest:focus {
   background-color: #ffebef;
+}
+
+.focus\:bg-inherit:focus {
+  background-color: inherit;
 }
 
 .bg-bottom {
@@ -1787,6 +1799,10 @@ table {
   border-color: #ffebef;
 }
 
+.border-inherit {
+  border-color: inherit;
+}
+
 .hover\:border-transparent:hover {
   border-color: transparent;
 }
@@ -2079,6 +2095,10 @@ table {
   border-color: #ffebef;
 }
 
+.hover\:border-inherit:hover {
+  border-color: inherit;
+}
+
 .focus\:border-transparent:focus {
   border-color: transparent;
 }
@@ -2369,6 +2389,10 @@ table {
 
 .focus\:border-pink-lightest:focus {
   border-color: #ffebef;
+}
+
+.focus\:border-inherit:focus {
+  border-color: inherit;
 }
 
 .rounded-none {
@@ -5300,6 +5324,10 @@ table {
   color: #ffebef;
 }
 
+.text-inherit {
+  color: inherit;
+}
+
 .hover\:text-transparent:hover {
   color: transparent;
 }
@@ -5590,6 +5618,10 @@ table {
 
 .hover\:text-pink-lightest:hover {
   color: #ffebef;
+}
+
+.hover\:text-inherit:hover {
+  color: inherit;
 }
 
 .focus\:text-transparent:focus {
@@ -5884,6 +5916,10 @@ table {
   color: #ffebef;
 }
 
+.focus\:text-inherit:focus {
+  color: inherit;
+}
+
 .text-xs {
   font-size: .75rem;
 }
@@ -6148,6 +6184,10 @@ table {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.w-0 {
+  width: 0;
 }
 
 .w-1 {
@@ -6419,7 +6459,6 @@ code {
   height: 25px;
   width: 25px;
   border-radius: 50%;
-  display: inline-block;
 }
 
 @media screen and (min-width: 700px) {
@@ -6744,6 +6783,10 @@ code {
     background-color: #ffebef;
   }
 
+  .sm\:bg-inherit {
+    background-color: inherit;
+  }
+
   .sm\:hover\:bg-transparent:hover {
     background-color: transparent;
   }
@@ -7036,6 +7079,10 @@ code {
     background-color: #ffebef;
   }
 
+  .sm\:hover\:bg-inherit:hover {
+    background-color: inherit;
+  }
+
   .sm\:focus\:bg-transparent:focus {
     background-color: transparent;
   }
@@ -7326,6 +7373,10 @@ code {
 
   .sm\:focus\:bg-pink-lightest:focus {
     background-color: #ffebef;
+  }
+
+  .sm\:focus\:bg-inherit:focus {
+    background-color: inherit;
   }
 
   .sm\:bg-bottom {
@@ -7684,6 +7735,10 @@ code {
     border-color: #ffebef;
   }
 
+  .sm\:border-inherit {
+    border-color: inherit;
+  }
+
   .sm\:hover\:border-transparent:hover {
     border-color: transparent;
   }
@@ -7976,6 +8031,10 @@ code {
     border-color: #ffebef;
   }
 
+  .sm\:hover\:border-inherit:hover {
+    border-color: inherit;
+  }
+
   .sm\:focus\:border-transparent:focus {
     border-color: transparent;
   }
@@ -8266,6 +8325,10 @@ code {
 
   .sm\:focus\:border-pink-lightest:focus {
     border-color: #ffebef;
+  }
+
+  .sm\:focus\:border-inherit:focus {
+    border-color: inherit;
   }
 
   .sm\:rounded-none {
@@ -11181,6 +11244,10 @@ code {
     color: #ffebef;
   }
 
+  .sm\:text-inherit {
+    color: inherit;
+  }
+
   .sm\:hover\:text-transparent:hover {
     color: transparent;
   }
@@ -11471,6 +11538,10 @@ code {
 
   .sm\:hover\:text-pink-lightest:hover {
     color: #ffebef;
+  }
+
+  .sm\:hover\:text-inherit:hover {
+    color: inherit;
   }
 
   .sm\:focus\:text-transparent:focus {
@@ -11765,6 +11836,10 @@ code {
     color: #ffebef;
   }
 
+  .sm\:focus\:text-inherit:focus {
+    color: inherit;
+  }
+
   .sm\:text-xs {
     font-size: .75rem;
   }
@@ -12029,6 +12104,10 @@ code {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .sm\:w-0 {
+    width: 0;
   }
 
   .sm\:w-1 {
@@ -12492,6 +12571,10 @@ code {
     background-color: #ffebef;
   }
 
+  .md\:bg-inherit {
+    background-color: inherit;
+  }
+
   .md\:hover\:bg-transparent:hover {
     background-color: transparent;
   }
@@ -12784,6 +12867,10 @@ code {
     background-color: #ffebef;
   }
 
+  .md\:hover\:bg-inherit:hover {
+    background-color: inherit;
+  }
+
   .md\:focus\:bg-transparent:focus {
     background-color: transparent;
   }
@@ -13074,6 +13161,10 @@ code {
 
   .md\:focus\:bg-pink-lightest:focus {
     background-color: #ffebef;
+  }
+
+  .md\:focus\:bg-inherit:focus {
+    background-color: inherit;
   }
 
   .md\:bg-bottom {
@@ -13432,6 +13523,10 @@ code {
     border-color: #ffebef;
   }
 
+  .md\:border-inherit {
+    border-color: inherit;
+  }
+
   .md\:hover\:border-transparent:hover {
     border-color: transparent;
   }
@@ -13724,6 +13819,10 @@ code {
     border-color: #ffebef;
   }
 
+  .md\:hover\:border-inherit:hover {
+    border-color: inherit;
+  }
+
   .md\:focus\:border-transparent:focus {
     border-color: transparent;
   }
@@ -14014,6 +14113,10 @@ code {
 
   .md\:focus\:border-pink-lightest:focus {
     border-color: #ffebef;
+  }
+
+  .md\:focus\:border-inherit:focus {
+    border-color: inherit;
   }
 
   .md\:rounded-none {
@@ -16929,6 +17032,10 @@ code {
     color: #ffebef;
   }
 
+  .md\:text-inherit {
+    color: inherit;
+  }
+
   .md\:hover\:text-transparent:hover {
     color: transparent;
   }
@@ -17219,6 +17326,10 @@ code {
 
   .md\:hover\:text-pink-lightest:hover {
     color: #ffebef;
+  }
+
+  .md\:hover\:text-inherit:hover {
+    color: inherit;
   }
 
   .md\:focus\:text-transparent:focus {
@@ -17513,6 +17624,10 @@ code {
     color: #ffebef;
   }
 
+  .md\:focus\:text-inherit:focus {
+    color: inherit;
+  }
+
   .md\:text-xs {
     font-size: .75rem;
   }
@@ -17777,6 +17892,10 @@ code {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .md\:w-0 {
+    width: 0;
   }
 
   .md\:w-1 {
@@ -18240,6 +18359,10 @@ code {
     background-color: #ffebef;
   }
 
+  .lg\:bg-inherit {
+    background-color: inherit;
+  }
+
   .lg\:hover\:bg-transparent:hover {
     background-color: transparent;
   }
@@ -18532,6 +18655,10 @@ code {
     background-color: #ffebef;
   }
 
+  .lg\:hover\:bg-inherit:hover {
+    background-color: inherit;
+  }
+
   .lg\:focus\:bg-transparent:focus {
     background-color: transparent;
   }
@@ -18822,6 +18949,10 @@ code {
 
   .lg\:focus\:bg-pink-lightest:focus {
     background-color: #ffebef;
+  }
+
+  .lg\:focus\:bg-inherit:focus {
+    background-color: inherit;
   }
 
   .lg\:bg-bottom {
@@ -19180,6 +19311,10 @@ code {
     border-color: #ffebef;
   }
 
+  .lg\:border-inherit {
+    border-color: inherit;
+  }
+
   .lg\:hover\:border-transparent:hover {
     border-color: transparent;
   }
@@ -19472,6 +19607,10 @@ code {
     border-color: #ffebef;
   }
 
+  .lg\:hover\:border-inherit:hover {
+    border-color: inherit;
+  }
+
   .lg\:focus\:border-transparent:focus {
     border-color: transparent;
   }
@@ -19762,6 +19901,10 @@ code {
 
   .lg\:focus\:border-pink-lightest:focus {
     border-color: #ffebef;
+  }
+
+  .lg\:focus\:border-inherit:focus {
+    border-color: inherit;
   }
 
   .lg\:rounded-none {
@@ -22677,6 +22820,10 @@ code {
     color: #ffebef;
   }
 
+  .lg\:text-inherit {
+    color: inherit;
+  }
+
   .lg\:hover\:text-transparent:hover {
     color: transparent;
   }
@@ -22967,6 +23114,10 @@ code {
 
   .lg\:hover\:text-pink-lightest:hover {
     color: #ffebef;
+  }
+
+  .lg\:hover\:text-inherit:hover {
+    color: inherit;
   }
 
   .lg\:focus\:text-transparent:focus {
@@ -23261,6 +23412,10 @@ code {
     color: #ffebef;
   }
 
+  .lg\:focus\:text-inherit:focus {
+    color: inherit;
+  }
+
   .lg\:text-xs {
     font-size: .75rem;
   }
@@ -23525,6 +23680,10 @@ code {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .lg\:w-0 {
+    width: 0;
   }
 
   .lg\:w-1 {
@@ -23988,6 +24147,10 @@ code {
     background-color: #ffebef;
   }
 
+  .xl\:bg-inherit {
+    background-color: inherit;
+  }
+
   .xl\:hover\:bg-transparent:hover {
     background-color: transparent;
   }
@@ -24280,6 +24443,10 @@ code {
     background-color: #ffebef;
   }
 
+  .xl\:hover\:bg-inherit:hover {
+    background-color: inherit;
+  }
+
   .xl\:focus\:bg-transparent:focus {
     background-color: transparent;
   }
@@ -24570,6 +24737,10 @@ code {
 
   .xl\:focus\:bg-pink-lightest:focus {
     background-color: #ffebef;
+  }
+
+  .xl\:focus\:bg-inherit:focus {
+    background-color: inherit;
   }
 
   .xl\:bg-bottom {
@@ -24928,6 +25099,10 @@ code {
     border-color: #ffebef;
   }
 
+  .xl\:border-inherit {
+    border-color: inherit;
+  }
+
   .xl\:hover\:border-transparent:hover {
     border-color: transparent;
   }
@@ -25220,6 +25395,10 @@ code {
     border-color: #ffebef;
   }
 
+  .xl\:hover\:border-inherit:hover {
+    border-color: inherit;
+  }
+
   .xl\:focus\:border-transparent:focus {
     border-color: transparent;
   }
@@ -25510,6 +25689,10 @@ code {
 
   .xl\:focus\:border-pink-lightest:focus {
     border-color: #ffebef;
+  }
+
+  .xl\:focus\:border-inherit:focus {
+    border-color: inherit;
   }
 
   .xl\:rounded-none {
@@ -28425,6 +28608,10 @@ code {
     color: #ffebef;
   }
 
+  .xl\:text-inherit {
+    color: inherit;
+  }
+
   .xl\:hover\:text-transparent:hover {
     color: transparent;
   }
@@ -28715,6 +28902,10 @@ code {
 
   .xl\:hover\:text-pink-lightest:hover {
     color: #ffebef;
+  }
+
+  .xl\:hover\:text-inherit:hover {
+    color: inherit;
   }
 
   .xl\:focus\:text-transparent:focus {
@@ -29009,6 +29200,10 @@ code {
     color: #ffebef;
   }
 
+  .xl\:focus\:text-inherit:focus {
+    color: inherit;
+  }
+
   .xl\:text-xs {
     font-size: .75rem;
   }
@@ -29273,6 +29468,10 @@ code {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .xl\:w-0 {
+    width: 0;
   }
 
   .xl\:w-1 {

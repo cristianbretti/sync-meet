@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import GoogleLogin from 'react-google-login';
-import {InputLabel} from '../components';
+import TextInput from '../components/TextInput';
 import DatePicker from "react-datepicker";
 import { registerLocale, setDefaultLocale } from "react-datepicker";
 import sv from 'date-fns/locale/sv';
 import "react-datepicker/dist/react-datepicker.css";
 import api from '../api/api';
 import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse, GetGroupCalendarResponse, EmptyResponse} from '../api/models';
-import AnimLogo from '../components/logo/AnimLogo';
 import Logo from '../components/logo/Logo';
 import {DateToYYYYMMDD, DateToHHMM, HourAndMinuteToHHMM} from '../utils/helpers'
 import { RouteComponentProps } from 'react-router-dom';
+import HelpHover from '../components/HelpHover';
 
 registerLocale('sv', sv);
 setDefaultLocale('sv');
 
 const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
     const [formValues, setFormValues] = useState({
-        name: "",
-        eventName: "",
+        userName: "",
+        groupName: "",
         startDate: new Date(),
         endDate: new Date(),
         startTime: new Date(),
@@ -27,22 +27,21 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
         lengthMinutes: 0,
     });
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        event.persist();
-        setFormValues(values => ({ ...values, [event.target.name]: event.target.value }));
+    const handleChange = (name: string, value: string) => {
+        setFormValues(values => ({ ...values, [name]: value }));
     };
 
 
     const responseGoogle = (googleResponse: any) => {
         console.log(googleResponse);
         let newGroup: CreateGroupBody = {
-            group_name: formValues.eventName,
+            group_name: formValues.groupName,
             from_date: new MyDate(DateToYYYYMMDD(formValues.startDate)),
             to_date: new MyDate(DateToYYYYMMDD(formValues.endDate)),
             from_time: new Time(DateToHHMM(formValues.startTime)),
             to_time: new Time(DateToHHMM(formValues.endTime)),
             meeting_length: new Time(HourAndMinuteToHHMM(formValues.lengthHours, formValues.lengthMinutes)),
-            user_name: formValues.name,
+            user_name: formValues.userName,
             access_token: googleResponse.getAuthResponse().access_token,
             id_token: googleResponse.getAuthResponse().id_token
         }
@@ -62,13 +61,30 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
     }
 
     return (
-        <div className="text-center h-screen flex flex-col items-center justify-center">
-            <div className="py-6 px-24 flex flex-col justify-center items-center bg-grey-darker">
-                <InputLabel text="Enter name"/>
-                <input className="p-2" type="text" name="name" value={formValues.name} onChange={handleChange}/>
-                <InputLabel text="Enter event name"/>
-                <input className="p-2" type="text" name="eventName" value={formValues.eventName} onChange={handleChange}/>
-                <InputLabel text="Enter start date"/>
+        <div className="h-screen flex flex-col items-center justify-center">
+            <div className="flex flex-col justify-center items-center bg-grey-darker">
+                <h2 className="text-blue-dark w-full bg-grey-darkest pr-12 pb-2">Creating a new meeting</h2>
+                <div className="flex items-center">
+                    <TextInput 
+                        className="mr-4 mb-2 mt-4"
+                        label="Your display name" 
+                        name={"userName"} 
+                        value={formValues.userName} 
+                        onChange={handleChange}
+                    />
+                    <HelpHover className="pt-2" text="This is the name that you will be represented with to your colleagues." />
+                </div>
+                <div className="flex items-center">
+                    <TextInput 
+                        className="mr-4 my-2"
+                        label="Meeting title" 
+                        name={"groupName"} 
+                        value={formValues.groupName} 
+                        onChange={handleChange}
+                    />
+                    <HelpHover className="pt-2" text="This is the name this meeting will be represented with." />
+                </div>
+                <div>Enter start date"</div>
                 <DatePicker
                     className="p-2"
                     selected={formValues.startDate}
@@ -78,7 +94,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                     dateFormat="yyyy/MM/dd"
                     onChange={(date: Date) => setFormValues({...formValues, ["startDate"]:date})}
                     />
-                <InputLabel text="Enter end date"/>
+                <div> text="Enter end date"/></div>
                 <DatePicker
                     className="p-2"
                     selected={formValues.endDate}
@@ -88,7 +104,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                     dateFormat="yyyy/MM/dd"
                     onChange={(date: Date) => setFormValues({...formValues, ["endDate"]:date})}
                 />
-                <InputLabel text="Enter start time"/>
+                <div> text="Enter start time"/></div>
                 <DatePicker
                     className="p-2"
                     selected={formValues.startTime}
@@ -99,7 +115,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                     dateFormat="HH:mm"
                     timeCaption="Time"
                 />
-                <InputLabel text="Enter end time"/>
+                <div> text="Enter end time"/></div>
                 <DatePicker
                     className="p-2"
                     selected={formValues.endTime}
@@ -110,14 +126,15 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                     dateFormat="HH:mm"
                     timeCaption="Time"
                 />
-                <InputLabel text="Length" />
+                <div> text="Length" /></div>
                 <div className="p-2 flex flex-row items-center">
                     <input
                         className="m-2 p-2 w-12"
                         type="number"
                         name="lengthHours"
                         value={formValues.lengthHours}
-                        onChange={handleChange}/>
+                        onChange={(event) => handleChange(event.target.name, event.target.value)}
+                    />
                     <div className="text-white align-middle">H</div>
                 
                     <input
@@ -125,7 +142,8 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                         type="number"
                         name="lengthMinutes"
                         value={formValues.lengthMinutes}
-                        onChange={handleChange}/>
+                        onChange={(event) => handleChange(event.target.name, event.target.value)}
+                    />
                     <div className="text-white align-middle">M</div>
                 </div>
                 <GoogleLogin

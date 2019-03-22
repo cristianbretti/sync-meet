@@ -127,6 +127,8 @@ let colors = {
   'pink-light': '#fa7ea8',
   'pink-lighter': '#ffbbca',
   'pink-lightest': '#ffebef',
+
+  'inherit': 'inherit',
 }
 
 module.exports = {
@@ -481,6 +483,7 @@ module.exports = {
 
   width: {
     'auto': 'auto',
+    '0': '0',
     'px': '1px',
     '1': '0.25rem',
     '2': '0.5rem',

@@ -1,9 +1,7 @@
 import React, {FC} from 'react';
 import { RouteComponentProps } from 'react-router';
 import AnimLogo from '../components/logo/AnimLogo';
-import { Link } from 'react-router-dom';
 import LinkButton from '../components/LinkButton';
-
 
 const bulletPoint = (color:string, text:string) => (
     <div className="flex-1 flex flex-col items-center bg-grey-dark rounded text-center m-4 p-4">
