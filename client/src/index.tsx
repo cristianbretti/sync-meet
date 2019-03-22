@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 import { BrowserRouter } from 'react-router-dom';
-import {OwnerStart} from './containers/OwnerStart'
+import {CreateGroup} from './containers/CreateGroup'
 import { Route } from 'react-router-dom';
 import './css/tailwind.css';
 import Calendar from './containers/Calendar';
@@ -12,7 +12,7 @@ ReactDOM.render(
 
     <BrowserRouter>
         <div>
-            <Route exact path="/" component={OwnerStart}/>
+            <Route exact path="/" component={CreateGroup}/>
             <Route path="/group/:group_str_id" component={Calendar}/>
         </div>
     </BrowserRouter>, document.getElementById('root'));

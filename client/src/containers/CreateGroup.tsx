@@ -15,7 +15,7 @@ import { RouteComponentProps } from 'react-router-dom';
 registerLocale('sv', sv);
 setDefaultLocale('sv');
 
-export const OwnerStart: React.SFC<RouteComponentProps<any>> = ({history}) => {
+export const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
     const [formValues, setFormValues] = useState({
         name: "",
         eventName: "",
