@@ -32,7 +32,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
     });
     const [dateChanged, setDateChanged] = useState(false);
 
-    const handleChange = (name: string, value: string | Date) => {
+    const handleChange = (name: string, value: string | MyDate | Date) => {
         setFormValues(values => ({ ...values, [name]: value }));
     };
 
@@ -77,7 +77,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                         value={formValues.userName} 
                         onChange={handleChange}
                     />
-                    <HelpHover className="pl-4 pt-2" text="This is the name that you will be represented with to your colleagues." />
+                    <HelpHover className="pl-4 pt-4" text="This is the name that you will be represented with to your colleagues." />
                 </div>
                 <div className="flex items-center">
                     <TextInput 
@@ -87,39 +87,39 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                         value={formValues.groupName} 
                         onChange={handleChange}
                     />
-                    <HelpHover className="pl-4 pt-2" text="This is the name this meeting will be represented with." />
+                    <HelpHover className="pl-4 pt-4" text="This is the name this meeting will be represented with." />
                 </div>
                 <div className="flex items-center">
                     <DateInput
                         className="mr-4 my-2"
                         label="From date"
                         name={"startDate"}
-                        value={formValues.startDate.date}
+                        value={formValues.startDate}
                         selectsStart={true}
                         selectsEnd={false}
                         startDate={formValues.startDate}
                         endDate={formValues.endDate}
                         onChange={(name,value) => {setDateChanged(true); handleChange(name, value);}}
-                        valid={formValues.endDate >= formValues.startDate}
+                        valid={formValues.endDate.date >= formValues.startDate.date}
                         changed={dateChanged}
                     />
-                    <HelpHover className="pl-4 pt-2" text="Look for available time slots from this day and forward." />
+                    <HelpHover className="pl-4 pt-4" text="Look for available time slots from this day and forward." />
                 </div>
                 <div className="flex items-center">
                     <DateInput
                         className="mr-4 my-2"
                         label="To date"
                         name={"endDate"}
-                        value={formValues.endDate.date}
+                        value={formValues.endDate}
                         selectsStart={false}
                         selectsEnd={true}
                         startDate={formValues.startDate}
                         endDate={formValues.endDate}
                         onChange={(name,value) => {setDateChanged(true); handleChange(name, value);}}
-                        valid={formValues.endDate >= formValues.startDate}
+                        valid={formValues.endDate.date >= formValues.startDate.date}
                         changed={dateChanged}
                     />
-                    <HelpHover className="pl-4 pt-2" text="Look for available time slots up to this day. This day is included as the last day." />
+                    <HelpHover className="pl-4 pt-4" text="Look for available time slots up to this day. This day is included as the last day." />
                 </div>
                 <div className="flex items-center">
                     <TimeInput
@@ -129,7 +129,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                         value={formValues.startTime}
                         onChange={handleChange}
                     />
-                    <HelpHover className="pl-4 pt-2" text="From which time on the day to look for available time slots." />
+                    <HelpHover className="pl-4 pt-4" text="From which time on the day to look for available time slots." />
                 </div>
                 <div className="flex items-center">
                     <TimeInput
@@ -139,7 +139,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                         value={formValues.endTime}
                         onChange={handleChange}
                     />
-                    <HelpHover className="pl-4 pt-2" text="From which time on the day to look for available time slots." />
+                    <HelpHover className="pl-4 pt-4" text="From which time on the day to look for available time slots." />
                 </div>
                 <div> text="Length" /></div>
                 <div className="p-2 flex flex-row items-center">

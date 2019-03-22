@@ -27,8 +27,7 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, onChange}
                 selected={value}
                 showTimeSelect
                 showTimeSelectOnly
-                timeIntervals={30}
-                dateFormat="HH:mm"
+                dateFormat="mm"
                 timeCaption="Time"
                 onChange={(date: Date) => onChange(name, date)}
                 onFocus={() => setActive(true)}

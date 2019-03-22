@@ -7,38 +7,47 @@ interface DateInputProps {
     className?: string;
     label: string;
     name: string;
-    value: Date;
-    startDate: Date;
-    endDate: Date;
+    value: MyDate;
+    startDate: MyDate;
+    endDate: MyDate;
     selectsStart: boolean;
     selectsEnd: boolean;
     valid: boolean;
     changed: boolean;
-    onChange(name:string, value: Date): void;
+    onChange(name:string, value: MyDate): void;
+}
+
+class CustomInput extends React.Component<any> {
+    render() {
+        return (
+        <input 
+            {...this.props}
+            readOnly={window.outerWidth < 700}
+        />
+        )
+    }
 }
 
 const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate, endDate, selectsStart, selectsEnd, valid, changed, onChange}) => {
-    const [active, setActive] = useState(false);
     return (
         <InputWrapper
             className={className}
             label={label}
             name={name}
-            active={active}
+            active={false}
             valid={valid}
             changed={changed}
         >
             <DatePicker
                 className="bg-inherit py-2 text-inherit outline-none"
-                selected={value}
+                customInput={<CustomInput />}
+                selected={value.date}
                 selectsStart={selectsStart}
                 selectsEnd={selectsEnd}
-                startDate={startDate}
-                endDate={endDate}
+                startDate={startDate.date}
+                endDate={endDate.date}
                 dateFormat="yyyy-MM-dd"
-                onChange={(date: Date) => onChange(name, date)}
-                onFocus={() => setActive(true)}
-                onBlur={() => setActive(false)}
+                onChange={(date: Date) => onChange(name, new MyDate({date: date}))}
             />
         </InputWrapper>
     )
