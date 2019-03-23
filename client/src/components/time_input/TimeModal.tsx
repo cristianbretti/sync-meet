@@ -2,6 +2,7 @@ import React, {Component, RefObject} from 'react';
 import { Time } from '../../api/models';
 import ListItem from './ListItem';
 import { render } from 'react-dom';
+import { KeyPress, KeyPressStatus } from './TimeInput';
 // import { registerLocale, setDefaultLocale } from "react-datepicker";
 // import sv from 'date-fns/locale/sv';
 // registerLocale('sv', sv);
@@ -12,6 +13,9 @@ interface TimeModalProps {
     setActive: React.Dispatch<React.SetStateAction<boolean>>;
     onHourChange(value: number): void;
     onMinChange(value: number): void;
+    keyPress: KeyPress;
+    setKeyPress: React.Dispatch<React.SetStateAction<KeyPress>>;
+    lastChanged: React.MutableRefObject<boolean>;
 }
 
 interface TimeModalState {
@@ -38,8 +42,58 @@ export default class TimeModal extends Component<TimeModalProps, TimeModalState>
         }
     }
 
+    componentWillReceiveProps(nextProps: TimeModalProps) {
+        if (nextProps.keyPress.status === KeyPressStatus.UP) {
+            if (!this.props.lastChanged.current) {
+                let newHover = (this.state.hoverHour + 23) % 24;
+                if (this.state.hoverHour === -1) {
+                    newHover = (nextProps.currentValue.getHours() + 23) % 24;
+                }
+                this.setHoverHour(newHover)
+            } else {
+                let newHover = (this.state.hoverMin + 55) % 60;
+                if (this.state.hoverMin === -1) {
+                    newHover = (nextProps.currentValue.getMinutes() + 55) % 60;
+                }
+                this.setHoverMin(newHover)
+            }
+            this.props.setKeyPress({status: KeyPressStatus.STANDBY});
+        } else if (nextProps.keyPress.status === KeyPressStatus.DOWN) {
+            if (!this.props.lastChanged.current) {
+                let newHover = (this.state.hoverHour + 1) % 24;
+                if (this.state.hoverHour === -1) {
+                    newHover = (nextProps.currentValue.getHours() + 1) % 24;
+                }
+                this.setHoverHour(newHover);
+            } else {
+                let newHover = (this.state.hoverMin + 5) % 60;
+                if (this.state.hoverMin === -1) {
+                    newHover = (nextProps.currentValue.getMinutes() + 5) % 60;
+                }
+                this.setHoverMin(newHover);
+            }
+            this.props.setKeyPress({status: KeyPressStatus.STANDBY});
+        } else if (nextProps.keyPress.status === KeyPressStatus.WAITING) {
+            if (!this.props.lastChanged.current) {
+                let newValue = this.state.hoverHour;
+                if (newValue === -1) {
+                    newValue = this.props.currentValue.getHours();
+                }
+                this.props.setKeyPress({status: KeyPressStatus.SET, value: newValue})
+                this.setHoverHour(-1);
+            } else {
+                let newValue = this.state.hoverMin;
+                if (newValue === -1) {
+                    newValue = this.props.currentValue.getMinutes();
+                }
+                this.props.setKeyPress({status: KeyPressStatus.SET, value: newValue})
+                this.setHoverMin(-1);
+            }
+        }
+    }
+
     render() {
-        const {setActive, currentValue} = this.props;
+        const {setActive, currentValue, keyPress} = this.props;
         return (<div 
                 className={"absolute pin-t pin-x mt-10 w-2/3 z-10  border border-white rounded"
                     + " " }
@@ -68,6 +122,7 @@ export default class TimeModal extends Component<TimeModalProps, TimeModalState>
                                     idx={idx}
                                     hover={this.state.hoverHour}
                                     current={currentValue.getHours()}
+                                    scrollToCenter={keyPress.status === KeyPressStatus.STANDBY}
                                     />);
                             })}
                         </div>
@@ -90,6 +145,7 @@ export default class TimeModal extends Component<TimeModalProps, TimeModalState>
                                     idx={idx}
                                     hover={this.state.hoverMin}
                                     current={currentValue.getMinutes()}
+                                    scrollToCenter={keyPress.status === KeyPressStatus.STANDBY}
                                     />);
                             })}
                         </div>

@@ -1,7 +1,8 @@
-import React, {FC, useState, useRef} from 'react';
+import React, {FC, useState, useRef, useEffect} from 'react';
 import { Time } from '../../api/models';
 import InputWrapper from '../InputWrapper';
 import TimeModal from './TimeModal';
+import { number } from 'prop-types';
 
 interface TimeInputProps {
     className?: string;
@@ -13,13 +14,36 @@ interface TimeInputProps {
     onChange(name:string, value: Time): void;
 }
 
+export enum KeyPressStatus {
+    UNSET = "UNSET",
+    UP = "UP",
+    DOWN = "DOWN",
+    LEFT = "LEFT",
+    RIGHT = "RIGHT",
+    STANDBY = "STANDBY",
+    WAITING = "WAITING",
+    SET = "SET",
+}
+
+interface KeyPressUnset {
+    status: Exclude<KeyPressStatus, KeyPressStatus.SET>,
+}
+
+interface KeyPressSet {
+    status: KeyPressStatus.SET;
+    value: number;
+}
+
+export type KeyPress = KeyPressUnset | KeyPressSet
 
 const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, changed, onChange}) => {
     const [currentValue, setCurrentValue] = useState(value);
     const lastChanged = useRef(false);
     const [active, setActive] = useState(false);
     const [typeing, setTyping] = useState(value.toString());
-
+    const [keyPress, setKeyPress] = useState({
+        status: KeyPressStatus.UNSET,
+    } as KeyPress);
 
     const reset = () => {
         setCurrentValue(value)
@@ -29,8 +53,27 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, ch
         onChange(name, value);
     }
 
+    const findNextInput = (e2:any) => {
+        // Tab and enter do same thing
+        const form = e2.target.form;
+        let index = Array.prototype.indexOf.call(form, e2.target);
+        const current = form.elements[index];
+        index += 1;
+        // find the next HTMLINPUT
+        while (form.elements[index].tagName !== "INPUT") {
+            index += 1;
+            if (index >= form.elements.length) {
+                current.blur();
+                return;
+            }
+        }
+        form.elements[index].focus();
+        e2.preventDefault();
+    }
+
     const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.keyCode === 13 || event.keyCode === 9) {
+        // Typeing and enter or tab
+        if ((event.keyCode === 13 && keyPress.status === KeyPressStatus.UNSET) || event.keyCode === 9) {
             try {
                 const newTime = new Time(typeing);
                 if (isNaN(newTime.getHours())) {
@@ -41,27 +84,43 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, ch
                 setTyping("empty")
                 onChange(name, newTime);
             } catch {
-                console.log("here bad")
                 reset();
             }
         }
-        if (event.keyCode === 13) {
+        if (event.keyCode === 13 && keyPress.status === KeyPressStatus.UNSET) {
             // Tab and enter do same thing
-            const e2 = event as any;
-            const form = e2.target.form;
-            let index = Array.prototype.indexOf.call(form, e2.target);
-            index += 1;
-            // find the next HTMLINPUT
-            while (form.elements[index].tagName !== "INPUT") {
-                index += 1;
-                if (index >= form.elements.length) {
-                    return;
-                }
-            }
-            form.elements[index].focus();
-            e2.preventDefault();
+            findNextInput(event);
         }
+        if (event.keyCode === 13 && keyPress.status === KeyPressStatus.STANDBY) {
+            setKeyPress({status: KeyPressStatus.WAITING});
+            event.persist();
+            if (lastChanged.current) {
+                setTimeout(() => {
+                    findNextInput(event)
+                }, 100);
+            }
+        }
+
+        // Movement in modal
+        if (event.keyCode === 38) {
+            setKeyPress({status: KeyPressStatus.UP});
+        } else if (event.keyCode === 40) {
+            setKeyPress({status: KeyPressStatus.DOWN});
+        }
+        console.log(event.keyCode)
     }
+
+    useEffect(() => {
+        if (keyPress.status === KeyPressStatus.SET) {
+            if (!lastChanged.current){
+                handleHourChange(keyPress.value);
+                setKeyPress({status: KeyPressStatus.STANDBY});
+            } else {
+                handleMinChange(keyPress.value);
+                setKeyPress({status: KeyPressStatus.UNSET});
+            }
+        }
+    })
 
     const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTyping(event.target.value);
@@ -80,6 +139,7 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, ch
     }
 
     const handleMinChange = (newValue: number) => {
+        console.log("in here", newValue)
         typeing !== "empty" ? setTyping("empty") : null;
         let timeString = (currentValue.getHours() > 9 ? currentValue.getHours() : "0" + currentValue.getHours()) 
             + ":" + (newValue > 9 ? newValue : "0" + newValue);
@@ -88,6 +148,7 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, ch
         lastChanged.current = false;
         onChange(name, newTime);
     }
+
     return (
         <InputWrapper
             className={className}
@@ -125,6 +186,7 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, ch
                             }
                             if (changed) {
                                 setActive(false);
+                                lastChanged.current = false;
                             } else if (!lastChanged.current) {
                                 setActive(false);
                             } else {
@@ -140,6 +202,9 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, ch
                         onHourChange={handleHourChange}
                         onMinChange={handleMinChange}
                         setActive={setActive}
+                        keyPress={keyPress}
+                        setKeyPress={setKeyPress}
+                        lastChanged={lastChanged}
                     />
                     : null
                 }
