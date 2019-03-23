@@ -8,10 +8,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import HelpHover from '../components/HelpHover';
 import DateInput from '../components/DateInput';
 import TimeInput from '../components/time_input/TimeInput';
-// import { registerLocale, setDefaultLocale } from "react-datepicker";
-// import sv from 'date-fns/locale/sv';
-// registerLocale('sv', sv);
-// setDefaultLocale('sv');
+
 
 const nextWeek = new Date();
 nextWeek.setDate(nextWeek.getDate() + 7);
@@ -126,7 +123,6 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({history}) => {
                         value={formValues.fromTime}
                         onChange={(name, value) => {setTimeChanged(true);handleChange(name, value);}}
                         valid={validTimes}
-                        changed={timeChanged}
                     />
                     <HelpHover className="pl-4 pt-4" text="From which time on the day to look for available time slots." />
                 </div>
@@ -138,7 +134,6 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({history}) => {
                         value={formValues.toTime}
                         onChange={(name, value) => {setTimeChanged(true);handleChange(name, value);}}
                         valid={validTimes}
-                        changed={timeChanged}
                     />
                     <HelpHover className="pl-4 pt-4" text="From which time on the day to look for available time slots." />
                 </div>
@@ -150,7 +145,6 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({history}) => {
                         value={formValues.meetingLength}
                         onChange={handleChange}
                         valid={true}
-                        changed={true}
                     />
                     <HelpHover className="pl-4 pt-4" text="The expected duration of the meeting." />
                 </div>

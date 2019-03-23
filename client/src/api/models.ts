@@ -1,8 +1,7 @@
 
-export class MyDate extends Date {
+export class MyDate{
     public date: Date;
     constructor(init: {date_str?:string, date?: Date}) {
-        super();
         if (init.date_str !== undefined) {
             this.date = new Date(init.date_str)
         } else if (init.date !== undefined) {
@@ -17,13 +16,12 @@ export class MyDate extends Date {
 
     public toJSON() {
         return this.date.toLocaleString().substr(0,10);
-    }   
+    }
 }
 
-export class Time extends Date {
+export class Time{
     public time: Date;
     constructor(time_str: string) {
-        super();
         this.time = new Date("2019-01-01T"+time_str + ":00+01:00")
     }
     public toString() {
@@ -32,6 +30,13 @@ export class Time extends Date {
 
     public toJSON() {
         return this.time.toTimeString().substr(0,5);
+    }
+
+    public getHours() {
+        return this.time.getHours();
+    }
+    public getMinutes() {
+        return this.time.getMinutes();
     }
 }
 

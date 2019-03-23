@@ -1,51 +1,101 @@
-import React, {FC, useState} from 'react';
+import React, {Component, RefObject} from 'react';
 import { Time } from '../../api/models';
+import ListItem from './ListItem';
+import { render } from 'react-dom';
+// import { registerLocale, setDefaultLocale } from "react-datepicker";
+// import sv from 'date-fns/locale/sv';
+// registerLocale('sv', sv);
+// setDefaultLocale('sv');
 
 interface TimeModalProps {
-    hover: number;
-    setHover(index: number): void;
-    title: string;
-    numOptions: number;
-    left: boolean;
-    onChange(value: string, left: boolean): void;
+    currentValue: Time;
+    setActive: React.Dispatch<React.SetStateAction<boolean>>;
+    onHourChange(value: number): void;
+    onMinChange(value: number): void;
 }
 
-const TimeModal: FC<TimeModalProps> = ({setHover, hover, title, numOptions, left, onChange}) => <div 
-        className={"absolute pin-t mt-10 w-1/2 z-10  border border-white"
-            + " " + (left ? "pin-l rounded-l" : "pin-r border-l-0 rounded-r")}
-    >
-    <div 
-        className={"relative h-64 overflow-hidden"}
-        onMouseLeave={() => setHover(-1)}
-    >
-        <div className={"absolute pin-x bg-white text-black font-semibold text-center py-2 border-grey-light"
-            +" " + (left ? "border-r" : "border-l")}
-        >
-            {title}
-        </div>
-        <div className="h-full w-full overflow-y-scroll"
-            style={{
-                paddingRight: '17px',
-                boxSizing: 'content-box'
-            }}
-        >
-            {Array.from(Array(numOptions)).map((v, idx) => {
-                if (!left && idx % 5 !== 0) {
-                    return null;
-                } 
-                return (<div 
-                    key={idx}
-                    className={"cursor-pointer flex justify-center text-xs bg-grey" + " " + (idx === 0 ? "pt-10": "")}
-                    onMouseEnter={() => setHover(idx)}
-                    onClick={() => onChange((idx > 9 ? "" + idx : "0" + idx), left)}
-                >
-                    <div className={"p-2 pointer-events-none"+ " " + (hover === idx ? "bg-blue-dark rounded" : "")}>
-                        {idx > 9 ? idx : "0" + idx}
-                    </div>
-                </div>)
-            })}
-        </div>
-    </div>
-</div>
+interface TimeModalState {
+    hoverHour: number;
+    hoverMin: number;
+}
 
-export default TimeModal;
+export default class TimeModal extends Component<TimeModalProps, TimeModalState> {
+    constructor(props: TimeModalProps) {
+        super(props);
+        this.state = {
+            hoverHour: -1,
+            hoverMin: -1,
+        }
+    }
+    public setHoverHour = (value: number) => {this.setState({hoverHour: value})}
+    public setHoverMin = (value: number) => {this.setState({hoverMin: value})}
+
+    public handleChange = (newValue: number, hour: boolean) => {
+        if (hour) {
+            this.props.onHourChange(newValue);
+        } else {
+            this.props.onMinChange(newValue);
+        }
+    }
+
+    render() {
+        const {setActive, currentValue} = this.props;
+        return (<div 
+                className={"absolute pin-t pin-x mt-10 w-2/3 z-10  border border-white rounded"
+                    + " " }
+                onBlur={() => setActive(false)}
+            >
+            <div 
+                className={"relative h-64 overflow-hidden"}
+            >
+                <div className={"absolute pin-x text-black font-bold flex justify-center py-2 border-grey bg-grey-lightest border-b border-grey-light"}
+                >
+                    <div className="flex-1 text-center">Hour</div><div className="text-center">:</div><div className="flex-1 text-center">Min</div>
+                </div>
+                <div className="flex h-full w-full">
+                    <div className="flex-1 h-full">
+                        <div className="h-full w-full overflow-y-scroll"
+                            style={{
+                                paddingRight: '17px',
+                                boxSizing: 'content-box'
+                            }}
+                        >
+                            {Array.from(Array(24)).map((v, idx) => {
+                                return (<ListItem
+                                    key={idx}
+                                    setHover={this.setHoverHour}
+                                    handleChange={() => this.handleChange(idx, true)}
+                                    idx={idx}
+                                    hover={this.state.hoverHour}
+                                    current={currentValue.getHours()} 
+                                    />);
+                            })}
+                        </div>
+                    </div>
+                    <div className="flex-1 h-full">
+                        <div className="w-full h-full overflow-y-scroll border-l border-grey"
+                            style={{
+                                paddingRight: '17px',
+                                boxSizing: 'content-box'
+                            }}
+                        >
+                            {Array.from(Array(60)).map((v, idx) => {
+                                if (idx % 5 !== 0) {
+                                    return null;
+                                } 
+                                return (<ListItem
+                                    key={idx}
+                                    setHover={this.setHoverMin}
+                                    handleChange={() => this.handleChange(idx, false)}
+                                    idx={idx}
+                                    hover={this.state.hoverMin}
+                                    current={currentValue.getMinutes()}
+                                    />);
+                            })}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>)
+    }
+}
