@@ -89,6 +89,12 @@ export default class TimeModal extends Component<TimeModalProps, TimeModalState>
                 this.props.setKeyPress({status: KeyPressStatus.SET, value: newValue})
                 this.setHoverMin(-1);
             }
+        } else if (nextProps.keyPress.status === KeyPressStatus.RIGHT) {
+            this.setHoverHour(-1);
+            this.setHoverMin(nextProps.currentValue.getMinutes());
+        } else if (nextProps.keyPress.status === KeyPressStatus.LEFT) {
+            this.setHoverHour(nextProps.currentValue.getHours());
+            this.setHoverMin(-1);
         }
     }
 

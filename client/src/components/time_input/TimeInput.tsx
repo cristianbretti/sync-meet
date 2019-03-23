@@ -107,7 +107,15 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, ch
         } else if (event.keyCode === 40) {
             setKeyPress({status: KeyPressStatus.DOWN});
         }
-        console.log(event.keyCode)
+        if (keyPress.status !== KeyPressStatus.UNSET) {
+            if (event.keyCode === 37) {
+                lastChanged.current = false;
+                setKeyPress({status: KeyPressStatus.LEFT});
+            } else if (event.keyCode === 39) {
+                lastChanged.current = true;
+                setKeyPress({status: KeyPressStatus.RIGHT});
+            }
+        }
     }
 
     useEffect(() => {
