@@ -9,15 +9,15 @@ interface TimeInputProps {
     name: string;
     value: Time;
     valid: boolean;
+    changed: boolean
     onChange(name:string, value: Time): void;
 }
 
 
-const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, onChange}) => {
+const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, changed, onChange}) => {
     const [currentValue, setCurrentValue] = useState(value);
     const lastChanged = useRef(false);
     const [active, setActive] = useState(false);
-    const [changed, setChanged] = useState(false);
     const [typeing, setTyping] = useState(value.toString());
 
 
@@ -36,7 +36,6 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, on
                 if (isNaN(newTime.getHours())) {
                     throw "is nan";
                 }
-                setChanged(true);
                 setCurrentValue(newTime);
                 lastChanged.current = false;
                 setTyping("empty")
@@ -85,7 +84,6 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, on
         let timeString = (currentValue.getHours() > 9 ? currentValue.getHours() : "0" + currentValue.getHours()) 
             + ":" + (newValue > 9 ? newValue : "0" + newValue);
         const newTime = new Time(timeString);
-        setChanged(true);
         setCurrentValue(newTime);
         lastChanged.current = false;
         onChange(name, newTime);

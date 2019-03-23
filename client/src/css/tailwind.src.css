@@ -95,3 +95,14 @@ body {
   margin-right: 1rem !important;
   color: black !important;
 }
+
+.google-button > div {
+  border-radius: 50% !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.google-button:disabled {
+  background: yellow !important;
+  cursor: default;
+}

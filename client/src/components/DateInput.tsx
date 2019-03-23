@@ -14,6 +14,7 @@ interface DateInputProps {
     selectsStart: boolean;
     selectsEnd: boolean;
     valid: boolean;
+    changed: boolean;
     onChange(name:string, value: MyDate): void;
 }
 
@@ -32,9 +33,9 @@ class CustomInput extends React.Component<any> {
     }
 }
 
-const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate, endDate, selectsStart, selectsEnd, valid, onChange}) => {
+const DateInput: FC<DateInputProps> = 
+    ({className, label, name, value, startDate, endDate, selectsStart, selectsEnd, valid, changed, onChange}) => {
     const [active, setActive] = useState(false);
-    const [changed, setChanged] = useState(false);
     return (
         <InputWrapper
             className={className}
@@ -55,7 +56,6 @@ const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate
                 dateFormat="yyyy-MM-dd"
                 onChange={(date: Date) => {
                     setActive(false);
-                    setChanged(true);
                     onChange(name, new MyDate({date: date}))
                 }}
                 dayClassName={(date: Date) => {
@@ -68,7 +68,6 @@ const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate
                     // This fires even when you pick the same date.
                     if (date.toDateString() === value.date.toDateString()) {
                         setActive(false);
-                        setChanged(true);
                         onChange(name, new MyDate({date: date}))
                     }
                 }}

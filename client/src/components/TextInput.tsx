@@ -6,13 +6,13 @@ interface TextInputProps {
     label: string;
     name: string;
     value: string;
+    changed: boolean;
+    valid: boolean;
     onChange(name:string, value: string): void;
 } 
 
-const TextInput: React.FC<TextInputProps> = ({className, label, name, value, onChange}) => {
+const TextInput: React.FC<TextInputProps> = ({className, label, name, value, changed, valid, onChange}) => {
     const [active, setActive] = useState(false);
-    const [valid, setValid] = useState(false);
-    const [changed, setChanged] = useState(false);
     return (
         <InputWrapper
             className={className}
@@ -27,8 +27,6 @@ const TextInput: React.FC<TextInputProps> = ({className, label, name, value, onC
                 name={name} 
                 value={value} 
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setChanged(true);
-                    setValid(event.target.value !== "");
                     onChange(event.target.name, event.target.value)}
                 }
                 onFocus={() => setActive(true)}
