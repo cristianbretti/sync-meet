@@ -67,7 +67,7 @@ export default class TimeModal extends Component<TimeModalProps, TimeModalState>
                                     handleChange={() => this.handleChange(idx, true)}
                                     idx={idx}
                                     hover={this.state.hoverHour}
-                                    current={currentValue.getHours()} 
+                                    current={currentValue.getHours()}
                                     />);
                             })}
                         </div>
