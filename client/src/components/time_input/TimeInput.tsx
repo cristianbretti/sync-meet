@@ -102,6 +102,7 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, on
             <div className="relative">
                 <input type="text" 
                     className="bg-inherit py-2 text-inherit outline-none" 
+                    readOnly={window.outerWidth < 700}
                     value={(!changed && !active
                         ? ""
                         : typeing !== "empty" 

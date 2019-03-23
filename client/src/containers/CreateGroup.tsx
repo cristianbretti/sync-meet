@@ -62,7 +62,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({history}) => {
     const validTimes = formValues.toTime.time > formValues.fromTime.time;
 
     return (
-        <div className="h-screen flex flex-col items-center justify-center">
+        <div className="min-h-screen flex flex-col items-center justify-center overflow-hidden">
             <form autoComplete="off" className="flex flex-col justify-center items-center bg-grey-darker">
                 <h3 className="text-blue-dark w-full bg-grey-darkest pr-32 pb-2">Creating a new meeting</h3>
                 <div className="flex items-center pt-4">
