@@ -7,7 +7,7 @@ import Logo from '../components/logo/Logo';
 import { RouteComponentProps } from 'react-router-dom';
 import HelpHover from '../components/HelpHover';
 import DateInput from '../components/DateInput';
-import TimeInput from '../components/TimeInput';
+import TimeInput from '../components/time_input/TimeInput';
 // import { registerLocale, setDefaultLocale } from "react-datepicker";
 // import sv from 'date-fns/locale/sv';
 // registerLocale('sv', sv);
@@ -98,9 +98,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({history}) => {
                         selectsEnd={false}
                         startDate={formValues.fromDate}
                         endDate={formValues.toDate}
-                        onChange={(name,value) => {setFromDateChanged(true); handleChange(name, value);}}
+                        onChange={handleChange}
                         valid={validDates}
-                        changed={fromDateChanged}
                     />
                     <HelpHover className="pl-4 pt-4" text="Look for available time slots from this day and forward." />
                 </div>
@@ -114,9 +113,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({history}) => {
                         selectsEnd={true}
                         startDate={formValues.fromDate}
                         endDate={formValues.toDate}
-                        onChange={(name,value) => {setToDateChanged(true); handleChange(name, value);}}
+                        onChange={handleChange}
                         valid={validDates}
-                        changed={toDateChanged}
                     />
                     <HelpHover className="pl-4 pt-4" text="Look for available time slots up to this day. This day is included as the last day." />
                 </div>
