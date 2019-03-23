@@ -1,21 +1,18 @@
 import React, { useState } from 'react';
 import GoogleLogin from 'react-google-login';
 import TextInput from '../components/TextInput';
-import DatePicker from "react-datepicker";
-import { registerLocale, setDefaultLocale } from "react-datepicker";
-import sv from 'date-fns/locale/sv';
-import "react-datepicker/dist/react-datepicker.css";
 import api from '../api/api';
-import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse, GetGroupCalendarResponse, EmptyResponse} from '../api/models';
+import {ErrorResponse, CreateGroupBody, Time, MyDate, CreateGroupResponse} from '../api/models';
 import Logo from '../components/logo/Logo';
-import {DateToYYYYMMDD, DateToHHMM, HourAndMinuteToHHMM} from '../utils/helpers'
 import { RouteComponentProps } from 'react-router-dom';
 import HelpHover from '../components/HelpHover';
 import DateInput from '../components/DateInput';
 import TimeInput from '../components/TimeInput';
+// import { registerLocale, setDefaultLocale } from "react-datepicker";
+// import sv from 'date-fns/locale/sv';
+// registerLocale('sv', sv);
+// setDefaultLocale('sv');
 
-registerLocale('sv', sv);
-setDefaultLocale('sv');
 const nextWeek = new Date();
 nextWeek.setDate(nextWeek.getDate() + 7);
 
@@ -23,36 +20,34 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
     const [formValues, setFormValues] = useState({
         userName: "",
         groupName: "",
-        startDate: new MyDate({date: new Date()}),
-        endDate: new MyDate({date: nextWeek}),
-        startTime: new Date(),
-        endTime: new Date(),
-        lengthHours: 1,
-        lengthMinutes: 0,
+        fromDate: new MyDate({date: new Date()}),
+        toDate: new MyDate({date: nextWeek}),
+        fromTime: new Time("08:00"),
+        toTime: new Time("17:00"),
+        meetingLength: new Time("01:00"),
     });
     const [dateChanged, setDateChanged] = useState(false);
+    const [timeChanged, setTimeChanged] = useState(false);
 
-    const handleChange = (name: string, value: string | MyDate | Date) => {
+    const handleChange = (name: string, value: string | MyDate | Time) => {
         setFormValues(values => ({ ...values, [name]: value }));
     };
 
 
     const responseGoogle = (googleResponse: any) => {
-        console.log(googleResponse);
         let newGroup: CreateGroupBody = {
             group_name: formValues.groupName,
-            from_date: formValues.startDate,
-            to_date: formValues.endDate,
-            from_time: new Time(DateToHHMM(formValues.startTime)),
-            to_time: new Time(DateToHHMM(formValues.endTime)),
-            meeting_length: new Time(HourAndMinuteToHHMM(formValues.lengthHours, formValues.lengthMinutes)),
+            from_date: formValues.fromDate,
+            to_date: formValues.toDate,
+            from_time: formValues.fromTime,
+            to_time: formValues.toTime,
+            meeting_length: formValues.meetingLength,
             user_name: formValues.userName,
             access_token: googleResponse.getAuthResponse().access_token,
             id_token: googleResponse.getAuthResponse().id_token
         }
         api.createGroup(newGroup)
         .then((createGroupResponse: CreateGroupResponse) => {
-            console.log(createGroupResponse)
             localStorage.setItem("google_id", createGroupResponse.google_id)
             history.push("/group/" + createGroupResponse.group_str_id)
         })
@@ -65,11 +60,14 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
         console.log(error)
     }
 
+    const validDates = formValues.toDate.date >= formValues.fromDate.date;
+    const validTimes = formValues.toTime.time > formValues.fromTime.time;
+
     return (
         <div className="h-screen flex flex-col items-center justify-center">
             <div className="flex flex-col justify-center items-center bg-grey-darker">
-                <h2 className="text-blue-dark w-full bg-grey-darkest pr-16 pb-2">Creating a new meeting</h2>
-                <div className="flex items-center">
+                <h3 className="text-blue-dark w-full bg-grey-darkest pr-32 pb-2">Creating a new meeting</h3>
+                <div className="flex items-center pt-4">
                     <TextInput 
                         className="mr-4 mb-2 mt-4"
                         label="Your display name" 
@@ -93,14 +91,14 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                     <DateInput
                         className="mr-4 my-2"
                         label="From date"
-                        name={"startDate"}
-                        value={formValues.startDate}
+                        name={"fromDate"}
+                        value={formValues.fromDate}
                         selectsStart={true}
                         selectsEnd={false}
-                        startDate={formValues.startDate}
-                        endDate={formValues.endDate}
+                        startDate={formValues.fromDate}
+                        endDate={formValues.toDate}
                         onChange={(name,value) => {setDateChanged(true); handleChange(name, value);}}
-                        valid={formValues.endDate.date >= formValues.startDate.date}
+                        valid={validDates}
                         changed={dateChanged}
                     />
                     <HelpHover className="pl-4 pt-4" text="Look for available time slots from this day and forward." />
@@ -109,14 +107,14 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                     <DateInput
                         className="mr-4 my-2"
                         label="To date"
-                        name={"endDate"}
-                        value={formValues.endDate}
+                        name={"toDate"}
+                        value={formValues.toDate}
                         selectsStart={false}
                         selectsEnd={true}
-                        startDate={formValues.startDate}
-                        endDate={formValues.endDate}
+                        startDate={formValues.fromDate}
+                        endDate={formValues.toDate}
                         onChange={(name,value) => {setDateChanged(true); handleChange(name, value);}}
-                        valid={formValues.endDate.date >= formValues.startDate.date}
+                        valid={validDates}
                         changed={dateChanged}
                     />
                     <HelpHover className="pl-4 pt-4" text="Look for available time slots up to this day. This day is included as the last day." />
@@ -125,9 +123,11 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                     <TimeInput
                         className="mr-4 my-2"
                         label="From time"
-                        name={"startTime"}
-                        value={formValues.startTime}
-                        onChange={handleChange}
+                        name={"fromTime"}
+                        value={formValues.fromTime}
+                        onChange={(name, value) => {setTimeChanged(true);handleChange(name, value);}}
+                        valid={validTimes}
+                        changed={timeChanged}
                     />
                     <HelpHover className="pl-4 pt-4" text="From which time on the day to look for available time slots." />
                 </div>
@@ -135,40 +135,39 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                     <TimeInput
                         className="mr-4 my-2"
                         label="To time"
-                        name={"endTime"}
-                        value={formValues.endTime}
-                        onChange={handleChange}
+                        name={"toTime"}
+                        value={formValues.toTime}
+                        onChange={(name, value) => {setTimeChanged(true);handleChange(name, value);}}
+                        valid={validTimes}
+                        changed={timeChanged}
                     />
                     <HelpHover className="pl-4 pt-4" text="From which time on the day to look for available time slots." />
                 </div>
-                <div> text="Length" /></div>
-                <div className="p-2 flex flex-row items-center">
-                    <input
-                        className="m-2 p-2 w-12"
-                        type="number"
-                        name="lengthHours"
-                        value={formValues.lengthHours}
-                        onChange={(event) => handleChange(event.target.name, event.target.value)}
+                <div className="flex items-center">
+                    <TimeInput
+                        className="mr-4 my-2"
+                        label="Meeting length"
+                        name={"meetingLength"}
+                        value={formValues.meetingLength}
+                        onChange={handleChange}
+                        valid={true}
+                        changed={true}
                     />
-                    <div className="text-white align-middle">H</div>
-                
-                    <input
-                        className="m-2 p-2 w-12"
-                        type="number"
-                        name="lengthMinutes"
-                        value={formValues.lengthMinutes}
-                        onChange={(event) => handleChange(event.target.name, event.target.value)}
-                    />
-                    <div className="text-white align-middle">M</div>
+                    <HelpHover className="pl-4 pt-4" text="The expected duration of the meeting." />
                 </div>
-                <GoogleLogin
-                    className="m-2"
-                    clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
-                    buttonText="Give access and create event"
-                    onSuccess={responseGoogle }
-                    onFailure={onGoogleFailure}
-                    cookiePolicy={'single_host_origin'}
-                    scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}/>
+                <div className="w-full flex items-center">
+                    <div className="flex-1"/>
+                    <GoogleLogin
+                        className="mt-8 mb-4 flex-1 google-button"
+                        clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
+                        buttonText="Create and give access"
+                        onSuccess={responseGoogle }
+                        onFailure={onGoogleFailure}
+                        cookiePolicy={'single_host_origin'}
+                        scope={'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'}
+                        disabled={formValues.userName === "" || formValues.groupName === "" || !validDates || !validTimes}
+                    />
+                </div>
             </div>
             <Logo className="w-16 fixed pin-t pin-l m-6"/>
         </div>

@@ -12,16 +12,16 @@ export class MyDate extends Date {
         }
     }
     public toString() {
-        return this.date.toJSON().substr(0,10);
+        return this.date.toLocaleString().substr(0,10);
     }
 
     public toJSON() {
-        return this.date.toJSON().substr(0,10);
+        return this.date.toLocaleString().substr(0,10);
     }   
 }
 
 export class Time extends Date {
-    private time: Date;
+    public time: Date;
     constructor(time_str: string) {
         super();
         this.time = new Date("2019-01-01T"+time_str + ":00+01:00")

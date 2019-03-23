@@ -14,7 +14,7 @@ const HelpHover: FC<HelpHoverProps> = ({className, text}) => {
             onMouseLeave={() => setHover(false)}
         >
             <div 
-                className={"dot bg-grey-darker text-center flex justify-center items-center mb-px pointer-events-none"
+                className={"dot bg-grey-darker text-center flex justify-center items-center pointer-events-none"
                     + " " + (hover ? "text-orange": "text-grey-light")}
                 style={{
                     width: '23px',

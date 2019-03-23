@@ -88,3 +88,10 @@ body {
       width: 33.33333%;
   }
 }
+
+.google-button {
+  background: #38c172 !important;
+  padding-left: 1rem !important;
+  margin-right: 1rem !important;
+  color: black !important;
+}

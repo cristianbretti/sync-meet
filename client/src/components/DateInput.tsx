@@ -2,6 +2,7 @@ import React, {FC, useState} from 'react';
 import DatePicker from "react-datepicker";
 import { MyDate } from '../api/models';
 import InputWrapper from './InputWrapper';
+import "react-datepicker/dist/react-datepicker.css";
 
 interface DateInputProps {
     className?: string;
