@@ -16,7 +16,7 @@ import TimeInput from '../components/TimeInput';
 const nextWeek = new Date();
 nextWeek.setDate(nextWeek.getDate() + 7);
 
-const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
+const CreateGroup: React.FC<RouteComponentProps<any>> = ({history}) => {
     const [formValues, setFormValues] = useState({
         userName: "",
         groupName: "",
@@ -26,7 +26,8 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
         toTime: new Time("17:00"),
         meetingLength: new Time("01:00"),
     });
-    const [dateChanged, setDateChanged] = useState(false);
+    const [fromDateChanged, setFromDateChanged] = useState(false);
+    const [toDateChanged, setToDateChanged] = useState(false);
     const [timeChanged, setTimeChanged] = useState(false);
 
     const handleChange = (name: string, value: string | MyDate | Time) => {
@@ -65,7 +66,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
 
     return (
         <div className="h-screen flex flex-col items-center justify-center">
-            <div className="flex flex-col justify-center items-center bg-grey-darker">
+            <form className="flex flex-col justify-center items-center bg-grey-darker">
                 <h3 className="text-blue-dark w-full bg-grey-darkest pr-32 pb-2">Creating a new meeting</h3>
                 <div className="flex items-center pt-4">
                     <TextInput 
@@ -97,9 +98,9 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                         selectsEnd={false}
                         startDate={formValues.fromDate}
                         endDate={formValues.toDate}
-                        onChange={(name,value) => {setDateChanged(true); handleChange(name, value);}}
+                        onChange={(name,value) => {setFromDateChanged(true); handleChange(name, value);}}
                         valid={validDates}
-                        changed={dateChanged}
+                        changed={fromDateChanged}
                     />
                     <HelpHover className="pl-4 pt-4" text="Look for available time slots from this day and forward." />
                 </div>
@@ -113,9 +114,9 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                         selectsEnd={true}
                         startDate={formValues.fromDate}
                         endDate={formValues.toDate}
-                        onChange={(name,value) => {setDateChanged(true); handleChange(name, value);}}
+                        onChange={(name,value) => {setToDateChanged(true); handleChange(name, value);}}
                         valid={validDates}
-                        changed={dateChanged}
+                        changed={toDateChanged}
                     />
                     <HelpHover className="pl-4 pt-4" text="Look for available time slots up to this day. This day is included as the last day." />
                 </div>
@@ -168,7 +169,7 @@ const CreateGroup: React.SFC<RouteComponentProps<any>> = ({history}) => {
                         disabled={formValues.userName === "" || formValues.groupName === "" || !validDates || !validTimes}
                     />
                 </div>
-            </div>
+            </form>
             <Logo className="w-16 fixed pin-t pin-l m-6"/>
         </div>
     );

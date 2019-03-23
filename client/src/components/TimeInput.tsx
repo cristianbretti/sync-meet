@@ -78,6 +78,7 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, ch
                         }
                     }, 100)}
                     onClick={handleClick}
+                    
                 />
                 {left 
                     ? <TimeModal 

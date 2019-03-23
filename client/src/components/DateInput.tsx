@@ -20,9 +20,13 @@ interface DateInputProps {
 
 class CustomInput extends React.Component<any> {
     render() {
+        const tempProps = {...this.props,
+            value: this.props.changed ? this.props.value : "",
+            changed: undefined
+        }
         return (
         <input 
-            {...this.props}
+            {...tempProps}
             readOnly={window.outerWidth < 700}
         />
         )
@@ -42,7 +46,7 @@ const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate
         >
             <DatePicker
                 className="bg-inherit py-2 text-inherit outline-none"
-                customInput={<CustomInput />}
+                customInput={<CustomInput changed={changed} />}
                 selected={value.date}
                 selectsStart={selectsStart}
                 selectsEnd={selectsEnd}
@@ -58,6 +62,33 @@ const DateInput: FC<DateInputProps> = ({className, label, name, value, startDate
                         return "bg-blue-dark rounded text-white"
                     }
                     return "text-white";
+                }}
+                onSelect={(date: Date) => {
+                    // This fires even when you pick the same date.
+                    if (date.toDateString() === value.date.toDateString()) {
+                        setActive(false);
+                        onChange(name, new MyDate({date: date}))
+                    }
+                }}
+                // Tab and enter do same thing
+                onKeyDown={(e) => {
+                    if (e.keyCode === 9) {
+                        onChange(name, value);
+                    } else if (e.keyCode === 13) {
+                        const e2 = e as any;
+                        const form = e2.target.form;
+                        let index = Array.prototype.indexOf.call(form, e2.target);
+                        index += 1;
+                        // find the next HTMLINPUT
+                        while (form.elements[index].tagName !== "INPUT") {
+                            index += 1;
+                            if (index >= form.elements.length) {
+                                return;
+                            }
+                        }
+                        form.elements[index].focus();
+                        e2.preventDefault();
+                    }
                 }}
                 calendarClassName="bg-grey"
                 onFocus={() => setActive(true)}
