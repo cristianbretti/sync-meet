@@ -22,6 +22,21 @@ export class MyDate{
 export class Time{
     public time: Date;
     constructor(time_str: string) {
+        
+        
+        //03:30
+        if (time_str.length === 3) {
+            //330
+            time_str = "0" + time_str.substr(0, 1) + ":" + time_str.substr(1, 2)
+        } else if (time_str.length === 4) {
+            //3.30 or 3:30 
+            if (time_str.includes(".") || time_str.includes(":") || time_str.includes(",") || time_str.includes(";")) {
+                time_str = "0" + time_str.substr(0, 1) + ":" + time_str.substr(2, 2)
+            } else {
+                //  0300
+                time_str = time_str.substr(0, 2) + ":" + time_str.substr(2, 2)
+            }
+        }
         this.time = new Date("2019-01-01T"+time_str + ":00+01:00")
     }
     public toString() {
