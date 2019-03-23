@@ -90,19 +90,18 @@ body {
 }
 
 .google-button {
-  background: #38c172 !important;
-  padding-left: 1rem !important;
-  margin-right: 1rem !important;
   color: black !important;
+  transition: .2s ease all;
+  box-shadow: #38c172 0px 0px 20px 3px !important;
 }
 
-.google-button > div {
-  border-radius: 50% !important;
-  width: 40px !important;
-  height: 40px !important;
+.google-button:hover {
+  box-shadow: #38c172 0px 0px 25px 3px !important;
+  opacity: 1 !important;
 }
 
 .google-button:disabled {
-  background: yellow !important;
   cursor: default;
+  box-shadow: yellow 0px 0px 15px 3px !important;
+  opacity: 0.8 !important;
 }

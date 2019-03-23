@@ -166,9 +166,9 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({history}) => {
                     />
                     <HelpHover className="pl-4 pt-4" text="The expected duration of the meeting." />
                 </div>
-                <div className="w-full flex items-center">
+                <div className="w-full flex justify-center">
                     <GoogleLogin
-                        className="mt-8 ml-4 mb-4 flex-1 google-button"
+                        className="mt-12 mb-6 w-2/3 google-button"
                         clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
                         buttonText="Grant access to calendar and create new meeting"
                         onSuccess={responseGoogle }
