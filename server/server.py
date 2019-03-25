@@ -148,7 +148,10 @@ def add_user(group=None):
             user = create_or_find_user(id_token, name, access_token)
             group.users.append(user)
             db.session.commit()
-            return jsonify({'google_id': user.google_id}), 200
+            return jsonify({
+                'google_id': user.google_id,
+                'group_str_id': group.group_str_id
+                }), 200
     except APIError as e:
         return e.response, e.code
 

@@ -40,6 +40,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({history}) => {
 
 
     const responseGoogle = (googleResponse: any) => {
+        console.log(googleResponse);
         let newGroup: CreateGroupBody = {
             group_name: formValues.groupName,
             from_date: formValues.fromDate,
