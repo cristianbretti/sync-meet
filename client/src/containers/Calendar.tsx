@@ -17,23 +17,25 @@ export interface GroupInfo {
 
 }
 
-type CalendarState = GroupInfo | {}
+type CalendarState = GroupInfo | {};
 
 
 class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
   constructor(props: RouteComponentProps<any>) {
     super(props);
-    this.state = {};
+    this.state = {
+      loggedIn: false
+    };
   }
 
   componentDidMount() {
-    const google_id = localStorage.getItem('google_id');
-    if(google_id === null){
-      // TODO
-      console.log("ERROR")
+    const group_str_id = this.props.match.params.group_str_id;
+    const loggedIn = api.isLoggedIn(group_str_id);
+    if (!loggedIn.success) {
+      // TODO: ADD USER and stuff
       return;
     }
-    const group_str_id = this.props.match.params.group_str_id;
+    const google_id = loggedIn.google_id;
     api.getGroupCalendar(google_id, group_str_id)
     .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
       if (!getGroupCalendarResponse.success) {
@@ -90,11 +92,6 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
                   <Day></Day> {/* One day takes up one seventh of the space*/}
                 </div>
               </div>
-              
-              
-              
-
-
             </div>
           </div>
         </div>

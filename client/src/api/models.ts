@@ -1,3 +1,16 @@
+export enum HTTPMethod {
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    DELETE = 'DELETE',
+}
+
+export enum SocketENUM {
+    JOIN = 'join',
+    LEAVE = 'leave',
+    DELETE = 'delete',
+    UPDATE = 'update',
+}
 
 export class MyDate{
     public date: Date;
@@ -129,4 +142,13 @@ export interface EmptyResponse {}
 
 export interface UpdateAccessTokenBody {
     access_token: string;
+}
+
+export interface LoggedIn {
+    success: true;
+    google_id: string;
+}
+
+export interface LoggedOut {
+    success: false
 }

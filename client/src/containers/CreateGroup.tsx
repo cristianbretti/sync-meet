@@ -54,7 +54,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({history}) => {
         }
         api.createGroup(newGroup)
         .then((createGroupResponse: CreateGroupResponse) => {
-            localStorage.setItem("google_id", createGroupResponse.google_id)
+            api.login(createGroupResponse.group_str_id, createGroupResponse.google_id, formValues.toDate);
             history.push("/group/" + createGroupResponse.group_str_id)
         })
         .catch((error: ErrorResponse) => {
