@@ -108,13 +108,22 @@ export interface Group {
     meeting_length: Time;
 }
 
-export interface GetGroupCalendarResponse {
+export interface GetGroupCalendarResponseSuccess {
+    success: true;
     events: CalendarEvent[];
     owner: DBUser;
     users: DBUser[];
     you: number;
     group: Group;
 }
+
+export interface GetGroupCalendarResponseFailure {
+    success: false;
+    cluprit: number;
+    you: number;
+}
+
+export type GetGroupCalendarResponse = GetGroupCalendarResponseSuccess | GetGroupCalendarResponseFailure;
 
 export interface EmptyResponse {}
 

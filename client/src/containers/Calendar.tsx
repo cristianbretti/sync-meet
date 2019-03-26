@@ -4,20 +4,20 @@ import Day from './Day';
 import Timebar from './Timebar';
 import api from '../api/api';
 import { RouteComponentProps } from 'react-router';
-import { GetGroupCalendarResponse, EmptyResponse } from '../api/models';
+import { GetGroupCalendarResponse, GetGroupCalendarResponseSuccess } from '../api/models';
 
 
 
 export interface GroupInfo {
-  group: GetGroupCalendarResponse["group"]
-  events: GetGroupCalendarResponse["events"]
-  owner: GetGroupCalendarResponse["owner"]
-  users: GetGroupCalendarResponse["users"]
-  you: GetGroupCalendarResponse["you"]
+  group: GetGroupCalendarResponseSuccess["group"]
+  events: GetGroupCalendarResponseSuccess["events"]
+  owner: GetGroupCalendarResponseSuccess["owner"]
+  users: GetGroupCalendarResponseSuccess["users"]
+  you: GetGroupCalendarResponseSuccess["you"]
 
 }
 
-type CalendarState = GroupInfo | EmptyResponse
+type CalendarState = GroupInfo | {}
 
 
 class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
@@ -34,10 +34,14 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
       return;
     }
     const group_str_id = this.props.match.params.group_str_id;
-    console.log(google_id)
-    console.log(group_str_id)
     api.getGroupCalendar(google_id, group_str_id)
     .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
+      if (!getGroupCalendarResponse.success) {
+        // TODO: something wrong
+        console.log("Access token expired!!")
+        console.log(getGroupCalendarResponse)
+        return;
+      }
       this.setState({
         group: getGroupCalendarResponse.group,
         events: getGroupCalendarResponse.events,
@@ -46,15 +50,10 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
         you: getGroupCalendarResponse.you
 
       })
-      console.log(getGroupCalendarResponse);
-      // api.remove(true, createGroupResponse.google_id, createGroupResponse.group_str_id)
-      // .then((removeResponse: EmptyResponse) => {
-      //     console.log(removeResponse);
-      // })
     })
     .catch((error: any)=>{
+      console.log("Error")
       console.log(error)
-    
       // TODO 
     })
 

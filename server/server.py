@@ -173,7 +173,14 @@ def get_group_calendar(user=None, group=None):
             users = [ {'name': user.name, 'id': user.id} for user in group.users]
             all_events = []
             for g_user in group.users:
-                all_events += get_events(g_user.access_token, group, user)
+                resp, success = get_events(g_user.access_token, group, user)
+                if success:
+                    all_events += resp
+                else:
+                    return jsonify({
+                        'you': user.id,
+                        'culprit': resp
+                    }), 206
             free_times = find_free_time(all_events, group)
             return jsonify({
                 'group': group.to_json(),

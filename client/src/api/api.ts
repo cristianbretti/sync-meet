@@ -97,7 +97,7 @@ class API {
     }
 
     getGroupCalendar = (google_id: string, group_str_id: string): Promise<GetGroupCalendarResponse> => {
-        return this.request('getgroupcalendar', 'GET', {google_id: google_id, group_str_id: group_str_id})
+        return this.request('getgroupcalendar', 'GET', {google_id: google_id, group_str_id: group_str_id});
     }
 
     remove = (owner: boolean, google_id: string, group_str_id: string): Promise<EmptyResponse> => {
