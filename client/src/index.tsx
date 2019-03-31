@@ -11,7 +11,7 @@ import StartPage from './containers/StartPage';
 
 ReactDOM.render(
     <BrowserRouter>
-        <div className="bg-grey-darkest text-white w-full">
+        <div className="w-full">
             <Route exact path="/" component={StartPage}/>
             <Route exact path="/creategroup" component={CreateGroup}/>
             <Route path="/group/:group_str_id" component={Calendar}/>

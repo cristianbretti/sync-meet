@@ -76,6 +76,16 @@ body {
   flex-shrink: 1;
   flex-basis: 0%;
 }
+.flex-3 {
+  flex-grow: 3;
+  flex-shrink: 1;
+  flex-basis: 0%;
+}
+.flex-4 {
+  flex-grow: 4;
+  flex-shrink: 1;
+  flex-basis: 0%;
+}
 
 .dot {
   height: 25px;
@@ -92,16 +102,20 @@ body {
 .google-button {
   color: black !important;
   transition: .2s ease all;
-  box-shadow: #38c172 0px 0px 20px 3px !important;
+  box-shadow: #38c172 0px 0px 10px 2px !important;
+}
+
+.google-button > span {
+  font-weight: 600 !important;
 }
 
 .google-button:hover {
-  box-shadow: #38c172 0px 0px 25px 3px !important;
+  box-shadow: #38c172 0px 0px 15px 2px !important;
   opacity: 1 !important;
 }
 
 .google-button:disabled {
   cursor: default;
-  box-shadow: yellow 0px 0px 15px 3px !important;
+  box-shadow: yellow 0px 0px 10px 2px !important;
   opacity: 0.8 !important;
 }

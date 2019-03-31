@@ -25,11 +25,11 @@ const HelpHover: FC<HelpHoverProps> = ({className, text}) => {
             </div>
         </div>
         <div 
-            className={"absolute pin-b -ml-12 pointer-events-none mb-8 z-10 bg-grey p-2 rounded-sm text-xs shadow-md min-w-32"}
+            className={"absolute pin-b pin-r -ml-12 pointer-events-none mb-8 z-10 bg-grey p-2 rounded-sm text-xs shadow-md min-w-32"}
             style={{
                 transition: ".25s ease all",
                 transitionDelay: ".1s",
-                transformOrigin: "bottom center",
+                transformOrigin: "bottom right",
                 transform: (hover ? "scale(1)" : "scale(0)" )
             }}
         >

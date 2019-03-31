@@ -6455,6 +6455,26 @@ code {
           flex-basis: 0%;
 }
 
+.flex-3 {
+  -webkit-box-flex: 3;
+  -webkit-flex-grow: 3;
+          flex-grow: 3;
+  -webkit-flex-shrink: 1;
+          flex-shrink: 1;
+  -webkit-flex-basis: 0%;
+          flex-basis: 0%;
+}
+
+.flex-4 {
+  -webkit-box-flex: 4;
+  -webkit-flex-grow: 4;
+          flex-grow: 4;
+  -webkit-flex-shrink: 1;
+          flex-shrink: 1;
+  -webkit-flex-basis: 0%;
+          flex-basis: 0%;
+}
+
 .dot {
   height: 25px;
   width: 25px;
@@ -6471,17 +6491,21 @@ code {
   color: black !important;
   -webkit-transition: .2s ease all;
   transition: .2s ease all;
-  box-shadow: #38c172 0px 0px 20px 3px !important;
+  box-shadow: #38c172 0px 0px 10px 2px !important;
+}
+
+.google-button > span {
+  font-weight: 600 !important;
 }
 
 .google-button:hover {
-  box-shadow: #38c172 0px 0px 25px 3px !important;
+  box-shadow: #38c172 0px 0px 15px 2px !important;
   opacity: 1 !important;
 }
 
 .google-button:disabled {
   cursor: default;
-  box-shadow: yellow 0px 0px 15px 3px !important;
+  box-shadow: yellow 0px 0px 10px 2px !important;
   opacity: .8 !important;
 }
 
