@@ -4,76 +4,58 @@ import Day from './Day';
 import Timebar from './Timebar';
 import api from '../api/api';
 import { RouteComponentProps } from 'react-router';
-import { GetGroupCalendarResponse, EmptyResponse, MyDate, Time, CalendarEvent } from '../api/models';
-import {getUniqueDaysFromListOfEvents, getEarliestTimeFromDates, getLatestTimeFromDates} from '../utils/helpers'
+import { GetGroupCalendarResponse, GetGroupCalendarResponseSuccess, GroupInfo } from '../api/models';
+import { getUniqueDaysFromListOfEvents, getEarliestTimeFromDates, getLatestTimeFromDates } from '../utils/helpers';
 
-
-
-export interface GroupInfo {
-  group: GetGroupCalendarResponse["group"]
-  events: CalendarEvent[]
-  owner: GetGroupCalendarResponse["owner"]
-  users: GetGroupCalendarResponse["users"]
-  you: GetGroupCalendarResponse["you"]
-
-}
-
-type CalendarState = GroupInfo | EmptyResponse
+type CalendarState = GroupInfo | {};
 
 
 class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
   constructor(props: RouteComponentProps<any>) {
     super(props);
-    this.state = {};
+    this.state = {
+    };
   }
 
   componentDidMount() {
-    const google_id = localStorage.getItem('google_id');
-    if(google_id === null){
-      // TODO
-      console.log("ERROR")
+    const group_str_id = this.props.match.params.group_str_id;
+    const loggedIn = api.isLoggedIn(group_str_id);
+    if (!loggedIn.success) {
+      // TODO: ADD USER and stuff
       return;
     }
-    const group_str_id = this.props.match.params.group_str_id;
-    console.log(google_id)
-    console.log(group_str_id)
+    const google_id = loggedIn.google_id;
     api.getGroupCalendar(google_id, group_str_id)
     .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
-      const events = getGroupCalendarResponse.events.map(calEventResponse => {
-        return {
-          date: new MyDate(calEventResponse.date),
-          from_time: new Time(calEventResponse.from_time),
-          to_time: new Time(calEventResponse.to_time), 
-        } as CalendarEvent
-      })
+      if (!getGroupCalendarResponse.success) {
+        // TODO: something wrong
+        console.log("Access token expired!!")
+        console.log(getGroupCalendarResponse)
+        return;
+      }
       this.setState({
         group: getGroupCalendarResponse.group,
-        events: events,
+        events: getGroupCalendarResponse.events,
         owner: getGroupCalendarResponse.owner,
         users: getGroupCalendarResponse.users,
         you: getGroupCalendarResponse.you
-
-      })
-      console.log(getGroupCalendarResponse);
-      // api.remove(true, createGroupResponse.google_id, createGroupResponse.group_str_id)
-      // .then((removeResponse: EmptyResponse) => {
-      //     console.log(removeResponse);
-      // })
+      });
     })
     .catch((error: any)=>{
+      console.log("Error")
       console.log(error)
-    
       // TODO 
     })
 
   }
 
-  renderDays = (state:GroupInfo) => {
+  renderDays = (state: GroupInfo) => {
+    console.log(state)
     const uniqueDays = getUniqueDaysFromListOfEvents(state.events)
     const earliestTime = getEarliestTimeFromDates(state.events)
     const latestTime = getLatestTimeFromDates(state.events)
-    return uniqueDays.map((day) =>
-      <Day events={state.events} thisDay={day} earliest={earliestTime} latest={latestTime}/>
+    return uniqueDays.map((day, idx) =>
+      <Day key={idx} events={state.events} thisDay={day} earliest={earliestTime} latest={latestTime}/>
     )
   }
   
@@ -86,7 +68,6 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
       )
     }
     const tempState = this.state as GroupInfo;
-    console.log(tempState)
     return (
       <div>
         <div className="flex">

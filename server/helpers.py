@@ -119,7 +119,8 @@ def create_or_find_user(id_token, name, access_token):
 
 def get_events(access_token, group, user):
     """ Return all the events on calendars that matches the
-    time interval defined by group parameter. 
+    time interval defined by group parameter and True.
+    Returns user id and False if the access token has expired.
     """
     try:
         credentials = AccessTokenCredentials(access_token, 'my-user-agent/1.0')
@@ -150,8 +151,8 @@ def get_events(access_token, group, user):
                         'end': end,
                     })
     except:
-        raise ValueError("Access token expired for user: " + str(user.id))
-    return all_events
+        return user.id, False
+    return all_events, True
 
 
 def create_interval(event):

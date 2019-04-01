@@ -148,7 +148,10 @@ def add_user(group=None):
             user = create_or_find_user(id_token, name, access_token)
             group.users.append(user)
             db.session.commit()
-            return jsonify({'google_id': user.google_id}), 200
+            return jsonify({
+                'google_id': user.google_id,
+                'group_str_id': group.group_str_id
+                }), 200
     except APIError as e:
         return e.response, e.code
 
@@ -170,7 +173,14 @@ def get_group_calendar(user=None, group=None):
             users = [ {'name': user.name, 'id': user.id} for user in group.users]
             all_events = []
             for g_user in group.users:
-                all_events += get_events(g_user.access_token, group, user)
+                resp, success = get_events(g_user.access_token, group, user)
+                if success:
+                    all_events += resp
+                else:
+                    return jsonify({
+                        'you': user.id,
+                        'culprit': resp
+                    }), 206
             free_times = find_free_time(all_events, group)
             return jsonify({
                 'group': group.to_json(),

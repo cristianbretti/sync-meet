@@ -11,8 +11,7 @@ interface DayProps {
 }
 
 const Day:React.FC<DayProps> = ({events, thisDay, earliest, latest}) =>  {
-    console.log(earliest)
-    console.log(latest)
+    console.log(thisDay);
     return (
         <div className="w-1/7 flex-none border border-black">
             <div className="text-center h-screen">

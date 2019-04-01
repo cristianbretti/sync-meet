@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { GroupInfo } from './Calendar';
-import { DBUser } from '../api/models';
+import { DBUser, GroupInfo } from '../api/models';
 
 type SiderbarProps = GroupInfo
 
@@ -20,7 +19,7 @@ const Sidebar: React.FC<SiderbarProps>  = ({group, users, you, owner}: SiderbarP
         </div>
         
         <div className="flex-1 text-center">
-          <h4>{group.from_date}</h4>
+          <h4>{group.from_date.toString()}</h4>
         </div>
       </div>
 
@@ -30,7 +29,7 @@ const Sidebar: React.FC<SiderbarProps>  = ({group, users, you, owner}: SiderbarP
         </div>
         
         <div className="flex-1 text-center">
-          <h4>{group.to_date}</h4>
+          <h4>{group.to_date.toString()}</h4>
         </div>
       </div>
 
@@ -40,7 +39,7 @@ const Sidebar: React.FC<SiderbarProps>  = ({group, users, you, owner}: SiderbarP
         </div>
         
         <div className="flex-1 text-center">
-          <h4>{group.from_time}</h4>
+          <h4>{group.from_time.toString()}</h4>
       
         </div>
       </div>
@@ -51,7 +50,7 @@ const Sidebar: React.FC<SiderbarProps>  = ({group, users, you, owner}: SiderbarP
         </div>
         
         <div className="flex-1 text-center">
-          <h4>{group.to_time}</h4>
+          <h4>{group.to_time.toString()}</h4>
       
         </div>
       </div>
@@ -62,7 +61,7 @@ const Sidebar: React.FC<SiderbarProps>  = ({group, users, you, owner}: SiderbarP
         </div>
         
         <div className="flex-1 text-center">
-          <h4>{group.meeting_length}</h4>
+          <h4>{group.meeting_length.toString()}</h4>
       
         </div>
       </div>
