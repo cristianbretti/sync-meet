@@ -24,11 +24,11 @@ export class MyDate {
         }
     }
     public toString() {
-        return this.date.toLocaleString().substr(0, 10)
+        return this.date.toLocaleString('sv').substr(0, 10)
     }
 
     public toJSON() {
-        return this.date.toLocaleString().substr(0, 10)
+        return this.date.toLocaleString('sv').substr(0, 10)
     }
 
     public getDate() {
