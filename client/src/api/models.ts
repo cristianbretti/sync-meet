@@ -36,7 +36,7 @@ export class MyDate {
     }
 
     public getDayString() {
-        return this.date.toLocaleDateString('en-us', { weekday: 'long' })
+        return this.date.toLocaleDateString('en-us', { weekday: 'short' })
     }
 }
 
