@@ -1,41 +1,27 @@
 import React, { Component } from 'react';
+import {CalendarEvent } from '../api/models';
+import { getEarliestTimeFromDates, getLatestTimeFromDates } from '../utils/helpers';
 
-interface DayProps {}
-
-interface DayState {
-    fromDate: string,
-    toDate: string
+interface TimebarProps {
+    events: CalendarEvent[],
 }
 
-class Timebar extends Component {
-    constructor(props: any) {
-        super(props);
-        this.state = {
-            fromTime: "",
-            toTime: ""
+const Timebar:React.FC<TimebarProps> = ({events}) =>  {
+    const earliest = getEarliestTimeFromDates(events)
+    const latest = getLatestTimeFromDates(events)
+    return (
+        <div className="h-screen text-center">
+            <div className="flex flex-col h-screen">
+                <div className="w-full bg-grey-light h-16 ">
+                </div>
 
-        }
-      }
-    
-    render() {
-        return (
-            <div className="h-screen text-center">
-                <div className="flex flex-wrap">
-                    <div className="w-full bg-grey-light h-16 ">
-                    </div>
-
-                    <div className="w-full bg-grey h-12">
-                        <h6>4:pm</h6>
-                    </div>
-                    
-                    <div className="w-full bg-grey-light h-12"></div>
-                    <div className="w-full bg-grey h-12"></div>
-                    <div className="w-full bg-grey-light h-12"></div>
+                <div className="w-full bg-grey flex-1 flex flex-col justify-between">
+                    <h6 className="p-2">{earliest.toString()}</h6>
+                    <h6 className="p-2">{latest.toString()}</h6>
                 </div>
             </div>
-        
-        );
-    }
+        </div>
+    );
 }
 
 export default Timebar;

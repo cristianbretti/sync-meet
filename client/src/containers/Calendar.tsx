@@ -4,18 +4,8 @@ import Day from './Day';
 import Timebar from './Timebar';
 import api from '../api/api';
 import { RouteComponentProps } from 'react-router';
-import { GetGroupCalendarResponse, GetGroupCalendarResponseSuccess } from '../api/models';
-
-
-
-export interface GroupInfo {
-  group: GetGroupCalendarResponseSuccess["group"]
-  events: GetGroupCalendarResponseSuccess["events"]
-  owner: GetGroupCalendarResponseSuccess["owner"]
-  users: GetGroupCalendarResponseSuccess["users"]
-  you: GetGroupCalendarResponseSuccess["you"]
-
-}
+import { GetGroupCalendarResponse, GetGroupCalendarResponseSuccess, GroupInfo } from '../api/models';
+import { getUniqueDaysFromListOfEvents, getEarliestTimeFromDates, getLatestTimeFromDates } from '../utils/helpers';
 
 type CalendarState = GroupInfo | {};
 
@@ -24,7 +14,6 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
   constructor(props: RouteComponentProps<any>) {
     super(props);
     this.state = {
-      loggedIn: false
     };
   }
 
@@ -50,8 +39,7 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
         owner: getGroupCalendarResponse.owner,
         users: getGroupCalendarResponse.users,
         you: getGroupCalendarResponse.you
-
-      })
+      });
     })
     .catch((error: any)=>{
       console.log("Error")
@@ -59,6 +47,16 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
       // TODO 
     })
 
+  }
+
+  renderDays = (state: GroupInfo) => {
+    console.log(state)
+    const uniqueDays = getUniqueDaysFromListOfEvents(state.events)
+    const earliestTime = getEarliestTimeFromDates(state.events)
+    const latestTime = getLatestTimeFromDates(state.events)
+    return uniqueDays.map((day, idx) =>
+      <Day key={idx} events={state.events} thisDay={day} earliest={earliestTime} latest={latestTime}/>
+    )
   }
   
   render() {
@@ -70,7 +68,6 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
       )
     }
     const tempState = this.state as GroupInfo;
-    console.log(tempState)
     return (
       <div>
         <div className="flex">
@@ -81,16 +78,12 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
           <div className="w-4/5 h-screen">  {/* The calendar goes in here */}
             <div className="flex">
 
-              <div className="w-1/40 h-screen border-t border-black"> {/* The timebar component goes in here */}
-                <Timebar></Timebar>
-              
+              <div className="w-2/40 h-screen border-t border-black"> {/* The timebar component goes in here */}
+                <Timebar events={tempState.events}/>
               </div> 
 
-              <div className="w-39/40 overflow-x-auto flex flex-no-wrap">
-              
-                <div className="w-1/7 flex-none border border-black">
-                  <Day></Day> {/* One day takes up one seventh of the space*/}
-                </div>
+              <div className="w-38/40 overflow-x-auto flex flex-no-wrap">
+                {this.renderDays(tempState)}
               </div>
             </div>
           </div>

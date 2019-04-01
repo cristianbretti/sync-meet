@@ -147,7 +147,6 @@ const TimeInput: FC<TimeInputProps> = ({className, label, name, value, valid, ch
     }
 
     const handleMinChange = (newValue: number) => {
-        console.log("in here", newValue)
         typeing !== "empty" ? setTyping("empty") : null;
         let timeString = (currentValue.getHours() > 9 ? currentValue.getHours() : "0" + currentValue.getHours()) 
             + ":" + (newValue > 9 ? newValue : "0" + newValue);
