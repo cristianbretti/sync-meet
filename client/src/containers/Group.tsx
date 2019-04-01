@@ -65,7 +65,10 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                             from_time={tempState.group.from_time}
                             to_time={tempState.group.to_time}
                         />
-                        <Calendar events={tempState.events} />
+                        <Calendar
+                            events={tempState.events}
+                            group={tempState.group}
+                        />
                     </div>
                 </div>
             </div>

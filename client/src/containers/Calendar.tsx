@@ -1,25 +1,39 @@
 import React, { Component } from 'react'
-import { DBUser, GroupInfo } from '../api/models'
+import { DBUser, GroupInfo, Time, MyDate } from '../api/models'
 import Day from './Day'
 
 import {
-    getUniqueDaysFromListOfEvents,
     getEarliestTimeFromDates,
     getLatestTimeFromDates,
 } from '../utils/helpers'
 
 interface CalendarProps {
     events: GroupInfo['events']
+    group: GroupInfo['group']
 }
 
-const Calendar: React.FC<CalendarProps> = ({ events }: CalendarProps) => {
-    const uniqueDays = getUniqueDaysFromListOfEvents(events)
+const Calendar: React.FC<CalendarProps> = ({
+    events,
+    group,
+}: CalendarProps) => {
+    const getDaysBetweenStartEnd = (from: MyDate, to: MyDate): MyDate[] => {
+        let listOfDays = []
+        const current = new Date(from.date)
+        while (new MyDate({ date: current }).toString() !== to.toString()) {
+            listOfDays.push(new MyDate({ date: current }))
+            current.setDate(current.getDate() + 1)
+        }
+        listOfDays.push(new MyDate({ date: current }))
+        return listOfDays
+    }
+
+    const days = getDaysBetweenStartEnd(group.from_date, group.to_date)
     const earliestTime = getEarliestTimeFromDates(events)
     const latestTime = getLatestTimeFromDates(events)
 
     return (
         <div className="flex-1 flex">
-            {uniqueDays.map((day, idx) => (
+            {days.map((day, idx) => (
                 <Day
                     key={idx}
                     events={events}
