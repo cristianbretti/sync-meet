@@ -6509,6 +6509,14 @@ code {
   opacity: .8 !important;
 }
 
+.text-2xs {
+  font-size: .5rem;
+}
+
+.text-3xs {
+  font-size: .25rem;
+}
+
 @media (min-width: 576px) {
   .sm\:list-reset {
     list-style: none;
