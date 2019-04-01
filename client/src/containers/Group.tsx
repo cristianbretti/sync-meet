@@ -1,19 +1,10 @@
 import React, { Component } from 'react'
 import Sidebar from './Sidebar'
-import Day from './Day'
 import Timebar from './Timebar'
 import api from '../api/api'
 import { RouteComponentProps } from 'react-router'
-import {
-    GetGroupCalendarResponse,
-    GetGroupCalendarResponseSuccess,
-    GroupInfo,
-} from '../api/models'
-import {
-    getUniqueDaysFromListOfEvents,
-    getEarliestTimeFromDates,
-    getLatestTimeFromDates,
-} from '../utils/helpers'
+import { GetGroupCalendarResponse, GroupInfo } from '../api/models'
+import Calendar from './Calendar'
 
 type GroupState = GroupInfo | {}
 
@@ -54,22 +45,6 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
             })
     }
 
-    renderDays = (state: GroupInfo) => {
-        console.log(state)
-        const uniqueDays = getUniqueDaysFromListOfEvents(state.events)
-        const earliestTime = getEarliestTimeFromDates(state.events)
-        const latestTime = getLatestTimeFromDates(state.events)
-        return uniqueDays.map((day, idx) => (
-            <Day
-                key={idx}
-                events={state.events}
-                thisDay={day}
-                earliest={earliestTime}
-                latest={latestTime}
-            />
-        ))
-    }
-
     render() {
         if (
             Object.entries(this.state).length === 0 &&
@@ -86,19 +61,8 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     </div>
 
                     <div className="flex-3 flex h-screen">
-                        {' '}
-                        {/* The calendar goes in here */}
-                        <div className="flex">
-                            <div className="w-2/40 h-screen border-t border-black">
-                                {' '}
-                                {/* The timebar component goes in here */}
-                                <Timebar events={tempState.events} />
-                            </div>
-
-                            <div className="w-38/40 overflow-x-auto flex flex-no-wrap">
-                                {this.renderDays(tempState)}
-                            </div>
-                        </div>
+                        <Timebar events={tempState.events} />
+                        <Calendar events={tempState.events} />
                     </div>
                 </div>
             </div>
