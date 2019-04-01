@@ -61,7 +61,10 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     </div>
 
                     <div className="flex-3 flex h-screen">
-                        <Timebar events={tempState.events} />
+                        <Timebar
+                            from_time={tempState.group.from_time}
+                            to_time={tempState.group.to_time}
+                        />
                         <Calendar events={tempState.events} />
                     </div>
                 </div>
