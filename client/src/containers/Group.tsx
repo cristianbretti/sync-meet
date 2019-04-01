@@ -15,9 +15,9 @@ import {
     getLatestTimeFromDates,
 } from '../utils/helpers'
 
-type CalendarState = GroupInfo | {}
+type GroupState = GroupInfo | {}
 
-class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
+class Group extends Component<RouteComponentProps<any>, GroupState> {
     constructor(props: RouteComponentProps<any>) {
         super(props)
         this.state = {}
@@ -81,11 +81,11 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
         return (
             <div>
                 <div className="flex">
-                    <div className="w-1/5 h-screen border border-black">
+                    <div className="flex-1 h-screen border border-black">
                         <Sidebar {...tempState} />
                     </div>
 
-                    <div className="w-4/5 h-screen">
+                    <div className="flex-3 flex h-screen">
                         {' '}
                         {/* The calendar goes in here */}
                         <div className="flex">
@@ -106,4 +106,4 @@ class Calendar extends Component<RouteComponentProps<any>, CalendarState> {
     }
 }
 
-export default Calendar
+export default Group
