@@ -3,25 +3,62 @@ import Sidebar from './Sidebar'
 import Timebar from './Timebar'
 import api from '../api/api'
 import { RouteComponentProps } from 'react-router'
-import { GetGroupCalendarResponse, GroupInfo } from '../api/models'
+import {
+    GetGroupCalendarResponse,
+    GroupInfo,
+    MyDate,
+    Time,
+} from '../api/models'
 import Calendar from './Calendar'
+import AddUserModal from './AddUserModal'
 
-type GroupState = GroupInfo | {}
+enum LoginStatus {
+    LOGGED_IN,
+    NOT_LOGGED_IN,
+    PENDING,
+}
+
+type GroupState = { status: LoginStatus } & GroupInfo
+
+const dayInOneWeek = new Date()
+dayInOneWeek.setDate(dayInOneWeek.getDate() + 7)
+
+const emptyGroupState: GroupInfo = {
+    events: [],
+    group: {
+        meeting_length: new Time('01:00'),
+        name: 'Empty',
+        from_date: new MyDate({ date: new Date() }),
+        to_date: new MyDate({ date: dayInOneWeek }),
+        from_time: new Time('09:00'),
+        to_time: new Time('17:00'),
+    },
+    owner: {
+        id: 0,
+        name: '',
+    },
+    users: [],
+    you: 0,
+}
 
 class Group extends Component<RouteComponentProps<any>, GroupState> {
     constructor(props: RouteComponentProps<any>) {
         super(props)
-        this.state = {}
+        this.state = { ...emptyGroupState, status: LoginStatus.PENDING }
     }
 
     componentDidMount() {
         const group_str_id = this.props.match.params.group_str_id
         const loggedIn = api.isLoggedIn(group_str_id)
         if (!loggedIn.success) {
-            // TODO: ADD USER and stuff
+            this.setState({ status: LoginStatus.NOT_LOGGED_IN })
             return
         }
         const google_id = loggedIn.google_id
+        this.getCalendarData(group_str_id, google_id)
+    }
+
+    getCalendarData = (group_str_id: string, google_id: string) => {
         api.getGroupCalendar(google_id, group_str_id)
             .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
                 if (!getGroupCalendarResponse.success) {
@@ -36,6 +73,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     owner: getGroupCalendarResponse.owner,
                     users: getGroupCalendarResponse.users,
                     you: getGroupCalendarResponse.you,
+                    status: LoginStatus.LOGGED_IN,
                 })
             })
             .catch((error: any) => {
@@ -46,15 +84,12 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
     }
 
     render() {
-        if (
-            Object.entries(this.state).length === 0 &&
-            this.state.constructor === Object
-        ) {
+        if (this.state.status === LoginStatus.PENDING) {
             return <div>SPINNING</div>
         }
         const tempState = this.state as GroupInfo
         return (
-            <div>
+            <div className="relative">
                 <div className="flex">
                     <div className="flex-1 h-screen border border-black">
                         <Sidebar {...tempState} />
@@ -71,6 +106,9 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         />
                     </div>
                 </div>
+                {this.state.status === LoginStatus.NOT_LOGGED_IN && (
+                    <AddUserModal />
+                )}
             </div>
         )
     }

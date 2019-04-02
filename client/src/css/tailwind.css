@@ -3851,6 +3851,10 @@ table {
   min-width: 83.33333%;
 }
 
+.min-w-1\/7 {
+  min-width: 14.285%;
+}
+
 .min-w-full {
   min-width: 100%;
 }
@@ -6292,6 +6296,10 @@ table {
 
 .w-1\/6 {
   width: 16.66667%;
+}
+
+.w-1\/7 {
+  width: 14.285%;
 }
 
 .w-5\/6 {
@@ -9841,6 +9849,10 @@ code {
     min-width: 83.33333%;
   }
 
+  .sm\:min-w-1\/7 {
+    min-width: 14.285%;
+  }
+
   .sm\:min-w-full {
     min-width: 100%;
   }
@@ -12266,6 +12278,10 @@ code {
 
   .sm\:w-1\/6 {
     width: 16.66667%;
+  }
+
+  .sm\:w-1\/7 {
+    width: 14.285%;
   }
 
   .sm\:w-5\/6 {
@@ -15629,6 +15645,10 @@ code {
     min-width: 83.33333%;
   }
 
+  .md\:min-w-1\/7 {
+    min-width: 14.285%;
+  }
+
   .md\:min-w-full {
     min-width: 100%;
   }
@@ -18054,6 +18074,10 @@ code {
 
   .md\:w-1\/6 {
     width: 16.66667%;
+  }
+
+  .md\:w-1\/7 {
+    width: 14.285%;
   }
 
   .md\:w-5\/6 {
@@ -21417,6 +21441,10 @@ code {
     min-width: 83.33333%;
   }
 
+  .lg\:min-w-1\/7 {
+    min-width: 14.285%;
+  }
+
   .lg\:min-w-full {
     min-width: 100%;
   }
@@ -23842,6 +23870,10 @@ code {
 
   .lg\:w-1\/6 {
     width: 16.66667%;
+  }
+
+  .lg\:w-1\/7 {
+    width: 14.285%;
   }
 
   .lg\:w-5\/6 {
@@ -27205,6 +27237,10 @@ code {
     min-width: 83.33333%;
   }
 
+  .xl\:min-w-1\/7 {
+    min-width: 14.285%;
+  }
+
   .xl\:min-w-full {
     min-width: 100%;
   }
@@ -29630,6 +29666,10 @@ code {
 
   .xl\:w-1\/6 {
     width: 16.66667%;
+  }
+
+  .xl\:w-1\/7 {
+    width: 14.285%;
   }
 
   .xl\:w-5\/6 {

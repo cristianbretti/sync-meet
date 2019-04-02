@@ -47,12 +47,12 @@ const Calendar: React.FC<CalendarProps> = ({
 
     const days = getDaysBetweenStartEnd(group.from_date, group.to_date)
     matchEvents(days, events)
-
+    console.log(days.length)
     return (
-        <div className="flex-1 flex">
+        <div className="flex overflow-x-auto w-full">
             {days.map((day, idx) => (
                 <Day
-                    className={days.length > 7 ? 'w-1/7' : 'flex-1'}
+                    className={'min-w-1/7'}
                     key={idx}
                     events={day.events}
                     thisDay={day.date}
