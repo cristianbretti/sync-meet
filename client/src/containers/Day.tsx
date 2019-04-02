@@ -5,26 +5,57 @@ import { CalendarEvent, MyDate, Time } from '../api/models'
 interface DayProps {
     events: CalendarEvent[]
     thisDay: MyDate
-    earliest: Time
-    latest: Time
+    fromTime: Time
+    toTime: Time
+    className?: string
 }
 
-const Day: React.FC<DayProps> = ({ events, thisDay, earliest, latest }) => {
-    console.log(thisDay)
+const Day: React.FC<DayProps> = ({
+    events,
+    thisDay,
+    fromTime,
+    toTime,
+    className,
+}) => {
+    let numberOfHoursBetweenStartEnd =
+        toTime.getHours() -
+        fromTime.getHours() +
+        (toTime.getMinutes() > 0 ? 1 : 0)
     return (
-        <div className="w-1/7 flex-none border border-black">
-            <div className="text-center h-screen">
-                <div className=" h-16">
-                    <div className="px-1">
-                        <h3>{thisDay.getDayString()}</h3>
-                    </div>
-                    <div className="px-1">
-                        <h3>{thisDay.getDate()}</h3>
-                    </div>
+        <div
+            className={
+                'flex flex-col border-r border-black h-screen' + ' ' + className
+            }
+        >
+            <div className="h-16 border-b border-black text-center">
+                <div className="px-1">
+                    <h3>{thisDay.getDayString()}</h3>
                 </div>
-                <Event />
-                <div className="h-24" />
-                <Event />
+                <div className="px-1">
+                    <h3>{thisDay.getDate()}</h3>
+                </div>
+            </div>
+            <div className="flex-1 flex flex-col relative">
+                {Array.from(Array(numberOfHoursBetweenStartEnd)).map(
+                    (v, idx) => {
+                        const hour = fromTime.getHours() + idx
+                        return (
+                            <div key={idx} className="flex flex-col flex-1">
+                                <div className="flex-1 border-b border-dotted text-2xs" />
+                                <div className="flex-1 border-b" />
+                            </div>
+                        )
+                    }
+                )}
+                {events.map((event, idx) => (
+                    <Event
+                        key={idx}
+                        eventStart={event.from_time}
+                        eventEnd={event.to_time}
+                        fromTime={fromTime}
+                        toTime={toTime}
+                    />
+                ))}
             </div>
         </div>
     )

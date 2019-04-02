@@ -1,32 +1,57 @@
 import React, { Component } from 'react'
+import { Time } from '../api/models'
 
-interface EventProps {}
-
-interface EventState {
-    fromTime: string
-    toTime: string
-    isMajority: boolean
+interface EventProps {
+    eventStart: Time
+    eventEnd: Time
+    fromTime: Time
+    toTime: Time
 }
 
-class Event extends Component {
-    constructor(props: EventProps) {
-        super(props)
-        this.state = {
-            fromTime: '13:00',
-            toTime: '16:00',
-            isMajority: false,
-        }
-    }
+const Event: React.FC<EventProps> = ({
+    eventStart,
+    eventEnd,
+    fromTime,
+    toTime,
+}) => {
+    const roundedToTime =
+        toTime.getMinutes() > 0
+            ? new Time(toTime.getHours() + 1 + ':00')
+            : new Time(toTime.getHours() + ':00')
 
-    render() {
-        return (
-            <div className="bg-blue-dark px-1 h-12">
-                <div>
-                    <h6>Event</h6>
-                </div>
+    // time difference in minutes
+    const fromStartOfDay =
+        (eventStart.getHours() - fromTime.getHours()) * 60 +
+        eventStart.getMinutes() -
+        fromTime.getMinutes()
+
+    const hours = roundedToTime.getHours() === 0 ? 24 : roundedToTime.getHours()
+    const totalViewLength =
+        (hours - fromTime.getHours()) * 60 +
+        roundedToTime.getMinutes() -
+        fromTime.getMinutes()
+
+    const eventLengthInMinutes =
+        (eventEnd.getHours() - eventStart.getHours()) * 60 +
+        eventEnd.getMinutes() -
+        eventStart.getMinutes()
+
+    const offset = (fromStartOfDay / totalViewLength) * 100
+    const height = (eventLengthInMinutes / totalViewLength) * 100
+
+    return (
+        <div
+            className="absolute pin-x bg-green border border-green-darker rounded opacity-80 z-10 ml-px mr-1 -mt-px"
+            style={{
+                top: offset + '%',
+                height: 'calc(' + height + '%)',
+            }}
+        >
+            <div className="text-sm font-semibold p-1">
+                {eventStart.toString() + ' - ' + eventEnd.toString()}
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 export default Event

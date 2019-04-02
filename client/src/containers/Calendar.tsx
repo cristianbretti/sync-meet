@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { DBUser, GroupInfo, Time, MyDate } from '../api/models'
+import { DBUser, GroupInfo, Time, MyDate, CalendarEvent } from '../api/models'
 import Day from './Day'
 
 import {
@@ -12,34 +12,52 @@ interface CalendarProps {
     group: GroupInfo['group']
 }
 
+interface DayObject {
+    date: MyDate
+    events: CalendarEvent[]
+}
+
 const Calendar: React.FC<CalendarProps> = ({
     events,
     group,
 }: CalendarProps) => {
-    const getDaysBetweenStartEnd = (from: MyDate, to: MyDate): MyDate[] => {
+    const getDaysBetweenStartEnd = (from: MyDate, to: MyDate): DayObject[] => {
         let listOfDays = []
         const current = new Date(from.date)
         while (new MyDate({ date: current }).toString() !== to.toString()) {
-            listOfDays.push(new MyDate({ date: current }))
+            listOfDays.push({ date: new MyDate({ date: current }), events: [] })
             current.setDate(current.getDate() + 1)
         }
-        listOfDays.push(new MyDate({ date: current }))
+        listOfDays.push({ date: new MyDate({ date: current }), events: [] })
         return listOfDays
     }
 
+    const matchEvents = (days: DayObject[], events: CalendarEvent[]) => {
+        events.forEach(event => {
+            // time difference
+            const timeDiff = Math.abs(
+                event.date.date.getTime() - group.from_date.date.getTime()
+            )
+
+            // days difference
+            const index = Math.ceil(timeDiff / (1000 * 3600 * 24))
+            days[index].events.push(event)
+        })
+    }
+
     const days = getDaysBetweenStartEnd(group.from_date, group.to_date)
-    const earliestTime = getEarliestTimeFromDates(events)
-    const latestTime = getLatestTimeFromDates(events)
+    matchEvents(days, events)
 
     return (
         <div className="flex-1 flex">
             {days.map((day, idx) => (
                 <Day
+                    className={days.length > 7 ? 'w-1/7' : 'flex-1'}
                     key={idx}
-                    events={events}
-                    thisDay={day}
-                    earliest={earliestTime}
-                    latest={latestTime}
+                    events={day.events}
+                    thisDay={day.date}
+                    fromTime={group.from_time}
+                    toTime={group.to_time}
                 />
             ))}
         </div>

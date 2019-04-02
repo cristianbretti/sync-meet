@@ -6517,6 +6517,10 @@ code {
   font-size: .25rem;
 }
 
+.opacity-80 {
+  opacity: .8;
+}
+
 @media (min-width: 576px) {
   .sm\:list-reset {
     list-style: none;
