@@ -301,9 +301,9 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                     </div>
                     <div className="flex-3 flex items-center">
                         <GoogleLogin
-                            className="google-button ml-4"
+                            className="google-button ml-4 bg-blue-dark"
                             clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
-                            buttonText="GRANT ACCESS AND CREATE"
+                            buttonText="Create meeting"
                             onSuccess={responseGoogle}
                             onFailure={onGoogleFailure}
                             cookiePolicy={'single_host_origin'}
