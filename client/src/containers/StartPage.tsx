@@ -3,14 +3,21 @@ import { RouteComponentProps } from 'react-router'
 import AnimLogo from '../components/logo/AnimLogo'
 import LinkButton from '../components/LinkButton'
 
-const bulletPoint = (color: string, text: string) => (
-    <div className="flex flex-col items-center bg-grey-darker rounded text-center p-4 mr-4 shadow-inner">
-        {/* <div className={'mb-4 dot ' + color} /> */}
-        {text}
-    </div>
-)
-
 const StartPage: FC<RouteComponentProps<any>> = () => {
+    const bulletPoint = (text: string) => (
+        <div className="flex flex-col items-center bg-grey-darker rounded text-center p-4 mr-4 shadow-inner">
+            {text}
+        </div>
+    )
+
+    const rowWrapper = (firstChild: JSX.Element, secondChild: JSX.Element) => (
+        <div className="flex-1 flex">
+            <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
+                <div className="flex-1 flex items-center">{firstChild}</div>
+            </div>
+            <div className="flex-3 pl-4 flex items-center">{secondChild}</div>
+        </div>
+    )
     return (
         <div className="min-h-screen flex flex-col bg-grey-darkest text-white overflow-hidden">
             <div className="flex-no-grow flex">
@@ -32,76 +39,42 @@ const StartPage: FC<RouteComponentProps<any>> = () => {
                     </div>
                 </div>
             </div>
-            <div className="flex-1 flex">
-                <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
-                    <div className="flex-1 flex items-center">
-                        <i className={'text-4xl material-icons text-red-dark'}>
-                            looks_one
-                        </i>
-                    </div>
-                </div>
-                <div className="flex-3 pl-4 flex items-center">
-                    {bulletPoint('bg-red-dark', 'Create a new meeting')}
-                </div>
-            </div>
-            <div className="flex-1 flex">
-                <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
-                    <div className="flex-1 flex items-center">
-                        <i
-                            className={
-                                'text-4xl material-icons text-yellow-dark'
-                            }
-                        >
-                            looks_two
-                        </i>
-                    </div>
-                </div>
-                <div className="flex-3 pl-4 flex items-center">
-                    {bulletPoint(
-                        'bg-yellow-dark',
-                        'Specifying between which dates and times you want the meeting to take place'
-                    )}
-                </div>
-            </div>
-            <div className="flex-1 flex">
-                <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
-                    <div className="flex-1 flex items-center">
-                        <i
-                            className={
-                                'text-4xl material-icons text-green-dark'
-                            }
-                        >
-                            looks_3
-                        </i>
-                    </div>
-                </div>
-                <div className="flex-3 pl-4 flex items-center">
-                    {bulletPoint(
-                        'bg-green-light',
-                        'Copy the invitation link and send to your colleagues'
-                    )}
-                </div>
-            </div>
-            <div className="flex-1 flex">
-                <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
-                    <div className="flex-1 flex items-center">
-                        <i
-                            className={
-                                'text-4xl font-bold material-icons text-grey-darkest'
-                            }
-                        >
-                            add
-                        </i>
-                    </div>
-                </div>
-                <div className="flex-3 pl-4 flex items-center">
-                    <LinkButton
-                        to="/creategroup"
-                        text="Create new meeting"
-                        className=""
-                    />
-                </div>
-            </div>
+            {rowWrapper(
+                <i className={'text-4xl material-icons text-red-dark'}>
+                    looks_one
+                </i>,
+                bulletPoint('Create a new meeting')
+            )}
+            {rowWrapper(
+                <i className={'text-4xl material-icons text-yellow-dark'}>
+                    looks_two
+                </i>,
+                bulletPoint(
+                    'Specifying between which dates and times you want the meeting to take place'
+                )
+            )}
+            {rowWrapper(
+                <i className={'text-4xl material-icons text-green-dark'}>
+                    looks_3
+                </i>,
+                bulletPoint(
+                    'Copy the invitation link and send to your colleagues'
+                )
+            )}
+            {rowWrapper(
+                <i
+                    className={
+                        'text-4xl font-bold material-icons text-grey-darkest'
+                    }
+                >
+                    add
+                </i>,
+                <LinkButton
+                    to="/creategroup"
+                    text="Create new meeting"
+                    className=""
+                />
+            )}
             <div className="flex-1 flex">
                 <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4" />
                 <div className="flex-3 pl-4">
