@@ -74,6 +74,24 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
         console.log(error)
     }
 
+    const rowWrapper = (
+        firstChild: JSX.Element,
+        secondChild: JSX.Element | JSX.Element[],
+        classNameFirst?: string,
+        calssNameSecond?: string
+    ) => (
+        <div className="flex-1 flex">
+            <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
+                <div className={'flex-1 flex items-center ' + classNameFirst}>
+                    {firstChild}
+                </div>
+            </div>
+            <div className={'flex-3 pl-4 flex items-center ' + calssNameSecond}>
+                {secondChild}
+            </div>
+        </div>
+    )
+
     const validDates =
         formValues.toDate.date >= formValues.fromDate.date &&
         formChanged.fromDate &&
@@ -128,21 +146,17 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                         />
                     </div>
                 </div>
-                <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
-                        <div className="flex-1 flex items-center">
-                            <i
-                                className={
-                                    'text-4xl material-icons pt-2 ' +
-                                    ' ' +
-                                    (validUserName ? 'text-green-dark' : '')
-                                }
-                            >
-                                perm_identity
-                            </i>
-                        </div>
-                    </div>
-                    <div className="flex-3 flex items-center pl-4">
+                {rowWrapper(
+                    <i
+                        className={
+                            'text-4xl material-icons pt-2 ' +
+                            ' ' +
+                            (validUserName ? 'text-green-dark' : '')
+                        }
+                    >
+                        perm_identity
+                    </i>,
+                    [
                         <TextInput
                             className=""
                             label="Your display name"
@@ -154,28 +168,24 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                                 formValues.userName !== '' &&
                                 formChanged.userName
                             }
-                        />
+                        />,
                         <HelpHover
                             className="pl-4 pt-1"
                             text="This is the name that you will be represented with to your colleagues."
-                        />
-                    </div>
-                </div>
-                <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
-                        <div className="flex-1 flex items-center">
-                            <i
-                                className={
-                                    'text-3xl material-icons pt-2' +
-                                    ' ' +
-                                    (validDates ? 'text-green-dark' : '')
-                                }
-                            >
-                                calendar_today
-                            </i>
-                        </div>
-                    </div>
-                    <div className="flex-3 flex items-center pl-4 flex-wrap">
+                        />,
+                    ]
+                )}
+                {rowWrapper(
+                    <i
+                        className={
+                            'text-3xl material-icons pt-2' +
+                            ' ' +
+                            (validDates ? 'text-green-dark' : '')
+                        }
+                    >
+                        calendar_today
+                    </i>,
+                    [
                         <DateInput
                             className=""
                             label="From date"
@@ -188,10 +198,10 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             onChange={handleChange}
                             valid={validDates || !formChanged.toDate}
                             changed={formChanged.fromDate}
-                        />
+                        />,
                         <i className="material-icons pt-2 px-4">
                             arrow_forward
-                        </i>
+                        </i>,
                         <DateInput
                             className=""
                             label="To date"
@@ -204,28 +214,26 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             onChange={handleChange}
                             valid={validDates || !formChanged.fromDate}
                             changed={formChanged.toDate}
-                        />
+                        />,
                         <HelpHover
                             className="pl-4 pt-1"
                             text="Look for available time slots for a meeting between (and including) these two dates."
-                        />
-                    </div>
-                </div>
-                <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
-                        <div className="flex-1 flex items-center">
-                            <i
-                                className={
-                                    'text-3xl material-icons pt-2' +
-                                    ' ' +
-                                    (validTimes ? 'text-green-dark' : '')
-                                }
-                            >
-                                access_time
-                            </i>
-                        </div>
-                    </div>
-                    <div className="flex-3 flex items-center flex-wrap pl-4">
+                        />,
+                    ],
+                    '',
+                    'flex-wrap'
+                )}
+                {rowWrapper(
+                    <i
+                        className={
+                            'text-3xl material-icons pt-2' +
+                            ' ' +
+                            (validTimes ? 'text-green-dark' : '')
+                        }
+                    >
+                        access_time
+                    </i>,
+                    [
                         <TimeInput
                             className=""
                             label="From time"
@@ -234,10 +242,10 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             onChange={handleChange}
                             valid={validTimes || !formChanged.toTime}
                             changed={formChanged.fromTime}
-                        />
+                        />,
                         <i className="material-icons pt-2 px-4">
                             arrow_forward
-                        </i>
+                        </i>,
                         <TimeInput
                             className=""
                             label="To time"
@@ -246,30 +254,26 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             onChange={handleChange}
                             valid={validTimes || !formChanged.fromTime}
                             changed={formChanged.toTime}
-                        />
+                        />,
                         <HelpHover
                             className="pl-4 pt-1"
                             text="Search for open time slots within the time period specified by these two inputs."
-                        />
-                    </div>
-                </div>
-                <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
-                        <div className="flex-1 flex items-center ">
-                            <i
-                                className={
-                                    'text-3xl material-icons pt-2' +
-                                    ' ' +
-                                    (validMeetingLength
-                                        ? 'text-green-dark'
-                                        : '')
-                                }
-                            >
-                                hourglass_full
-                            </i>
-                        </div>
-                    </div>
-                    <div className="flex-3 flex items-center pl-4">
+                        />,
+                    ],
+                    '',
+                    'flex-wrap'
+                )}
+                {rowWrapper(
+                    <i
+                        className={
+                            'text-3xl material-icons pt-2' +
+                            ' ' +
+                            (validMeetingLength ? 'text-green-dark' : '')
+                        }
+                    >
+                        hourglass_full
+                    </i>,
+                    [
                         <TimeInput
                             className=""
                             label="Meeting length"
@@ -278,42 +282,36 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             onChange={handleChange}
                             valid={validMeetingLength}
                             changed={formChanged.meetingLength}
-                        />
+                        />,
                         <HelpHover
                             className="pl-4 pt-1"
                             text="The estimated meeting length."
-                        />
-                    </div>
-                </div>
-                <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
-                        <div className="flex-1 flex items-center">
-                            <i
-                                className={
-                                    'text-3xl material-icons pt-2' +
-                                    ' ' +
-                                    (allValid ? 'text-green-dark' : '')
-                                }
-                            >
-                                done_outline
-                            </i>
-                        </div>
-                    </div>
-                    <div className="flex-3 flex items-center pl-4">
-                        <GoogleLogin
-                            className="google-button"
-                            clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
-                            buttonText="Create meeting"
-                            onSuccess={responseGoogle}
-                            onFailure={onGoogleFailure}
-                            cookiePolicy={'single_host_origin'}
-                            scope={
-                                'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'
-                            }
-                            disabled={!allValid}
-                        />
-                    </div>
-                </div>
+                        />,
+                    ]
+                )}
+                {rowWrapper(
+                    <i
+                        className={
+                            'text-3xl material-icons pt-2' +
+                            ' ' +
+                            (allValid ? 'text-green-dark' : '')
+                        }
+                    >
+                        done_outline
+                    </i>,
+                    <GoogleLogin
+                        className="google-button"
+                        clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
+                        buttonText="Create meeting"
+                        onSuccess={responseGoogle}
+                        onFailure={onGoogleFailure}
+                        cookiePolicy={'single_host_origin'}
+                        scope={
+                            'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'
+                        }
+                        disabled={!allValid}
+                    />
+                )}
             </form>
             <Logo className="w-16 fixed px-1 pin-t pin-r bg-white rounded m-6 invisible md:visible" />
         </div>
