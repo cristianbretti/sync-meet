@@ -130,3 +130,7 @@ code {
 .opacity-80 {
     opacity: 0.8;
 }
+
+.blur {
+    filter: blur(3px);
+}

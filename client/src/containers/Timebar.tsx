@@ -13,7 +13,7 @@ const Timebar: React.FC<TimebarProps> = ({ from_time, to_time }) => {
         (to_time.getMinutes() > 0 ? 1 : 0)
     return (
         <div className="h-full w-8 flex flex-col border-r border-black">
-            <div className="w-full bg-grey-light h-16 border-b border-black" />
+            <div className="w-full h-16 border-b border-black" />
 
             {Array.from(Array(numberOfHoursBetweenStartEnd)).map((v, idx) => {
                 const hour = from_time.getHours() + idx

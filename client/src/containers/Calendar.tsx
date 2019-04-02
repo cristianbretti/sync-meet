@@ -47,7 +47,6 @@ const Calendar: React.FC<CalendarProps> = ({
 
     const days = getDaysBetweenStartEnd(group.from_date, group.to_date)
     matchEvents(days, events)
-    console.log(days.length)
     return (
         <div className="flex overflow-x-auto w-full">
             {days.map((day, idx) => (

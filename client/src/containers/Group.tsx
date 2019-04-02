@@ -8,6 +8,7 @@ import {
     GroupInfo,
     MyDate,
     Time,
+    SocketENUM,
 } from '../api/models'
 import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
@@ -59,6 +60,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
     }
 
     getCalendarData = (group_str_id: string, google_id: string) => {
+        this.setState({ status: LoginStatus.PENDING })
         api.getGroupCalendar(google_id, group_str_id)
             .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
                 if (!getGroupCalendarResponse.success) {
@@ -75,6 +77,11 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     you: getGroupCalendarResponse.you,
                     status: LoginStatus.LOGGED_IN,
                 })
+                api.login(
+                    group_str_id,
+                    google_id,
+                    getGroupCalendarResponse.group.to_date
+                )
             })
             .catch((error: any) => {
                 console.log('Error')
@@ -89,25 +96,40 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         }
         const tempState = this.state as GroupInfo
         return (
-            <div className="relative">
-                <div className="flex">
-                    <div className="flex-1 h-screen border border-black">
-                        <Sidebar {...tempState} />
-                    </div>
+            <div className="relative overflow-hidden">
+                <div
+                    className={
+                        'flex' +
+                        ' ' +
+                        (this.state.status === LoginStatus.NOT_LOGGED_IN
+                            ? 'blur'
+                            : '')
+                    }
+                >
+                    <Sidebar
+                        {...tempState}
+                        className="flex-1 h-screen border border-black"
+                    />
 
-                    <div className="flex-3 flex h-screen">
-                        <Timebar
-                            from_time={tempState.group.from_time}
-                            to_time={tempState.group.to_time}
-                        />
-                        <Calendar
-                            events={tempState.events}
-                            group={tempState.group}
-                        />
+                    <div className="flex-3 flex flex-col h-screen">
+                        <div className="flex flex-1">
+                            <Timebar
+                                from_time={tempState.group.from_time}
+                                to_time={tempState.group.to_time}
+                            />
+                            <Calendar
+                                events={tempState.events}
+                                group={tempState.group}
+                            />
+                        </div>
+                        <div className="h-8 " />
                     </div>
                 </div>
                 {this.state.status === LoginStatus.NOT_LOGGED_IN && (
-                    <AddUserModal />
+                    <AddUserModal
+                        group_str_id={this.props.match.params.group_str_id}
+                        getCalendarData={this.getCalendarData}
+                    />
                 )}
             </div>
         )

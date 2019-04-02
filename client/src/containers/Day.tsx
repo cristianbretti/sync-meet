@@ -23,16 +23,12 @@ const Day: React.FC<DayProps> = ({
         (toTime.getMinutes() > 0 ? 1 : 0)
     return (
         <div
-            className={
-                'flex flex-col border-r border-black h-screen' + ' ' + className
-            }
+            className={'flex flex-col border-r border-black' + ' ' + className}
         >
             <div className="h-16 border-b border-black text-center">
-                <div className="px-1">
-                    <h3>{thisDay.getDayString()}</h3>
-                </div>
-                <div className="px-1">
-                    <h3>{thisDay.getDate()}</h3>
+                <div className="px-1 pt-2 text-xl font-semibold">
+                    <div>{thisDay.getDayString()}</div>
+                    <div>{thisDay.getDate()}</div>
                 </div>
             </div>
             <div className="flex-1 flex flex-col relative">
