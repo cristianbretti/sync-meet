@@ -22,12 +22,13 @@ code {
 }
 
 .logo-letter {
-    margin-top: 2px;
     animation: letter 3s ease-in-out infinite;
+    margin-top: 2%;
 }
 
 .logo-letter-containter {
     animation: letterContainer 3s ease-in-out infinite;
+    margin-top: -2px;
 }
 
 @keyframes letterContainer {

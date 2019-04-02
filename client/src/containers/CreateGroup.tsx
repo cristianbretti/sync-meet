@@ -100,8 +100,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                 className="flex-1 flex flex-col bg-grey-darkest text-white shadow-inner overflow-hidden"
             >
                 <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end justify-center bg-white text-grey-darkest">
-                        <div className="flex flex-col items-end justify-center overflow-hidden mr-4 font-bold text-lg md:text-3xl">
+                    <div className="flex-1 flex flex-col items-end justify-center bg-white text-grey-darkest pr-4">
+                        <div className="flex flex-col items-end justify-center overflow-hidden font-bold text-lg md:text-3xl">
                             <div>CREATING</div>
                             <div className="text-green-dark font-medium">
                                 NEW
@@ -109,9 +109,9 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             <div className="">MEETING</div>
                         </div>
                     </div>
-                    <div className="flex-3 flex items-center">
+                    <div className="flex-3 pl-4 flex items-center">
                         <TextInput
-                            className="ml-4"
+                            className=""
                             label="Meeting title"
                             name={'groupName'}
                             value={formValues.groupName}
@@ -129,8 +129,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                     </div>
                 </div>
                 <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest">
-                        <div className="flex-1 flex items-center mr-4">
+                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
+                        <div className="flex-1 flex items-center">
                             <i
                                 className={
                                     'text-4xl material-icons pt-2 ' +
@@ -142,9 +142,9 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             </i>
                         </div>
                     </div>
-                    <div className="flex-3 flex items-center">
+                    <div className="flex-3 flex items-center pl-4">
                         <TextInput
-                            className="ml-4"
+                            className=""
                             label="Your display name"
                             name={'userName'}
                             value={formValues.userName}
@@ -162,8 +162,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                     </div>
                 </div>
                 <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest">
-                        <div className="flex-1 flex items-center mr-4">
+                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
+                        <div className="flex-1 flex items-center">
                             <i
                                 className={
                                     'text-3xl material-icons pt-2' +
@@ -175,9 +175,9 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             </i>
                         </div>
                     </div>
-                    <div className="flex-3 flex items-center flex-wrap">
+                    <div className="flex-3 flex items-center pl-4 flex-wrap">
                         <DateInput
-                            className="ml-4"
+                            className=""
                             label="From date"
                             name={'fromDate'}
                             value={formValues.fromDate}
@@ -189,11 +189,11 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             valid={validDates || !formChanged.toDate}
                             changed={formChanged.fromDate}
                         />
-                        <i className="material-icons pt-2 pl-4">
+                        <i className="material-icons pt-2 px-4">
                             arrow_forward
                         </i>
                         <DateInput
-                            className="ml-4"
+                            className=""
                             label="To date"
                             name={'toDate'}
                             value={formValues.toDate}
@@ -212,8 +212,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                     </div>
                 </div>
                 <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest">
-                        <div className="flex-1 flex items-center mr-4">
+                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
+                        <div className="flex-1 flex items-center">
                             <i
                                 className={
                                     'text-3xl material-icons pt-2' +
@@ -225,9 +225,9 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             </i>
                         </div>
                     </div>
-                    <div className="flex-3 flex items-center flex-wrap">
+                    <div className="flex-3 flex items-center flex-wrap pl-4">
                         <TimeInput
-                            className="ml-4"
+                            className=""
                             label="From time"
                             name={'fromTime'}
                             value={formValues.fromTime}
@@ -235,11 +235,11 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             valid={validTimes || !formChanged.toTime}
                             changed={formChanged.fromTime}
                         />
-                        <i className="material-icons pt-2 pl-4">
+                        <i className="material-icons pt-2 px-4">
                             arrow_forward
                         </i>
                         <TimeInput
-                            className="ml-4"
+                            className=""
                             label="To time"
                             name={'toTime'}
                             value={formValues.toTime}
@@ -254,8 +254,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                     </div>
                 </div>
                 <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest">
-                        <div className="flex-1 flex items-center mr-4">
+                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
+                        <div className="flex-1 flex items-center ">
                             <i
                                 className={
                                     'text-3xl material-icons pt-2' +
@@ -269,9 +269,9 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             </i>
                         </div>
                     </div>
-                    <div className="flex-3 flex items-center">
+                    <div className="flex-3 flex items-center pl-4">
                         <TimeInput
-                            className="ml-4"
+                            className=""
                             label="Meeting length"
                             name={'meetingLength'}
                             value={formValues.meetingLength}
@@ -286,8 +286,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                     </div>
                 </div>
                 <div className="flex-1 flex">
-                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest">
-                        <div className="flex-1 flex items-center mr-4">
+                    <div className="flex-1 flex flex-col items-end bg-white text-grey-darkest pr-4">
+                        <div className="flex-1 flex items-center">
                             <i
                                 className={
                                     'text-3xl material-icons pt-2' +
@@ -299,9 +299,9 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             </i>
                         </div>
                     </div>
-                    <div className="flex-3 flex items-center">
+                    <div className="flex-3 flex items-center pl-4">
                         <GoogleLogin
-                            className="google-button ml-4 bg-blue-dark"
+                            className="google-button"
                             clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
                             buttonText="Create meeting"
                             onSuccess={responseGoogle}
@@ -315,7 +315,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                     </div>
                 </div>
             </form>
-            <Logo className="w-16 fixed pin-t pin-r bg-white rounded m-6 invisible md:visible" />
+            <Logo className="w-16 fixed px-1 pin-t pin-r bg-white rounded m-6 invisible md:visible" />
         </div>
     )
 }

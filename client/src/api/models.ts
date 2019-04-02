@@ -83,9 +83,6 @@ export class Time {
     }
 }
 
-const test = new MyDate({ date_str: '2019-04-01' })
-console.log(test.toJSON())
-
 export interface ErrorResponse {
     status: number
     error: string

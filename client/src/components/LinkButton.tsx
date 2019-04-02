@@ -13,7 +13,7 @@ const LinkButton: FC<LinkButtonProps> = ({ className, text, to }) => {
             <Link
                 to={to}
                 className={
-                    'no-underline text-inherit p-2 block rounded bg-green hover:bg-green-dark hover:shadow-inner shadow'
+                    'no-underline text-inherit p-2 block rounded bg-green-dark hover:bg-green-darker hover:shadow-inner shadow'
                 }
             >
                 {text}
