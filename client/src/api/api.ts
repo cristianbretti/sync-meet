@@ -40,7 +40,7 @@ class API {
         })
     }
 
-    setReciveCallback = (callback: (msg: SocketENUM) => void) => {
+    setReceiveCallback = (callback: (msg: SocketENUM) => void) => {
         this.socket.off('message') // remove all other listeners
         this.socket.on('message', callback)
     }
@@ -128,15 +128,15 @@ class API {
 
     addUser = (
         user: AddUserBody,
-        google_id: string,
         group_str_id: string
     ): Promise<AddUserResponse> => {
         return this.request(
             'adduser',
             HTTPMethod.POST,
-            { google_id: google_id, group_str_id: group_str_id },
+            { group_str_id: group_str_id },
             user
         ).then((resp: AddUserResponse) => {
+            console.log('join called on add')
             this.join(group_str_id)
             return resp
         })

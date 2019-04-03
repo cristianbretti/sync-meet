@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import GoogleLogin from 'react-google-login'
+import GoogleLogin, { GoogleLoginResponse } from 'react-google-login'
 import TextInput from '../components/TextInput'
 import api from '../api/api'
 import {
@@ -71,6 +71,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
     }
 
     const onGoogleFailure = (error: any) => {
+        console.log('BAD google reponse from create group')
         console.log(error)
     }
 

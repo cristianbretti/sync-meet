@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { DBUser, GroupInfo } from '../api/models'
 
-type SiderbarProps = GroupInfo
+type SiderbarProps = GroupInfo & { className?: string }
 
 const userDisplay = (user: DBUser) => (
     <div key={user.id} className="text-center">
@@ -14,9 +14,10 @@ const Sidebar: React.FC<SiderbarProps> = ({
     users,
     you,
     owner,
+    className,
 }: SiderbarProps) => {
     return (
-        <div>
+        <div className={'bg-grey-darkest text-white' + ' ' + className}>
             <div className="text-center">
                 <h3 className="py-1 px-1 mx-1 text-center">{group.name}</h3>
             </div>

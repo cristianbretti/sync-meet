@@ -1,27 +1,31 @@
 import React, { Component } from 'react'
-import { CalendarEvent } from '../api/models'
-import {
-    getEarliestTimeFromDates,
-    getLatestTimeFromDates,
-} from '../utils/helpers'
+import { Time } from '../api/models'
 
 interface TimebarProps {
-    events: CalendarEvent[]
+    from_time: Time
+    to_time: Time
 }
 
-const Timebar: React.FC<TimebarProps> = ({ events }) => {
-    const earliest = getEarliestTimeFromDates(events)
-    const latest = getLatestTimeFromDates(events)
+const Timebar: React.FC<TimebarProps> = ({ from_time, to_time }) => {
+    let numberOfHoursBetweenStartEnd =
+        to_time.getHours() -
+        from_time.getHours() +
+        (to_time.getMinutes() > 0 ? 1 : 0)
     return (
-        <div className="h-screen text-center">
-            <div className="flex flex-col h-screen">
-                <div className="w-full bg-grey-light h-16 " />
+        <div className="h-full w-8 flex flex-col border-r border-black">
+            <div className="w-full h-16 border-b border-black" />
 
-                <div className="w-full bg-grey flex-1 flex flex-col justify-between">
-                    <h6 className="p-2">{earliest.toString()}</h6>
-                    <h6 className="p-2">{latest.toString()}</h6>
-                </div>
-            </div>
+            {Array.from(Array(numberOfHoursBetweenStartEnd)).map((v, idx) => {
+                const hour = from_time.getHours() + idx
+                return (
+                    <div key={idx} className="flex flex-col flex-1">
+                        <div className="flex-1 border-b border-dotted text-2xs">
+                            {hour < 10 ? '0' + hour + ':00' : hour + ':00'}
+                        </div>
+                        <div className="flex-1 border-b" />
+                    </div>
+                )
+            })}
         </div>
     )
 }

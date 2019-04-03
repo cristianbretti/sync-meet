@@ -18,7 +18,7 @@ export class MyDate {
         if (init.date_str !== undefined) {
             this.date = new Date(init.date_str)
         } else if (init.date !== undefined) {
-            this.date = init.date
+            this.date = new Date(init.date)
         } else {
             this.date = new Date()
         }
@@ -36,7 +36,7 @@ export class MyDate {
     }
 
     public getDayString() {
-        return this.date.toLocaleDateString('en-us', { weekday: 'long' })
+        return this.date.toLocaleDateString('en-us', { weekday: 'short' })
     }
 }
 
