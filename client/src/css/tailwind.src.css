@@ -126,3 +126,19 @@ code {
     /* box-shadow: yellow 0px 0px 10px 2px !important; */
     opacity: 0.7 !important;
 }
+
+.text-2xs {
+    font-size: 0.5rem;
+}
+
+.text-3xs {
+    font-size: 0.25rem;
+}
+
+.opacity-80 {
+    opacity: 0.8;
+}
+
+.blur {
+    filter: blur(3px);
+}
