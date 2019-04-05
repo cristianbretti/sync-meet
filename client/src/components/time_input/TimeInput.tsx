@@ -14,28 +14,6 @@ interface TimeInputProps {
     onChange(name: string, value: Time): void
 }
 
-export enum KeyPressStatus {
-    UNSET = 'UNSET',
-    UP = 'UP',
-    DOWN = 'DOWN',
-    LEFT = 'LEFT',
-    RIGHT = 'RIGHT',
-    STANDBY = 'STANDBY',
-    WAITING = 'WAITING',
-    SET = 'SET',
-}
-
-interface KeyPressUnset {
-    status: Exclude<KeyPressStatus, KeyPressStatus.SET>
-}
-
-interface KeyPressSet {
-    status: KeyPressStatus.SET
-    value: number
-}
-
-export type KeyPress = KeyPressUnset | KeyPressSet
-
 const TimeInput: FC<TimeInputProps> = ({
     className,
     label,
@@ -45,138 +23,36 @@ const TimeInput: FC<TimeInputProps> = ({
     changed,
     onChange,
 }) => {
-    const [currentValue, setCurrentValue] = useState(value)
-    const lastChanged = useRef(false)
+    const [currentValue, setCurrentValue] = useState(value.toString())
     const [active, setActive] = useState(false)
-    const [typeing, setTyping] = useState(value.toString())
-    const [keyPress, setKeyPress] = useState({
-        status: KeyPressStatus.UNSET,
-    } as KeyPress)
+    const [inside, setInside] = useState(false)
 
-    const reset = () => {
-        setCurrentValue(value)
-        lastChanged.current = false
-        setTyping('empty')
-        setActive(false)
-        onChange(name, value)
-    }
-
-    const findNextInput = (e2: any) => {
-        // Tab and enter do same thing
-        const form = e2.target.form
-        let index = Array.prototype.indexOf.call(form, e2.target)
-        const current = form.elements[index]
-        index += 1
-        // find the next HTMLINPUT
-        while (form.elements[index].tagName !== 'INPUT') {
-            index += 1
-            if (index >= form.elements.length) {
-                current.blur()
-                return
-            }
-        }
-        form.elements[index].focus()
-        e2.preventDefault()
-    }
-
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        // Typeing and enter or tab
-        if (
-            (event.keyCode === 13 &&
-                keyPress.status === KeyPressStatus.UNSET) ||
-            event.keyCode === 9
-        ) {
-            try {
-                const newTime = new Time(typeing)
-                if (isNaN(newTime.getHours())) {
-                    throw 'is nan'
-                }
-                setCurrentValue(newTime)
-                lastChanged.current = false
-                setTyping('empty')
-                onChange(name, newTime)
-            } catch {
-                reset()
-            }
-        }
-        if (event.keyCode === 13 && keyPress.status === KeyPressStatus.UNSET) {
-            // Tab and enter do same thing
-            findNextInput(event)
-        }
-        if (
-            event.keyCode === 13 &&
-            keyPress.status === KeyPressStatus.STANDBY
-        ) {
-            setKeyPress({ status: KeyPressStatus.WAITING })
-            event.persist()
-            if (lastChanged.current) {
-                setTimeout(() => {
-                    findNextInput(event)
-                }, 100)
-            }
-        }
-
-        // Movement in modal
-        if (event.keyCode === 38) {
-            setKeyPress({ status: KeyPressStatus.UP })
-        } else if (event.keyCode === 40) {
-            setKeyPress({ status: KeyPressStatus.DOWN })
-        }
-        if (keyPress.status !== KeyPressStatus.UNSET) {
-            if (event.keyCode === 37) {
-                lastChanged.current = false
-                setKeyPress({ status: KeyPressStatus.LEFT })
-            } else if (event.keyCode === 39) {
-                lastChanged.current = true
-                setKeyPress({ status: KeyPressStatus.RIGHT })
-            }
+    const handleKeyDown = (keyCode: number) => {
+        switch (keyCode) {
+            case 13:
+            case 9:
+                onChange(name, new Time(currentValue))
+                setActive(false)
+            case 27:
+                setCurrentValue(value.toString())
+                setActive(false)
         }
     }
 
-    useEffect(() => {
-        if (keyPress.status === KeyPressStatus.SET) {
-            if (!lastChanged.current) {
-                handleHourChange(keyPress.value)
-                setKeyPress({ status: KeyPressStatus.STANDBY })
-            } else {
-                handleMinChange(keyPress.value)
-                setKeyPress({ status: KeyPressStatus.UNSET })
-            }
-        }
-    })
-
-    const handleTypeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTyping(event.target.value)
+    const handleHourScroll = (event: any) => {
+        event.persist()
+        const childHeight = event.target.children[1].clientHeight
+        const chosen = Math.round((event.target.scrollTop - 8) / childHeight)
+        const chosenStr = chosen < 10 ? '0' + chosen : chosen
+        setCurrentValue(chosenStr + ':' + currentValue.substr(3, 2))
     }
 
-    const handleHourChange = (newValue: number) => {
-        typeing !== 'empty' ? setTyping('empty') : null
-        let timeString =
-            (newValue > 9 ? newValue : '0' + newValue) +
-            ':' +
-            (currentValue.getMinutes() > 9
-                ? currentValue.getMinutes()
-                : '0' + currentValue.getMinutes())
-        const newTime = new Time(timeString)
-        setCurrentValue(newTime)
-        lastChanged.current = true
-        if (changed) {
-            onChange(name, newTime)
-        }
-    }
-
-    const handleMinChange = (newValue: number) => {
-        typeing !== 'empty' ? setTyping('empty') : null
-        let timeString =
-            (currentValue.getHours() > 9
-                ? currentValue.getHours()
-                : '0' + currentValue.getHours()) +
-            ':' +
-            (newValue > 9 ? newValue : '0' + newValue)
-        const newTime = new Time(timeString)
-        setCurrentValue(newTime)
-        lastChanged.current = false
-        onChange(name, newTime)
+    const handleMinScroll = (event: any) => {
+        event.persist()
+        const childHeight = event.target.children[1].clientHeight
+        const chosen = Math.round((event.target.scrollTop - 8) / childHeight)
+        const chosenStr = chosen < 10 ? '0' + chosen : chosen
+        setCurrentValue(currentValue.substr(0, 3) + chosenStr)
     }
 
     return (
@@ -194,51 +70,66 @@ const TimeInput: FC<TimeInputProps> = ({
                     className="bg-inherit py-2 text-inherit outline-none"
                     readOnly={window.outerWidth < 700}
                     value={
-                        !changed && !active
+                        active
+                            ? currentValue.toString()
+                            : !changed
                             ? ''
-                            : typeing !== 'empty'
-                            ? typeing
-                            : changed
-                            ? currentValue.toString()
-                            : active
-                            ? currentValue.toString()
-                            : ''
+                            : value.toString()
                     }
-                    onChange={handleTypeChange}
-                    onKeyDown={handleKeyDown}
-                    onFocus={e => {
-                        e.persist()
-                        setActive(true)
-                        setTimeout(() => e.target.select(), 100)
-                    }}
-                    onBlur={e => {
-                        e.persist()
-                        setTimeout(() => {
-                            if (typeing !== 'empty') {
-                                setTyping('empty')
-                            }
-                            if (changed) {
-                                setActive(false)
-                                lastChanged.current = false
-                            } else if (!lastChanged.current) {
-                                setActive(false)
-                            } else {
-                                e.target.focus()
-                            }
-                        }, 200)
-                    }}
+                    onChange={e => setCurrentValue(e.target.value)}
+                    onKeyDown={e => handleKeyDown(e.keyCode)}
+                    onFocus={() => setActive(true)}
                     onClick={() => setActive(true)}
+                    onBlur={() => !inside && setActive(false)}
                 />
                 {active ? (
-                    <TimeModal
-                        currentValue={currentValue}
-                        onHourChange={handleHourChange}
-                        onMinChange={handleMinChange}
-                        setActive={setActive}
-                        keyPress={keyPress}
-                        setKeyPress={setKeyPress}
-                        lastChanged={lastChanged}
-                    />
+                    <div
+                        className="absolute pin-t pin-x mt-10 w-2/3 z-10 border border-white rounded flex h-10"
+                        onMouseEnter={() => setInside(true)}
+                        onMouseLeave={() => setInside(false)}
+                    >
+                        <div
+                            className="h-full overflow-y-auto invisible-scrollbar flex-1 flex flex-col items-center scroll-snap cursor-default"
+                            onScroll={handleHourScroll}
+                        >
+                            <div className="invisible h-3">filler</div>
+                            {Array.from(new Array(24)).map((v, idx) => (
+                                <div className="snap-point" key={idx}>
+                                    {idx < 10 ? '0' + idx : idx}
+                                </div>
+                            ))}
+                            <div className="invisible h-3">filler</div>
+                        </div>
+                        <div className="flex flex-col items-center justify-center">
+                            <div className="mb-px pb-px">:</div>
+                        </div>
+                        <div
+                            className="h-full overflow-y-auto invisible-scrollbar flex-1 flex flex-col items-center scroll-snap cursor-default"
+                            onScroll={handleMinScroll}
+                        >
+                            <div className="invisible h-3">filler</div>
+                            {Array.from(new Array(60)).map((v, idx) => (
+                                <div className="snap-point" key={idx}>
+                                    {idx < 10 ? '0' + idx : idx}
+                                </div>
+                            ))}
+                            <div className="invisible h-3">filler</div>
+                        </div>
+                        <div className="flex flex-col items-center justify-center px-1">
+                            <i
+                                className="mb-px material-icons text-sm cursor-pointer hover:bg-white rounded hover:text-grey-darkest hover:border border-white"
+                                onClick={() => handleKeyDown(27)}
+                            >
+                                cancel
+                            </i>
+                            <i
+                                className="mt-px material-icons text-sm cursor-pointer hover:bg-white rounded hover:text-grey-darkest hover:border border-white"
+                                onClick={() => handleKeyDown(13)}
+                            >
+                                done
+                            </i>
+                        </div>
+                    </div>
                 ) : null}
             </div>
         </InputWrapper>

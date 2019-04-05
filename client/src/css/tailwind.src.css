@@ -142,3 +142,18 @@ code {
 .blur {
     filter: blur(3px);
 }
+
+.invisible-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.invisible-scrollbar::scrollbar {
+    display: none;
+}
+
+.scroll-snap {
+    scroll-snap-type: y mandatory;
+}
+
+.snap-point {
+    scroll-snap-align: center;
+}

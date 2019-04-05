@@ -2,11 +2,33 @@ import React, { Component, RefObject } from 'react'
 import { Time } from '../../api/models'
 import ListItem from './ListItem'
 import { render } from 'react-dom'
-import { KeyPress, KeyPressStatus } from './TimeInput'
+// import { KeyPress, KeyPressStatus } from './TimeInput'
 // import { registerLocale, setDefaultLocale } from "react-datepicker";
 // import sv from 'date-fns/locale/sv';
 // registerLocale('sv', sv);
 // setDefaultLocale('sv');
+
+export enum KeyPressStatus {
+    UNSET = 'UNSET',
+    UP = 'UP',
+    DOWN = 'DOWN',
+    LEFT = 'LEFT',
+    RIGHT = 'RIGHT',
+    STANDBY = 'STANDBY',
+    WAITING = 'WAITING',
+    SET = 'SET',
+}
+
+interface KeyPressUnset {
+    status: Exclude<KeyPressStatus, KeyPressStatus.SET>
+}
+
+interface KeyPressSet {
+    status: KeyPressStatus.SET
+    value: number
+}
+
+export type KeyPress = KeyPressUnset | KeyPressSet
 
 interface TimeModalProps {
     currentValue: Time
