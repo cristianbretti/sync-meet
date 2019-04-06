@@ -31,8 +31,18 @@ const TimeInput: FC<TimeInputProps> = ({
         switch (keyCode) {
             case 13:
             case 9:
-                onChange(name, new Time(currentValue))
+                try {
+                    const newTime = new Time(currentValue)
+                    if (isNaN(newTime.getHours())) {
+                        throw 'is nan'
+                    }
+                    onChange(name, newTime)
+                    setCurrentValue(newTime.toString())
+                } catch {
+                    setCurrentValue(value.toString())
+                }
                 setActive(false)
+                break
             case 27:
                 setCurrentValue(value.toString())
                 setActive(false)
