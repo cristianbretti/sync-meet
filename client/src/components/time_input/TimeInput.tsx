@@ -31,6 +31,7 @@ const TimeInput: FC<TimeInputProps> = ({
         switch (keyCode) {
             case 13:
             case 9:
+                // Enter or Tab
                 try {
                     const newTime = new Time(currentValue)
                     if (isNaN(newTime.getHours())) {
@@ -44,8 +45,10 @@ const TimeInput: FC<TimeInputProps> = ({
                 setActive(false)
                 break
             case 27:
+                // Escape
                 setCurrentValue(value.toString())
                 setActive(false)
+                break
         }
     }
 
@@ -97,18 +100,21 @@ const TimeInput: FC<TimeInputProps> = ({
                         className="absolute pin-t pin-x mt-10 w-2/3 z-10 border border-white rounded flex h-10"
                         onMouseEnter={() => setInside(true)}
                         onMouseLeave={() => setInside(false)}
+                        onClick={(e: any) =>
+                            e.currentTarget.parentElement.firstChild.focus()
+                        }
                     >
                         <div
                             className="h-full overflow-y-auto invisible-scrollbar flex-1 flex flex-col items-center scroll-snap cursor-default"
                             onScroll={handleHourScroll}
                         >
-                            <div className="invisible h-3">filler</div>
                             {Array.from(new Array(24)).map((v, idx) => (
                                 <div className="snap-point" key={idx}>
                                     {idx < 10 ? '0' + idx : idx}
                                 </div>
                             ))}
-                            <div className="invisible h-3">filler</div>
+                            <div className="snap-point">00</div>
+                            <div className="snap-point">01</div>
                         </div>
                         <div className="flex flex-col items-center justify-center">
                             <div className="mb-px pb-px">:</div>
@@ -125,16 +131,22 @@ const TimeInput: FC<TimeInputProps> = ({
                             ))}
                             <div className="invisible h-3">filler</div>
                         </div>
-                        <div className="flex flex-col items-center justify-center px-1">
+                        <div className="flex flex-col items-center justify-center pr-1">
                             <i
                                 className="mb-px material-icons text-sm cursor-pointer hover:bg-white rounded hover:text-grey-darkest hover:border border-white"
-                                onClick={() => handleKeyDown(27)}
+                                onClick={e => {
+                                    e.stopPropagation()
+                                    handleKeyDown(27)
+                                }}
                             >
                                 cancel
                             </i>
                             <i
                                 className="mt-px material-icons text-sm cursor-pointer hover:bg-white rounded hover:text-grey-darkest hover:border border-white"
-                                onClick={() => handleKeyDown(13)}
+                                onClick={e => {
+                                    e.stopPropagation()
+                                    handleKeyDown(13)
+                                }}
                             >
                                 done
                             </i>

@@ -1,73 +1,46 @@
 import React, { Component } from 'react'
+import { Time } from '../../api/models'
 
-interface ListItemProps {
-    setHover: (value: number) => void
-    handleChange: () => void
-    idx: number
-    hover: number
-    current: number
-    scrollToCenter: boolean
+interface ScrollLoopProps {
+    amount: number
+    value: number
 }
 
-export default class ListItem extends Component<ListItemProps> {
+export default class ScrollLoop extends Component<ScrollLoopProps> {
     private container: React.RefObject<HTMLDivElement>
-    constructor(props: ListItemProps) {
+    constructor(props: ScrollLoopProps) {
         super(props)
         this.container = React.createRef()
     }
 
-    public scrollToView = (extra: number) => {
-        if (this.container.current && this.container.current.parentElement) {
-            const child = this.container.current
-            const parent = this.container.current.parentElement
-            let offset = child.offsetTop - extra
-            if (this.props.idx !== 0) {
-                // 40 for fixed header height
-                offset -= 40
-            }
-            parent.scroll({ top: offset })
-        }
-    }
-
     componentDidMount() {
-        if (this.props.current === this.props.idx) {
-            this.scrollToView(80)
+        if (this.container.current) {
+            this.container.current.children[this.props.value].scrollIntoView()
         }
     }
 
-    componentWillReceiveProps(nextProps: ListItemProps) {
-        if (nextProps.hover === this.props.idx && nextProps.scrollToCenter) {
-            this.scrollToView(80)
-        }
+    handleHourScroll = (event: any) => {
+        event.persist()
+        const childHeight = event.target.children[1].clientHeight
+        const chosen = Math.round((event.target.scrollTop - 8) / childHeight)
+        const chosenStr = chosen < 10 ? '0' + chosen : chosen
+        console.log(chosenStr)
     }
 
     render() {
-        const { setHover, handleChange, idx, hover, current } = this.props
         return (
             <div
                 ref={this.container}
-                className={
-                    'cursor-pointer flex justify-center text-xs text-black bg-white' +
-                    ' ' +
-                    (idx === 0 ? 'pt-10' : '')
-                }
-                onMouseEnter={() => setHover(idx)}
-                onMouseLeave={() => setHover(-1)}
-                onClick={() => handleChange()}
+                className="h-full overflow-y-auto invisible-scrollbar flex-1 flex flex-col items-center scroll-snap cursor-default"
+                onScroll={this.handleHourScroll}
             >
-                <div
-                    className={
-                        'p-2 pointer-events-none rounded' +
-                        ' ' +
-                        (hover === idx
-                            ? 'bg-blue-light '
-                            : current === idx
-                            ? 'bg-blue-dark text-white font-semibold'
-                            : '')
-                    }
-                >
-                    {idx > 9 ? idx : '0' + idx}
-                </div>
+                {Array.from(new Array(this.props.amount)).map((v, idx) => (
+                    <div className="snap-point" key={idx}>
+                        {idx < 10 ? '0' + idx : idx}
+                    </div>
+                ))}
+                <div className="snap-point">00</div>
+                <div className="snap-point">01</div>
             </div>
         )
     }
