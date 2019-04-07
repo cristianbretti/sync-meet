@@ -1,8 +1,9 @@
 import React, { FC, useState, useRef, useEffect } from 'react'
 import { Time } from '../../api/models'
 import InputWrapper from '../InputWrapper'
-import TimeModal from './TimeModal'
+// import TimeModal from './TimeModal'
 import { number } from 'prop-types'
+import ScrollLoop from './ScrollLoop'
 
 interface TimeInputProps {
     className?: string
@@ -104,33 +105,27 @@ const TimeInput: FC<TimeInputProps> = ({
                             e.currentTarget.parentElement.firstChild.focus()
                         }
                     >
-                        <div
-                            className="h-full overflow-y-auto invisible-scrollbar flex-1 flex flex-col items-center scroll-snap cursor-default"
-                            onScroll={handleHourScroll}
-                        >
-                            {Array.from(new Array(24)).map((v, idx) => (
-                                <div className="snap-point" key={idx}>
-                                    {idx < 10 ? '0' + idx : idx}
-                                </div>
-                            ))}
-                            <div className="snap-point">00</div>
-                            <div className="snap-point">01</div>
-                        </div>
+                        <ScrollLoop
+                            amount={24}
+                            setValue={chosenStr =>
+                                setCurrentValue(
+                                    chosenStr + ':' + currentValue.substr(3, 2)
+                                )
+                            }
+                            value={value.getHours()}
+                        />
                         <div className="flex flex-col items-center justify-center">
                             <div className="mb-px pb-px">:</div>
                         </div>
-                        <div
-                            className="h-full overflow-y-auto invisible-scrollbar flex-1 flex flex-col items-center scroll-snap cursor-default"
-                            onScroll={handleMinScroll}
-                        >
-                            <div className="invisible h-3">filler</div>
-                            {Array.from(new Array(60)).map((v, idx) => (
-                                <div className="snap-point" key={idx}>
-                                    {idx < 10 ? '0' + idx : idx}
-                                </div>
-                            ))}
-                            <div className="invisible h-3">filler</div>
-                        </div>
+                        <ScrollLoop
+                            amount={60}
+                            setValue={chosenStr =>
+                                setCurrentValue(
+                                    currentValue.substr(0, 2) + ':' + chosenStr
+                                )
+                            }
+                            value={value.getMinutes()}
+                        />
                         <div className="flex flex-col items-center justify-center pr-1">
                             <i
                                 className="mb-px material-icons text-sm cursor-pointer hover:bg-white rounded hover:text-grey-darkest hover:border border-white"
