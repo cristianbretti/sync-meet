@@ -53,22 +53,6 @@ const TimeInput: FC<TimeInputProps> = ({
         }
     }
 
-    const handleHourScroll = (event: any) => {
-        event.persist()
-        const childHeight = event.target.children[1].clientHeight
-        const chosen = Math.round((event.target.scrollTop - 8) / childHeight)
-        const chosenStr = chosen < 10 ? '0' + chosen : chosen
-        setCurrentValue(chosenStr + ':' + currentValue.substr(3, 2))
-    }
-
-    const handleMinScroll = (event: any) => {
-        event.persist()
-        const childHeight = event.target.children[1].clientHeight
-        const chosen = Math.round((event.target.scrollTop - 8) / childHeight)
-        const chosenStr = chosen < 10 ? '0' + chosen : chosen
-        setCurrentValue(currentValue.substr(0, 3) + chosenStr)
-    }
-
     return (
         <InputWrapper
             className={className}
@@ -98,7 +82,7 @@ const TimeInput: FC<TimeInputProps> = ({
                 />
                 {active ? (
                     <div
-                        className="absolute pin-t pin-x mt-10 w-24 z-10 border border-white rounded flex h-10"
+                        className="absolute pin-t pin-x mt-10 w-24 z-10 border border-white bg-grey-darkest rounded flex h-10"
                         onMouseEnter={() => setInside(true)}
                         onMouseLeave={() => setInside(false)}
                         onClick={(e: any) =>

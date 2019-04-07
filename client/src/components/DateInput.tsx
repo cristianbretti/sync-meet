@@ -54,6 +54,13 @@ const DateInput: FC<DateInputProps> = ({
         >
             <DatePicker
                 className="bg-inherit py-2 text-inherit outline-none"
+                dayClassName={(date: Date) => {
+                    if (date >= startDate.date && date <= endDate.date) {
+                        return 'bg-blue-dark rounded text-white'
+                    }
+                    return 'text-white hover:text-black'
+                }}
+                calendarClassName="bg-grey-darkest"
                 customInput={<CustomInput changed={changed} />}
                 selected={value.date}
                 selectsStart={selectsStart}
@@ -64,12 +71,6 @@ const DateInput: FC<DateInputProps> = ({
                 onChange={(date: Date) => {
                     setActive(false)
                     onChange(name, new MyDate({ date: date }))
-                }}
-                dayClassName={(date: Date) => {
-                    if (date >= startDate.date && date <= endDate.date) {
-                        return 'bg-blue-dark rounded text-white'
-                    }
-                    return null
                 }}
                 onSelect={(date: Date) => {
                     // This fires even when you pick the same date.
