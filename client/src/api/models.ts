@@ -7,6 +7,7 @@ export enum HTTPMethod {
 
 export enum SocketENUM {
     JOIN = 'join',
+    REJOIN = 'rejoin',
     LEAVE = 'leave',
     DELETE = 'delete',
     UPDATE = 'update',

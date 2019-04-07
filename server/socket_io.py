@@ -5,8 +5,13 @@ sio = SocketIO()
 """ SOCKET IO """
 @sio.on('join')
 def on_join(group_str_id):
-    join_room(group_str_id)
     send("join", room=group_str_id)
+    join_room(group_str_id)
+
+
+@sio.on('rejoin')
+def on_rejoin(group_str_id):
+    join_room(group_str_id)
 
 
 @sio.on('leave')
