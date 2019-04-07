@@ -162,6 +162,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             className=""
                             label="Your display name"
                             name={'userName'}
+                            key={'userName'}
                             value={formValues.userName}
                             changed={formChanged.userName}
                             onChange={handleChange}
@@ -172,6 +173,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                         />,
                         <HelpHover
                             className="pl-4 pt-1"
+                            key="help"
                             text="This is the name that you will be represented with to your colleagues."
                         />,
                     ]
@@ -191,6 +193,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             className=""
                             label="From date"
                             name={'fromDate'}
+                            key={'fromDate'}
                             value={formValues.fromDate}
                             selectsStart={true}
                             selectsEnd={false}
@@ -200,13 +203,14 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             valid={validDates || !formChanged.toDate}
                             changed={formChanged.fromDate}
                         />,
-                        <i className="material-icons pt-2 px-4">
+                        <i key="arrow" className="material-icons pt-2 px-4">
                             arrow_forward
                         </i>,
                         <DateInput
                             className=""
                             label="To date"
                             name={'toDate'}
+                            key={'toDate'}
                             value={formValues.toDate}
                             selectsStart={false}
                             selectsEnd={true}
@@ -218,6 +222,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                         />,
                         <HelpHover
                             className="pl-4 pt-1"
+                            key="help"
                             text="Look for available time slots for a meeting between (and including) these two dates."
                         />,
                     ],
@@ -239,18 +244,20 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             className=""
                             label="From time"
                             name={'fromTime'}
+                            key={'fromTime'}
                             value={formValues.fromTime}
                             onChange={handleChange}
                             valid={validTimes || !formChanged.toTime}
                             changed={formChanged.fromTime}
                         />,
-                        <i className="material-icons pt-2 px-4">
+                        <i key="arrow" className="material-icons pt-2 px-4">
                             arrow_forward
                         </i>,
                         <TimeInput
                             className=""
                             label="To time"
                             name={'toTime'}
+                            key={'toTime'}
                             value={formValues.toTime}
                             onChange={handleChange}
                             valid={validTimes || !formChanged.fromTime}
@@ -258,6 +265,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                         />,
                         <HelpHover
                             className="pl-4 pt-1"
+                            key="help"
                             text="Search for open time slots within the time period specified by these two inputs."
                         />,
                     ],
@@ -279,6 +287,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             className=""
                             label="Meeting length"
                             name={'meetingLength'}
+                            key={'meetingLength'}
                             value={formValues.meetingLength}
                             onChange={handleChange}
                             valid={validMeetingLength}
@@ -286,6 +295,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                         />,
                         <HelpHover
                             className="pl-4 pt-1"
+                            key="help"
                             text="The estimated meeting length."
                         />,
                     ]
