@@ -19,7 +19,6 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
     const [userName, setUserName] = useState('')
 
     const responseGoogle = (googleResponse: any) => {
-        const google_id = googleResponse.getAuthResponse()
         const access_token = googleResponse.getAuthResponse().access_token
         const id_token = googleResponse.getAuthResponse().id_token
         const newUser: AddUserBody = {
@@ -29,7 +28,6 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
         }
         api.addUser(newUser, group_str_id)
             .then((resp: AddUserResponse) => {
-                console.log('new user added')
                 getCalendarData(group_str_id, resp.google_id)
             })
             .catch(badResp => {
