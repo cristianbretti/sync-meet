@@ -14,9 +14,9 @@ import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
 
 enum LoginStatus {
-    LOGGED_IN,
-    NOT_LOGGED_IN,
-    PENDING,
+    LOGGED_IN = 'logged_in',
+    NOT_LOGGED_IN = 'not_logged_in',
+    PENDING = 'pending',
 }
 
 type GroupState = { status: LoginStatus } & GroupInfo
@@ -49,13 +49,28 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
     }
 
     componentDidMount() {
-        const group_str_id = this.props.match.params.group_str_id
-        const loggedIn = api.isLoggedIn(group_str_id)
-        if (!loggedIn.success) {
-            this.setState({ status: LoginStatus.NOT_LOGGED_IN })
-        } else {
-            const google_id = loggedIn.google_id
-            this.getCalendarData(group_str_id, google_id)
+        api.setReceiveCallback(this.handleSocketIO)
+        this.handleSocketIO(SocketENUM.JOIN)
+    }
+
+    handleSocketIO = (message: SocketENUM) => {
+        switch (message) {
+            case SocketENUM.JOIN:
+            case SocketENUM.LEAVE:
+            case SocketENUM.UPDATE:
+                const group_str_id = this.props.match.params.group_str_id
+                const loggedIn = api.isLoggedIn(group_str_id)
+                if (!loggedIn.success) {
+                    this.setState({ status: LoginStatus.NOT_LOGGED_IN })
+                } else {
+                    const google_id = loggedIn.google_id
+                    this.getCalendarData(group_str_id, google_id)
+                }
+                break
+            case SocketENUM.DELETE:
+                // TODO: deleted group
+                console.log('GROUP IS DELETED SHOW SOMETHING NICE')
+                break
         }
     }
 

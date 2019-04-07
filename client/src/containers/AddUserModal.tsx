@@ -29,6 +29,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
         }
         api.addUser(newUser, group_str_id)
             .then((resp: AddUserResponse) => {
+                console.log('new user added')
                 getCalendarData(group_str_id, resp.google_id)
             })
             .catch(badResp => {
