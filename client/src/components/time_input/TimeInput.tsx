@@ -98,7 +98,7 @@ const TimeInput: FC<TimeInputProps> = ({
                 />
                 {active ? (
                     <div
-                        className="absolute pin-t pin-x mt-10 w-2/3 z-10 border border-white rounded flex h-10"
+                        className="absolute pin-t pin-x mt-10 w-24 z-10 border border-white rounded flex h-10"
                         onMouseEnter={() => setInside(true)}
                         onMouseLeave={() => setInside(false)}
                         onClick={(e: any) =>
@@ -107,11 +107,13 @@ const TimeInput: FC<TimeInputProps> = ({
                     >
                         <ScrollLoop
                             amount={24}
-                            setValue={chosenStr =>
-                                setCurrentValue(
+                            setValue={chosenStr => {
+                                const newTime = new Time(
                                     chosenStr + ':' + currentValue.substr(3, 2)
                                 )
-                            }
+                                setCurrentValue(newTime.toString())
+                                onChange(name, newTime)
+                            }}
                             value={value.getHours()}
                         />
                         <div className="flex flex-col items-center justify-center">
@@ -119,33 +121,15 @@ const TimeInput: FC<TimeInputProps> = ({
                         </div>
                         <ScrollLoop
                             amount={60}
-                            setValue={chosenStr =>
-                                setCurrentValue(
+                            setValue={chosenStr => {
+                                const newTime = new Time(
                                     currentValue.substr(0, 2) + ':' + chosenStr
                                 )
-                            }
+                                setCurrentValue(newTime.toString())
+                                onChange(name, newTime)
+                            }}
                             value={value.getMinutes()}
                         />
-                        <div className="flex flex-col items-center justify-center pr-1">
-                            <i
-                                className="mb-px material-icons text-sm cursor-pointer hover:bg-white rounded hover:text-grey-darkest hover:border border-white"
-                                onClick={e => {
-                                    e.stopPropagation()
-                                    handleKeyDown(27)
-                                }}
-                            >
-                                cancel
-                            </i>
-                            <i
-                                className="mt-px material-icons text-sm cursor-pointer hover:bg-white rounded hover:text-grey-darkest hover:border border-white"
-                                onClick={e => {
-                                    e.stopPropagation()
-                                    handleKeyDown(13)
-                                }}
-                            >
-                                done
-                            </i>
-                        </div>
                     </div>
                 ) : null}
             </div>
