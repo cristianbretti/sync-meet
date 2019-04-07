@@ -63,6 +63,8 @@ class API {
     isLoggedIn = (group_str_id: string): LoggedIn | LoggedOut => {
         const google_id = getCookie(group_str_id)
         if (google_id !== null) {
+            // Rejoin the socket-io room for this group
+            api.rejoin(group_str_id)
             return { success: true, google_id }
         }
         return { success: false }
@@ -110,6 +112,8 @@ class API {
      */
     join = (group_str_id: string) =>
         this.socket.emit(SocketENUM.JOIN, group_str_id)
+    rejoin = (group_str_id: string) =>
+        this.socket.emit(SocketENUM.REJOIN, group_str_id)
     leave = (group_str_id: string) =>
         this.socket.emit(SocketENUM.LEAVE, group_str_id)
     delete = (group_str_id: string) =>
@@ -120,7 +124,7 @@ class API {
     createGroup = (group: CreateGroupBody): Promise<CreateGroupResponse> => {
         return this.request('creategroup', HTTPMethod.POST, {}, group).then(
             (resp: CreateGroupResponse) => {
-                this.join(resp.group_str_id)
+                this.rejoin(resp.group_str_id)
                 return resp
             }
         )

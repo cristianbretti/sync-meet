@@ -53,10 +53,10 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         const loggedIn = api.isLoggedIn(group_str_id)
         if (!loggedIn.success) {
             this.setState({ status: LoginStatus.NOT_LOGGED_IN })
-            return
+        } else {
+            const google_id = loggedIn.google_id
+            this.getCalendarData(group_str_id, google_id)
         }
-        const google_id = loggedIn.google_id
-        this.getCalendarData(group_str_id, google_id)
     }
 
     getCalendarData = (group_str_id: string, google_id: string) => {
@@ -77,6 +77,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     you: getGroupCalendarResponse.you,
                     status: LoginStatus.LOGGED_IN,
                 })
+                // Login has to be done here since it need the group end date.
                 api.login(
                     group_str_id,
                     google_id,
@@ -84,9 +85,9 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                 )
             })
             .catch((error: any) => {
+                // TODO: Error handeling
                 console.log('Error')
                 console.log(error)
-                // TODO
             })
     }
 
@@ -94,7 +95,6 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         if (this.state.status === LoginStatus.PENDING) {
             return <div>SPINNING</div>
         }
-        const tempState = this.state as GroupInfo
         return (
             <div className="relative overflow-hidden">
                 <div
@@ -107,19 +107,19 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     }
                 >
                     <Sidebar
-                        {...tempState}
+                        {...this.state}
                         className="flex-1 h-screen border border-black"
                     />
 
                     <div className="flex-3 flex flex-col h-screen">
                         <div className="flex flex-1">
                             <Timebar
-                                from_time={tempState.group.from_time}
-                                to_time={tempState.group.to_time}
+                                from_time={this.state.group.from_time}
+                                to_time={this.state.group.to_time}
                             />
                             <Calendar
-                                events={tempState.events}
-                                group={tempState.group}
+                                events={this.state.events}
+                                group={this.state.group}
                             />
                         </div>
                         <div className="h-8 " />
