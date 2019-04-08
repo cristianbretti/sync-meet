@@ -63,7 +63,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                     createGroupResponse.google_id,
                     formValues.toDate
                 )
-                history.push('/group/' + createGroupResponse.group_str_id)
+                history.push('/group/' + createGroupResponse.group_str_id, true)
             })
             .catch((error: ErrorResponse) => {
                 console.error(error)
