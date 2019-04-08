@@ -82,7 +82,7 @@ const TimeInput: FC<TimeInputProps> = ({
                 />
                 {active ? (
                     <div
-                        className="absolute pin-t pin-x mt-10 w-24 z-10 border border-white bg-grey-darkest rounded flex h-10"
+                        className="absolute pin-t pin-x mt-10 w-24 z-10 border border-white bg-grey-darkest rounded flex h-12"
                         onMouseEnter={() => setInside(true)}
                         onMouseLeave={() => setInside(false)}
                         onClick={(e: any) =>
@@ -114,6 +114,8 @@ const TimeInput: FC<TimeInputProps> = ({
                             }}
                             value={value.getMinutes()}
                         />
+                        <div className="absolute pin-t pin-x h-3 bg-grey-darkest opacity-50 pointer-events-none" />
+                        <div className="absolute pin-b pin-x h-3 bg-grey-darkest opacity-50 pointer-events-none" />
                     </div>
                 ) : null}
             </div>
