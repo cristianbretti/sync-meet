@@ -21,7 +21,7 @@ export default class ScrollLoop extends Component<ScrollLoopProps> {
         if (this.container.current) {
             if (this.props.value === 0) {
                 this.container.current.children[
-                    this.props.amount + 1
+                    this.props.amount
                 ].scrollIntoView({ block: 'center' })
             } else {
                 this.container.current.children[
@@ -39,20 +39,12 @@ export default class ScrollLoop extends Component<ScrollLoopProps> {
         }
 
         if (!this.disableScroll) {
-            // const lowerLimit = this.scrollHeight - 2 * this.childHeight
             const lowerLimit = this.childHeight * this.props.amount + 2
-            console.log(this.container.current.scrollTop)
-            // console.log(this.childHeight * this.props.amount) 432
-
             if (this.container.current.scrollTop >= lowerLimit) {
-                console.log('bottom')
                 this.container.current.scrollTop = 1
                 this.disableScroll = true
             } else if (this.container.current.scrollTop <= 0) {
-                console.log('top')
-                const newVal = lowerLimit - 2
-                console.log(newVal)
-                this.container.current.scrollTop = newVal
+                this.container.current.scrollTop = lowerLimit - 2
                 this.disableScroll = true
             }
         } else {
