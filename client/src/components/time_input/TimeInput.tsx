@@ -114,8 +114,8 @@ const TimeInput: FC<TimeInputProps> = ({
                             }}
                             value={value.getMinutes()}
                         />
-                        <div className="absolute pin-t pin-x h-3 bg-grey-darkest opacity-50 pointer-events-none" />
-                        <div className="absolute pin-b pin-x h-3 bg-grey-darkest opacity-50 pointer-events-none" />
+                        <div className="absolute pin-t pin-x h-3 bg-grey-darkest rounded opacity-50 pointer-events-none" />
+                        <div className="absolute pin-b pin-x h-3 bg-grey-darkest rounded opacity-50 pointer-events-none" />
                     </div>
                 ) : null}
             </div>
