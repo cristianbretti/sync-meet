@@ -12,6 +12,7 @@ import {
 } from '../api/models'
 import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
+import SendLinkModal from './SendLinkModal'
 
 enum LoginStatus {
     LOGGED_IN = 'logged_in',
@@ -19,7 +20,7 @@ enum LoginStatus {
     PENDING = 'pending',
 }
 
-type GroupState = { status: LoginStatus } & GroupInfo
+type GroupState = { status: LoginStatus; shouldShowLink: boolean } & GroupInfo
 
 const dayInOneWeek = new Date()
 dayInOneWeek.setDate(dayInOneWeek.getDate() + 7)
@@ -45,10 +46,19 @@ const emptyGroupState: GroupInfo = {
 class Group extends Component<RouteComponentProps<any>, GroupState> {
     constructor(props: RouteComponentProps<any>) {
         super(props)
-        this.state = { ...emptyGroupState, status: LoginStatus.PENDING }
+        this.state = {
+            ...emptyGroupState,
+            status: LoginStatus.PENDING,
+            shouldShowLink: false,
+        }
     }
 
     componentDidMount() {
+        if (this.props.location.state) {
+            //This is only true when redirected from /creategroup
+            this.setState({ shouldShowLink: true })
+        }
+        console.log(this.props)
         api.setReceiveCallback(this.handleSocketIO)
         this.handleSocketIO(SocketENUM.JOIN)
     }
@@ -106,6 +116,10 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
             })
     }
 
+    closeSendLinkModal = () => {
+        this.setState({ shouldShowLink: false })
+    }
+
     render() {
         if (this.state.status === LoginStatus.PENDING) {
             return <div>SPINNING</div>
@@ -116,7 +130,8 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     className={
                         'flex' +
                         ' ' +
-                        (this.state.status === LoginStatus.NOT_LOGGED_IN
+                        (this.state.status === LoginStatus.NOT_LOGGED_IN ||
+                        this.state.shouldShowLink
                             ? 'blur'
                             : '')
                     }
@@ -144,6 +159,11 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     <AddUserModal
                         group_str_id={this.props.match.params.group_str_id}
                         getCalendarData={this.getCalendarData}
+                    />
+                )}
+                {this.state.shouldShowLink && (
+                    <SendLinkModal
+                        closeSendLinkModal={() => this.closeSendLinkModal()}
                     />
                 )}
             </div>
