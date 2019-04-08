@@ -30,12 +30,12 @@ const SendLinkModal: React.FC<SendLinkModalProps> = ({
                     onClick={event => {
                         event.stopPropagation()
                     }}
-                    className="bg-grey-darker text-white rounded shadow p-16 mx-8"
+                    className="bg-grey-darkest text-white rounded shadow mx-8"
                 >
-                    <div className="flex justify-end">
+                    <div className="flex justify-end m-8 mt-2 mr-2">
                         <i
                             className={
-                                'text-4xl material-icons text-white cursor-pointer'
+                                'text-3xl material-icons text-white cursor-pointer'
                             }
                             onClick={() => closeSendLinkModal()}
                         >
@@ -43,23 +43,23 @@ const SendLinkModal: React.FC<SendLinkModalProps> = ({
                         </i>
                     </div>
 
-                    <div className="mt-8 text-lg">
+                    <div className="m-8 text-lg">
                         Sent this link to your friends to plan this meeting!
                     </div>
-                    <div className="mt-8 text-sm flex ">
+                    <div className="m-8 text-sm flex ">
                         <input
                             ref={(el: HTMLInputElement) => (linkInput = el)}
                             onClick={event =>
                                 (event.target as HTMLInputElement).select()
                             }
                             type="text"
-                            className="w-full select-text p-2"
+                            className="w-full select-text p-2 bg-grey-darker text-white rounded outline-none"
                             readOnly={true}
                             value={window.location.href}
                         />
                         <i
                             className={
-                                'text-4xl material-icons text-white cursor-pointer pl-2'
+                                'text-2xl material-icons text-white cursor-pointer m-2 mr-0'
                             }
                             onClick={copyLink}
                         >
