@@ -21,7 +21,7 @@ export default class ScrollLoop extends Component<ScrollLoopProps> {
         if (this.container.current) {
             if (this.props.value === 0) {
                 this.container.current.children[
-                    this.props.amount + 1
+                    this.props.amount
                 ].scrollIntoView({ block: 'center' })
             } else {
                 this.container.current.children[
@@ -39,26 +39,25 @@ export default class ScrollLoop extends Component<ScrollLoopProps> {
         }
 
         if (!this.disableScroll) {
-            if (
-                this.container.current.scrollTop >=
-                this.scrollHeight - 2 * this.childHeight - 2
-            ) {
+            const lowerLimit = this.childHeight * this.props.amount + 2
+            if (this.container.current.scrollTop >= lowerLimit) {
                 this.container.current.scrollTop = 1
                 this.disableScroll = true
             } else if (this.container.current.scrollTop <= 0) {
-                const newVal = this.scrollHeight - 2.0 * this.childHeight - 2
-                this.container.current.scrollTop = newVal
+                this.container.current.scrollTop = lowerLimit - 2
                 this.disableScroll = true
             }
         } else {
             setTimeout(() => {
                 this.disableScroll = false
-            }, 40)
+            }, 100)
         }
 
         const chosen =
             Math.round(
-                (this.container.current.scrollTop - 8) / this.childHeight + 1
+                (this.container.current.scrollTop - this.childHeight / 2) /
+                    this.childHeight +
+                    1
             ) % this.props.amount
         const chosenStr = chosen < 10 ? '0' + chosen : '' + chosen
         this.props.setValue(chosenStr)
@@ -77,7 +76,8 @@ export default class ScrollLoop extends Component<ScrollLoopProps> {
                     </div>
                 ))}
                 <div className="snap-point">00</div>
-                <div className="">01</div>
+                <div className="snap-point">01</div>
+                <div className="">02</div>
             </div>
         )
     }
