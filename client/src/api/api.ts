@@ -14,14 +14,10 @@ import {
     SocketENUM,
     LoggedIn,
     LoggedOut,
-    GroupInfo,
-    BadAccessToken,
-    GetGroupCalendarResponseFailure,
-    GetGroupCalendarResponseSuccess,
-    GroupInfoResponse,
     Group,
-    CalendarEventResponse,
     CalendarEvent,
+    APIGetGroupCalendarResponse,
+    APICalendarEvent,
 } from './models'
 
 //Use this when running client served from server
@@ -153,36 +149,27 @@ class API {
         return this.request('getgroupcalendar', HTTPMethod.GET, {
             google_id: google_id,
             group_str_id: group_str_id,
-        }).then((resp: GroupInfoResponse | BadAccessToken) => {
-            if ('culprit' in resp) {
-                return {
-                    ...(resp as BadAccessToken),
-                    success: false,
-                } as GetGroupCalendarResponseFailure
-            } else {
-                resp = resp as GroupInfoResponse
-                const group = {
-                    name: resp.group.name,
-                    from_date: new MyDate({ date_str: resp.group.from_date }),
-                    to_date: new MyDate({ date_str: resp.group.to_date }),
-                    to_time: new Time(resp.group.to_time),
-                    from_time: new Time(resp.group.from_time),
-                    meeting_length: new Time(resp.group.meeting_length),
-                } as Group
-                const events = resp.events.map(
-                    (ev: CalendarEventResponse): CalendarEvent => ({
-                        date: new MyDate({ date_str: ev.date }),
-                        from_time: new Time(ev.from_time),
-                        to_time: new Time(ev.to_time),
-                    })
-                )
-                return {
-                    ...resp,
-                    group,
-                    events,
-                    success: true,
-                } as GetGroupCalendarResponseSuccess
-            }
+        }).then((resp: APIGetGroupCalendarResponse) => {
+            const group = {
+                name: resp.group.name,
+                from_date: new MyDate({ date_str: resp.group.from_date }),
+                to_date: new MyDate({ date_str: resp.group.to_date }),
+                to_time: new Time(resp.group.to_time),
+                from_time: new Time(resp.group.from_time),
+                meeting_length: new Time(resp.group.meeting_length),
+            } as Group
+            const events = resp.events.map(
+                (ev: APICalendarEvent): CalendarEvent => ({
+                    date: new MyDate({ date_str: ev.date }),
+                    from_time: new Time(ev.from_time),
+                    to_time: new Time(ev.to_time),
+                })
+            )
+            return {
+                ...resp,
+                group,
+                events,
+            } as GetGroupCalendarResponse
         })
     }
 

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import { DBUser, GroupInfo } from '../api/models'
+import { DBUser, GetGroupCalendarResponse } from '../api/models'
 
-type SiderbarProps = GroupInfo & { className?: string }
+type SiderbarProps = GetGroupCalendarResponse & { className?: string }
 
 const userDisplay = (user: DBUser) => (
     <div key={user.id} className="text-center">
@@ -12,8 +12,8 @@ const userDisplay = (user: DBUser) => (
 const Sidebar: React.FC<SiderbarProps> = ({
     group,
     users,
-    you,
-    owner,
+    your_id,
+    owner_id,
     className,
 }: SiderbarProps) => {
     return (
