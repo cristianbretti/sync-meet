@@ -5,7 +5,6 @@ import api from '../api/api'
 import { RouteComponentProps } from 'react-router'
 import {
     GetGroupCalendarResponse,
-    GroupInfo,
     MyDate,
     Time,
     SocketENUM,
@@ -21,12 +20,15 @@ enum LoginStatus {
     PENDING = 'pending',
 }
 
-type GroupState = { status: LoginStatus; shouldShowLink: boolean } & GroupInfo
+type GroupState = {
+    status: LoginStatus
+    shouldShowLink: boolean
+} & GetGroupCalendarResponse
 
 const dayInOneWeek = new Date()
 dayInOneWeek.setDate(dayInOneWeek.getDate() + 7)
 
-const emptyGroupState: GroupInfo = {
+const emptyGroupState: GetGroupCalendarResponse = {
     events: [],
     group: {
         meeting_length: new Time('01:00'),
@@ -36,12 +38,9 @@ const emptyGroupState: GroupInfo = {
         from_time: new Time('09:00'),
         to_time: new Time('17:00'),
     },
-    owner: {
-        id: 0,
-        name: '',
-    },
+    owner_id: 0,
     users: [],
-    you: 0,
+    your_id: 0,
 }
 
 class Group extends Component<RouteComponentProps<any>, GroupState> {
@@ -59,7 +58,6 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
             //This is only true when redirected from /creategroup
             this.setState({ shouldShowLink: true })
         }
-        console.log(this.props)
         api.setReceiveCallback(this.handleSocketIO)
         this.handleSocketIO(SocketENUM.JOIN)
     }
@@ -89,18 +87,12 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         this.setState({ status: LoginStatus.PENDING })
         api.getGroupCalendar(google_id, group_str_id)
             .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
-                if (!getGroupCalendarResponse.success) {
-                    // TODO: something wrong
-                    console.log('Access token expired!!')
-                    console.log(getGroupCalendarResponse)
-                    return
-                }
                 this.setState({
                     group: getGroupCalendarResponse.group,
                     events: getGroupCalendarResponse.events,
-                    owner: getGroupCalendarResponse.owner,
+                    owner_id: getGroupCalendarResponse.owner_id,
                     users: getGroupCalendarResponse.users,
-                    you: getGroupCalendarResponse.you,
+                    your_id: getGroupCalendarResponse.your_id,
                     status: LoginStatus.LOGGED_IN,
                 })
                 // Login has to be done here since it need the group end date.

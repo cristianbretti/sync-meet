@@ -1,5 +1,11 @@
 import React, { Component } from 'react'
-import { DBUser, GroupInfo, Time, MyDate, CalendarEvent } from '../api/models'
+import {
+    DBUser,
+    GetGroupCalendarResponse,
+    Time,
+    MyDate,
+    CalendarEvent,
+} from '../api/models'
 import Day from './Day'
 
 import {
@@ -8,8 +14,8 @@ import {
 } from '../utils/helpers'
 
 interface CalendarProps {
-    events: GroupInfo['events']
-    group: GroupInfo['group']
+    events: GetGroupCalendarResponse['events']
+    group: GetGroupCalendarResponse['group']
 }
 
 interface DayObject {

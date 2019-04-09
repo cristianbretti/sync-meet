@@ -1,3 +1,4 @@
+from flask_cors import CORS, cross_origin
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from socket_io import sio
 from model import db, admin, User, Planning_group
@@ -11,22 +12,24 @@ import random
 import string
 
 # File paths
-root_path = os.path.realpath(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
+root_path = os.path.realpath(os.path.join(
+    os.path.abspath(os.path.dirname(__file__)), '..'))
 db_path = os.path.join(root_path, 'db', 'syncmeet.db')
 db_uri = 'sqlite:///{}'.format(db_path)
 static_folder_path = os.path.join(root_path, 'client', 'build', 'static')
 template_folder_path = os.path.join(root_path, 'client', 'build')
 
-app = Flask(__name__, static_folder=static_folder_path, template_folder=template_folder_path)
+app = Flask(__name__, static_folder=static_folder_path,
+            template_folder=template_folder_path)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # To supress a warning
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # To supress a warning
 app.config['SECRET_KEY'] = config.MY_SECRET
 
 """ dev only """
-from flask_cors import CORS, cross_origin
 app.config['CORS_HEADERS'] = 'Content-Type'
 cors = CORS(app, supports_credentials=True)
 """ end """
+
 
 def create_prod_app(app):
     """ Initialize the database and admin.
@@ -35,6 +38,7 @@ def create_prod_app(app):
     admin.init_app(app)
     sio.init_app(app)
 
+
 def create_test_app(app):
     """ Sets up the correct config
     for testing the app. 
@@ -42,7 +46,8 @@ def create_test_app(app):
     and initialize it. 
     """
     app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(os.path.join(root_path, 'db', 'test.db'))
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(
+        os.path.join(root_path, 'db', 'test.db'))
     app.config['SECRET_KEY'] = "testsecret"
     db.init_app(app)
     return app
@@ -77,13 +82,16 @@ def create_group():
                 raise ValueError("Missing json body in post")
             # get group params
             group_name = payload['group_name']
-            from_date = datetime.strptime(payload['from_date'], '%Y-%m-%d').date()
+            from_date = datetime.strptime(
+                payload['from_date'], '%Y-%m-%d').date()
             to_date = datetime.strptime(payload['to_date'], '%Y-%m-%d').date()
             from_time = datetime.strptime(payload['from_time'], '%H:%M').time()
             to_time = datetime.strptime(payload['to_time'], '%H:%M').time()
-            meeting_length = datetime.strptime(payload['meeting_length'], '%H:%M').time()
+            meeting_length = datetime.strptime(
+                payload['meeting_length'], '%H:%M').time()
             # input checking
-            validate_datetimes(from_date, to_date, from_time, to_time, meeting_length)
+            validate_datetimes(from_date, to_date, from_time,
+                               to_time, meeting_length)
             # get user params
             user_name = payload['user_name']
             id_token = payload['id_token']
@@ -91,11 +99,13 @@ def create_group():
             # Create or find user
             user = create_or_find_user(id_token, user_name, access_token)
             if len(user.owner) >= 10:
-                raise ValueError("You cannot have more than 10 groups active per user.")
+                raise ValueError(
+                    "You cannot have more than 10 groups active per user.")
             # Create group
             if len(group_name) > 30:
                 raise ValueError("Group name too long. Max 30 characters")
-            new_group_str_id = ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(16))
+            new_group_str_id = ''.join(random.SystemRandom().choice(
+                string.ascii_lowercase + string.digits) for _ in range(16))
             new_group = Planning_group(
                 new_group_str_id,
                 group_name,
@@ -113,7 +123,7 @@ def create_group():
             return jsonify({
                 'group_str_id': new_group.group_str_id,
                 'google_id': user.google_id
-                }), 201
+            }), 201
     except APIError as e:
         return e.response, e.code
 
@@ -151,7 +161,7 @@ def add_user(group=None):
             return jsonify({
                 'google_id': user.google_id,
                 'group_str_id': group.group_str_id
-                }), 200
+            }), 200
     except APIError as e:
         return e.response, e.code
 
@@ -170,25 +180,22 @@ def get_group_calendar(user=None, group=None):
     """
     try:
         with handle_exceptions():
-            users = [ {'name': user.name, 'id': user.id} for user in group.users]
+            users = []
             all_events = []
             for g_user in group.users:
                 resp, success = get_events(g_user.access_token, group, user)
                 if success:
                     all_events += resp
-                else:
-                    return jsonify({
-                        'you': user.id,
-                        'culprit': resp
-                    }), 206
+                users.append(
+                    {'name': user.name, 'id': g_user.id, 'valid': success})
             free_times = find_free_time(all_events, group)
             return jsonify({
                 'group': group.to_json(),
                 'events': free_times,
                 'users': users,
-                'owner': {'name': group.owner.name, 'id': group.owner.id},
-                'you': user.id,
-                }), 200
+                'owner_id': group.owner.id,
+                'your_id': user.id,
+            }), 200
     except APIError as e:
         return e.response, e.code
 
@@ -245,6 +252,7 @@ def update_access_token(user=None):
             return jsonify({}), 200
     except APIError as e:
         return e.response, e.code
+
 
 @app.route('/favicon.ico')
 def favicon():
