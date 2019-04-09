@@ -12,6 +12,7 @@ import {
 } from '../api/models'
 import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
+import SpinningModal from './SpinningModal'
 
 enum LoginStatus {
     LOGGED_IN = 'logged_in',
@@ -107,16 +108,14 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
     }
 
     render() {
-        if (this.state.status === LoginStatus.PENDING) {
-            return <div>SPINNING</div>
-        }
         return (
             <div className="relative overflow-hidden">
                 <div
                     className={
                         'flex' +
                         ' ' +
-                        (this.state.status === LoginStatus.NOT_LOGGED_IN
+                        (this.state.status === LoginStatus.NOT_LOGGED_IN ||
+                        this.state.status === LoginStatus.PENDING
                             ? 'blur'
                             : '')
                     }
@@ -140,6 +139,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         <div className="h-8 " />
                     </div>
                 </div>
+                {this.state.status === LoginStatus.PENDING && <SpinningModal />}
                 {this.state.status === LoginStatus.NOT_LOGGED_IN && (
                     <AddUserModal
                         group_str_id={this.props.match.params.group_str_id}
