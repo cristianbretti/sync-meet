@@ -21,7 +21,7 @@ const SpinningModal: React.FC = () => {
     }
 
     const increasePercent = () => {
-        if (percentDecimal >= 100) {
+        if (percentDecimal >= 99) {
             clearInterval(timer)
             return
         }
