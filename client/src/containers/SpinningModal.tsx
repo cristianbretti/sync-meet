@@ -43,7 +43,9 @@ const SpinningModal: React.FC = () => {
             <div className="absolute flex items-center justify-center pin bg-grey-darkest opacity-50 z-10" />
             <div className="absolute flex flex-col items-center justify-center pin z-20 ">
                 <div className="flex flex-col items-center bg-grey-darkest rounded shadow p-16 mx-8">
-                    <div className="text-white pb-4">{percentDecimal}%</div>
+                    <div className="text-white text-lg pb-8">
+                        {percentDecimal}%
+                    </div>
                     <div className="w-64 h-8 bg-grey-darker rounded">
                         <div
                             className="h-8 bg-green rounded"
@@ -51,7 +53,10 @@ const SpinningModal: React.FC = () => {
                         />
                     </div>
 
-                    <div className="text-white pt-4">{text}</div>
+                    {percentDecimal < 99 && (
+                        <div className="text-white text-lg pt-8">{text}</div>
+                    )}
+                    {percentDecimal >= 99 && <div className="loader" />}
                 </div>
             </div>
         </div>
