@@ -42,11 +42,11 @@ const SpinningModal: React.FC = () => {
         <div>
             <div className="absolute flex items-center justify-center pin bg-grey-darkest opacity-50 z-10" />
             <div className="absolute flex flex-col items-center justify-center pin z-20 ">
-                <div className="flex flex-col items-center bg-grey-darker rounded shadow p-16 mx-8">
+                <div className="flex flex-col items-center bg-grey-darkest rounded shadow p-16 mx-8">
                     <div className="text-white pb-4">{percentDecimal}%</div>
-                    <div className="w-64 h-8 bg-white">
+                    <div className="w-64 h-8 bg-grey-darker rounded">
                         <div
-                            className="h-8 bg-green"
+                            className="h-8 bg-green rounded"
                             style={{ width: percentDecimal + '%' }}
                         />
                     </div>
