@@ -123,6 +123,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     <Sidebar
                         {...this.state}
                         className="flex-1 h-screen border border-black"
+                        group_str_id = {this.props.match.params.group_str_id}
                     />
 
                     <div className="flex-3 flex flex-col h-screen">
