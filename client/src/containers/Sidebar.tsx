@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
-import { DBUser, GroupInfo } from '../api/models'
-import { SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION } from 'constants';
+import { DBUser, GetGroupCalendarResponse} from '../api/models'
 import api from '../api/api';
 
-type SiderbarProps = GroupInfo & { className?: string } & {group_str_id: string}
+type SiderbarProps = GetGroupCalendarResponse & { className?: string } & {group_str_id: string}
 
 const userDisplay = (user: DBUser) => (
     <div key={user.id} className="text-center">
@@ -11,11 +10,11 @@ const userDisplay = (user: DBUser) => (
     </div>
 )
 
-const leaveGroup = (you: number, owner: DBUser, group_str_id: string) => {
+const leaveGroup = (your_id: number, owner_id: number, group_str_id: string) => {
     console.log(group_str_id)
     const loggedIn = api.isLoggedIn(group_str_id)
     if (loggedIn.success) {
-        api.remove(you == owner.id, loggedIn.google_id, group_str_id)
+        api.remove(your_id == owner_id, loggedIn.google_id, group_str_id)
     } 
                     
 }
@@ -23,8 +22,8 @@ const leaveGroup = (you: number, owner: DBUser, group_str_id: string) => {
 const Sidebar: React.FC<SiderbarProps> = ({
     group,
     users,
-    you,
-    owner,
+    your_id,
+    owner_id,
     className,
     group_str_id
 }: SiderbarProps) => {
@@ -96,8 +95,8 @@ const Sidebar: React.FC<SiderbarProps> = ({
 
             <div className="text-center absolute pin-b pin-r">
                 
-                <button onClick={() => leaveGroup(you, owner, group_str_id)} className="m-3 p-2 no-underline text-inherit p-2 rounded bg-red-dark hover:bg-red-darker hover:shadow-inner shadow">
-                    {owner ? 'Delete group' : 'Leave group'}
+                <button onClick={() => leaveGroup(your_id, owner_id, group_str_id)} className="m-3 p-2 no-underline text-inherit p-2 rounded bg-red-dark hover:bg-red-darker hover:shadow-inner shadow">
+                    {owner_id == your_id ? 'Delete group' : 'Leave group'}
                 </button>
             
             </div>

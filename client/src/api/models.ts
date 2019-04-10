@@ -122,7 +122,7 @@ export interface CalendarEvent {
     to_time: Time
 }
 
-export interface CalendarEventResponse {
+export interface APICalendarEvent {
     date: string
     from_time: string
     to_time: string
@@ -131,6 +131,7 @@ export interface CalendarEventResponse {
 export interface DBUser {
     id: number
     name: string
+    valid: boolean
 }
 
 export interface Group {
@@ -142,7 +143,7 @@ export interface Group {
     meeting_length: Time
 }
 
-export interface GroupResponse {
+export interface APIGroup {
     name: string
     from_date: string
     to_date: string
@@ -151,36 +152,21 @@ export interface GroupResponse {
     meeting_length: string
 }
 
-export interface GroupInfoResponse {
-    events: CalendarEventResponse[]
-    owner: DBUser
+export interface APIGetGroupCalendarResponse {
+    events: APICalendarEvent[]
+    owner_id: number
     users: DBUser[]
-    you: number
-    group: GroupResponse
+    your_id: number
+    group: APIGroup
 }
 
-export interface GroupInfo {
+export interface GetGroupCalendarResponse {
     events: CalendarEvent[]
-    owner: DBUser
+    owner_id: number
     users: DBUser[]
-    you: number
+    your_id: number
     group: Group
 }
-
-export interface BadAccessToken {
-    cluprit: number
-    you: number
-}
-
-export type GetGroupCalendarResponseSuccess = { success: true } & GroupInfo
-
-export type GetGroupCalendarResponseFailure = {
-    success: false
-} & BadAccessToken
-
-export type GetGroupCalendarResponse =
-    | GetGroupCalendarResponseSuccess
-    | GetGroupCalendarResponseFailure
 
 export interface EmptyResponse {}
 

@@ -63,7 +63,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                     createGroupResponse.google_id,
                     formValues.toDate
                 )
-                history.push('/group/' + createGroupResponse.group_str_id)
+                history.push('/group/' + createGroupResponse.group_str_id, true)
             })
             .catch((error: ErrorResponse) => {
                 console.error(error)
@@ -93,6 +93,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
         </div>
     )
 
+    const timeInMin = (t: Time) => t.getHours() * 60 + t.getMinutes()
+
     const validDates =
         formValues.toDate.date >= formValues.fromDate.date &&
         formChanged.fromDate &&
@@ -102,7 +104,10 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
         formChanged.fromTime &&
         formChanged.toTime
     const validMeetingLength =
-        formValues.meetingLength > new Time('0000') && formChanged.meetingLength
+        formValues.meetingLength > new Time('0000') &&
+        formChanged.meetingLength &&
+        timeInMin(formValues.meetingLength) <=
+            timeInMin(formValues.toTime) - timeInMin(formValues.fromTime)
     const validUserName = formValues.userName !== ''
     const validMeetingName = formValues.groupName !== ''
     const allValid =
@@ -296,7 +301,7 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                         <HelpHover
                             className="pl-4 pt-1"
                             key="help"
-                            text="The estimated meeting length."
+                            text="The estimated meeting length. This has to be shorted than the time period selected above."
                         />,
                     ]
                 )}
