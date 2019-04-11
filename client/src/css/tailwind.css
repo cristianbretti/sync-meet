@@ -30433,3 +30433,15 @@ code {
     z-index: auto;
   }
 }
+
+.bottom-border {
+  border-bottom-color: #D3D3D3;
+  border-bottom-width: 2px;
+  margin-bottom: 50px;
+}
+
+.inline {
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+}

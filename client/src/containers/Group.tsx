@@ -13,6 +13,8 @@ import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
 import SpinningModal from './SpinningModal'
 import SendLinkModal from './SendLinkModal'
+import Error from '../components/Error'
+import { stat } from 'fs';
 
 enum LoginStatus {
     LOGGED_IN = 'logged_in',
@@ -23,6 +25,7 @@ enum LoginStatus {
 type GroupState = {
     status: LoginStatus
     shouldShowLink: boolean
+    error: boolean
 } & GetGroupCalendarResponse
 
 const dayInOneWeek = new Date()
@@ -50,6 +53,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
             ...emptyGroupState,
             status: LoginStatus.PENDING,
             shouldShowLink: false,
+            error: false,
         }
     }
 
@@ -104,6 +108,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
             })
             .catch((error: any) => {
                 // TODO: Error handeling
+                this.setState({error:true})
                 console.log('Error')
                 console.log(error)
             })
@@ -114,53 +119,57 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
     }
 
     render() {
-        return (
-            <div className="relative overflow-hidden">
-                <div
-                    className={
-                        'flex' +
-                        ' ' +
-                        (this.state.status === LoginStatus.NOT_LOGGED_IN ||
-                        this.state.status === LoginStatus.PENDING ||
-                        this.state.shouldShowLink
-                            ? 'blur'
-                            : '')
-                    }
-                >
-                    <Sidebar
-                        {...this.state}
-                        className="flex-1 h-screen border border-black"
-                    />
+        if (!this.state.error){
+            return (
+                <div className="relative overflow-hidden">
+                    <div
+                        className={
+                            'flex' +
+                            ' ' +
+                            (this.state.status === LoginStatus.NOT_LOGGED_IN ||
+                            this.state.status === LoginStatus.PENDING ||
+                            this.state.shouldShowLink
+                                ? 'blur'
+                                : '')
+                        }
+                    >
+                        <Sidebar
+                            {...this.state}
+                            className="flex-1 h-screen border border-black"
+                        />
 
-                    <div className="flex-3 flex flex-col h-screen">
-                        <div className="flex flex-1">
-                            <Timebar
-                                from_time={this.state.group.from_time}
-                                to_time={this.state.group.to_time}
-                            />
-                            <Calendar
-                                events={this.state.events}
-                                group={this.state.group}
-                            />
+                        <div className="flex-3 flex flex-col h-screen">
+                            <div className="flex flex-1">
+                                <Timebar
+                                    from_time={this.state.group.from_time}
+                                    to_time={this.state.group.to_time}
+                                />
+                                <Calendar
+                                    events={this.state.events}
+                                    group={this.state.group}
+                                />
+                            </div>
+                            <div className="h-8 " />
                         </div>
-                        <div className="h-8 " />
                     </div>
-                </div>
-                {this.state.status === LoginStatus.PENDING && <SpinningModal />}
-                {this.state.status === LoginStatus.NOT_LOGGED_IN && (
-                    <AddUserModal
-                        group_str_id={this.props.match.params.group_str_id}
-                        getCalendarData={this.getCalendarData}
-                    />
-                )}
-                {this.state.shouldShowLink &&
-                    this.state.status !== LoginStatus.PENDING && (
-                        <SendLinkModal
-                            closeSendLinkModal={() => this.closeSendLinkModal()}
+                    {this.state.status === LoginStatus.PENDING && <SpinningModal />}
+                    {this.state.status === LoginStatus.NOT_LOGGED_IN && (
+                        <AddUserModal
+                            group_str_id={this.props.match.params.group_str_id}
+                            getCalendarData={this.getCalendarData}
                         />
                     )}
-            </div>
-        )
+                    {this.state.shouldShowLink &&
+                        this.state.status !== LoginStatus.PENDING && (
+                            <SendLinkModal
+                                closeSendLinkModal={() => this.closeSendLinkModal()}
+                            />
+                        )}
+                </div>
+            )
+        } else {
+            return (<div> <Error /> </div>)
+        }
     }
 }
 
