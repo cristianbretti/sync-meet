@@ -4,11 +4,25 @@ import api from '../api/api';
 
 type SiderbarProps = GetGroupCalendarResponse & { className?: string } & {group_str_id: string}
 
-const userDisplay = (user: DBUser) => (
+const userDisplay = (user: DBUser, owner_id: number, your_id: number) => (
     <div key={user.id} className="text-center">
-        <h4 className="py-1 px-1 mx-1 text-center">{user.name}</h4>
+        <h4 className="py-1 px-1 mx-1 text-center">{user.name}
+            {showUserIcons(user, owner_id, your_id)}
+        </h4>
+        
     </div>
 )
+
+const showUserIcons = (user: DBUser, owner_id: number, your_id: number) => {
+    if(user.valid && (user.id == your_id)){
+        return(<i className="material-icons pl-1 text-xs text-grey-light">refresh</i>)
+    }
+    else if(user.valid){
+        return(<i className="material-icons pl-1 text-xs text-yellow-dark">warning</i>)
+    }
+
+
+}
 
 const leaveGroup = (your_id: number, owner_id: number, group_str_id: string) => {
     const loggedIn = api.isLoggedIn(group_str_id)
@@ -100,7 +114,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
                 <h3 className="py-1 px-1 mx-1 text-center">Members</h3>
             </div>
 
-            {users.map(user => userDisplay(user))}
+            {users.map(user => userDisplay(user, owner_id, your_id))}
 
             <div className="text-center absolute pin-b pin-r flex ">
 
