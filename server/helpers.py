@@ -9,8 +9,7 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenCredentials
-from sympy import Interval, Union, Complement
-import sympy as sp
+import intervals as I
 import re
 
 """ HELPERS """
@@ -163,6 +162,7 @@ def get_events(access_token, group, user):
                     all_events.append({
                         'start': start,
                         'end': end,
+                        'user_id': user.id,
                     })
     except:
         return user.id, False
@@ -175,27 +175,9 @@ def create_interval(event):
         start: datetime,
         end: datetime
     }
-    to an Sympy Interval
+    to an Interval
     """
-    start_str = str(event['start'])
-    end_str = str(event['end'])
-    start_str = re.sub("[-\s:]", "", start_str)[:-2]
-    end_str = re.sub("[-\s:]", "", end_str)[:-2]
-    return Interval(int(start_str), int(end_str))
-
-
-def interval_to_datetime(interval):
-    """ Convert a Sympy Inverval 
-    to an dict 
-    {
-        start: datetime,
-        end: datetime
-    }
-    """
-    return {
-        'start': datetime.strptime(str(interval.start), "%Y%m%d%H%M"),
-        'end': datetime.strptime(str(interval.end), "%Y%m%d%H%M")
-    }
+    return I.closed(event['start'], event['end'])
 
 
 def find_free_time(all_events, group):
@@ -213,41 +195,33 @@ def find_free_time(all_events, group):
     intervals = [create_interval(event) for event in all_events]
 
     # Take the union of all events
-    event_union = Union(intervals)
+    event_union = I.empty()
+    for i in range(len(intervals)):
+        event_union = event_union | intervals[i]
 
     # Create one whole interval for each day
-    whole_day_intervals = []
+    whole_day_intervals = I.empty()
     current_day = group.from_date
     while current_day != group.to_date + timedelta(days=1):
         start = datetime.combine(current_day, group.from_time)
         end = datetime.combine(current_day, group.to_time)
-        whole_day_intervals.append(
-            create_interval({'start': start, 'end': end}))
+        whole_day_intervals = whole_day_intervals | create_interval(
+            {'start': start, 'end': end})
         current_day = current_day + timedelta(days=1)
 
     # The free time is A - B where A is the whole day and B are the events
-    free_time_intervals = Complement(Union(whole_day_intervals), event_union)
+    free_time_intervals = whole_day_intervals - event_union
 
-    # If only one interval, convert to list
-    free_time_list = []
-    if len(free_time_intervals.args) > 0 and isinstance(free_time_intervals.args[0], sp.numbers.Integer):
-        free_time_list.append(
-            Interval(free_time_intervals.args[0], free_time_intervals.args[1]))
-    else:
-        for interval in free_time_intervals.args:
-            free_time_list.append(interval)
-
+    meeting_len = timedelta(
+        hours=group.meeting_length.hour, minutes=group.meeting_length.minute)
     result = []
-    for time_slot in free_time_list:
-        free_event = interval_to_datetime(time_slot)
-        diff = free_event['end'] - free_event['start']
-        meeting_len = timedelta(
-            hours=group.meeting_length.hour, minutes=group.meeting_length.minute)
+    for interval in list(free_time_intervals):
+        diff = interval.upper - interval.lower
         # Check that the free interval is long enought for the meeting
         if diff >= meeting_len:
             result.append({
-                'date': str(free_event['start'].date()),
-                'from_time': str(free_event['start'].time())[:-3],
-                'to_time': str(free_event['end'].time())[:-3]
+                'date': str(interval.lower.date()),
+                'from_time': str(interval.lower.time())[:-3],
+                'to_time': str(interval.upper.time())[:-3]
             })
     return result
