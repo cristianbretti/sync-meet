@@ -7,4 +7,3 @@ oauth2client
 Flask-Testing
 flask-socketio
 eventlet
-python-intervals

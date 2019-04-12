@@ -30,6 +30,7 @@ dayInOneWeek.setDate(dayInOneWeek.getDate() + 7)
 
 const emptyGroupState: GetGroupCalendarResponse = {
     events: [],
+    all_but_one: [],
     group: {
         meeting_length: new Time('01:00'),
         name: 'Empty',
@@ -90,6 +91,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                 this.setState({
                     group: getGroupCalendarResponse.group,
                     events: getGroupCalendarResponse.events,
+                    all_but_one: getGroupCalendarResponse.all_but_one,
                     owner_id: getGroupCalendarResponse.owner_id,
                     users: getGroupCalendarResponse.users,
                     your_id: getGroupCalendarResponse.your_id,
@@ -141,6 +143,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                             <Calendar
                                 events={this.state.events}
                                 group={this.state.group}
+                                all_but_one={this.state.all_but_one}
                             />
                         </div>
                         <div className="h-8 " />

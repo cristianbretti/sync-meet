@@ -154,6 +154,7 @@ export interface APIGroup {
 
 export interface APIGetGroupCalendarResponse {
     events: APICalendarEvent[]
+    all_but_one: APICalendarEvent[]
     owner_id: number
     users: DBUser[]
     your_id: number
@@ -162,6 +163,7 @@ export interface APIGetGroupCalendarResponse {
 
 export interface GetGroupCalendarResponse {
     events: CalendarEvent[]
+    all_but_one: CalendarEvent[]
     owner_id: number
     users: DBUser[]
     your_id: number

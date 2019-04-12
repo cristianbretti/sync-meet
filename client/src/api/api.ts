@@ -165,10 +165,18 @@ class API {
                     to_time: new Time(ev.to_time),
                 })
             )
+            const all_but_one = resp.all_but_one.map(
+                (ev: APICalendarEvent): CalendarEvent => ({
+                    date: new MyDate({ date_str: ev.date }),
+                    from_time: new Time(ev.from_time),
+                    to_time: new Time(ev.to_time),
+                })
+            )
             return {
                 ...resp,
                 group,
                 events,
+                all_but_one,
             } as GetGroupCalendarResponse
         })
     }

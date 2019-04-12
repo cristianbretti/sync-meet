@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Time } from '../api/models'
 
 interface EventProps {
+    className?: string
     eventStart: Time
     eventEnd: Time
     fromTime: Time
@@ -10,6 +11,7 @@ interface EventProps {
 
 const Event: React.FC<EventProps> = ({
     eventStart,
+    className,
     eventEnd,
     fromTime,
     toTime,
@@ -41,7 +43,11 @@ const Event: React.FC<EventProps> = ({
 
     return (
         <div
-            className="absolute pin-x bg-green border border-green-darker rounded opacity-80 z-10 ml-px mr-1 -mt-px"
+            className={
+                'absolute pin-x bg-green border border-green-darker rounded opacity-80 z-10 ml-px mr-1 -mt-px' +
+                ' ' +
+                className
+            }
             style={{
                 top: offset + '%',
                 height: 'calc(' + height + '%)',

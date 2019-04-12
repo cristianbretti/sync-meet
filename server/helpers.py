@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from model import db, User, Planning_group
 import config
-from datetime import datetime
+from datetime import datetime, time
 from datetime import timedelta
 from contextlib import contextmanager
 from functools import wraps, cmp_to_key
@@ -9,7 +9,7 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenCredentials
-import intervals as I
+import numpy as np
 import re
 
 """ HELPERS """
@@ -192,36 +192,75 @@ def find_free_time(all_events, group):
         to_time: HH:MM
     }
     """
-    intervals = [create_interval(event) for event in all_events]
-
-    # Take the union of all events
-    event_union = I.empty()
-    for i in range(len(intervals)):
-        event_union = event_union | intervals[i]
-
+    event_on_days = dict()
+    days = []
     # Create one whole interval for each day
-    whole_day_intervals = I.empty()
     current_day = group.from_date
     while current_day != group.to_date + timedelta(days=1):
-        start = datetime.combine(current_day, group.from_time)
-        end = datetime.combine(current_day, group.to_time)
-        whole_day_intervals = whole_day_intervals | create_interval(
-            {'start': start, 'end': end})
+        days.append(current_day)
+        event_on_days[str(current_day)] = []
         current_day = current_day + timedelta(days=1)
 
-    # The free time is A - B where A is the whole day and B are the events
-    free_time_intervals = whole_day_intervals - event_union
+    for event in all_events:
+        event_on_days[str(event['start'].date())].append(event)
 
-    meeting_len = timedelta(
-        hours=group.meeting_length.hour, minutes=group.meeting_length.minute)
+    day_start = (group.from_time.hour * 60 + group.from_time.minute)
+
+    n_days = len(days)
+    n_minutes = (group.to_time.hour - group.from_time.hour) * \
+        60 + (group.to_time.minute - group.from_time.minute)
+    free_table = np.zeros((n_days, n_minutes))
+
+    for idx, day in enumerate(days):
+        for event in event_on_days[str(day)]:
+            start_idx = event['start'].hour * 60 + event['start'].minute - \
+                day_start
+            end_idx = event['end'].hour * 60 + event['end'].minute - \
+                day_start
+            free_table[idx, start_idx:end_idx] += 1
+
     result = []
-    for interval in list(free_time_intervals):
-        diff = interval.upper - interval.lower
-        # Check that the free interval is long enought for the meeting
-        if diff >= meeting_len:
+    all_but_one = []
+    for day_idx, day in enumerate(days):
+        free = True
+        row = free_table[day_idx, :]
+        zeros = [[0, -1]]
+        zeros_ab1 = []
+        for min_idx, val in enumerate(row):
+            if val >= 1 and free:
+                free = False
+                zeros[-1][1] = min_idx
+                if val == 1:
+                    zeros_ab1.append([min_idx, -1])
+            elif val == 0 and not free:
+                free = True
+                zeros.append([min_idx, -1])
+                if len(zeros_ab1) > 0:
+                    zeros_ab1[-1][1] = min_idx
+            elif min_idx == len(row) - 1:
+                if free:
+                    zeros[-1][1] = min_idx
+                elif val == 1:
+                    zeros_ab1[-1][1] = min_idx
+        for i in range(len(zeros)):
+            from_time = zeros[i][0] + day_start
+            from_time = time(int(from_time / 60), from_time % 60)
+            to_time = zeros[i][1] + day_start
+            to_time = time(int(to_time / 60), to_time % 60)
             result.append({
-                'date': str(interval.lower.date()),
-                'from_time': str(interval.lower.time())[:-3],
-                'to_time': str(interval.upper.time())[:-3]
+                'date': str(day),
+                'from_time': str(from_time)[:-3],
+                'to_time': str(to_time)[:-3]
             })
-    return result
+        for i in range(len(zeros_ab1)):
+            from_time = zeros_ab1[i][0] + day_start
+            from_time = time(int(from_time / 60), from_time % 60)
+            to_time = zeros_ab1[i][1] + day_start
+            to_time = time(int(to_time / 60), to_time % 60)
+            all_but_one.append({
+                'date': str(day),
+                'from_time': str(from_time)[:-3],
+                'to_time': str(to_time)[:-3]
+            })
+
+    return result, all_but_one
