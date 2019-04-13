@@ -83,7 +83,7 @@ def require_group_str_id(func):
             if group is None:
                 raise Exception
         except Exception:
-            return (jsonify({'error': "Invalid group_str_id header"}), 403)
+            return (jsonify({'error': "This group does not exist"}), 403)
         return func(*args, **kwargs, group=group)
     return check_group_str_id
 
@@ -112,7 +112,7 @@ def create_or_find_user(id_token, name, access_token):
         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
             raise ValueError('Wrong issuer.')
     except:
-        raise ValueError('Could not authenticate id_token')
+        raise ValueError('Could not authenticate google account')
     google_id = idinfo['sub']
     # Check if user exists
     new_user = User.query.filter_by(google_id=google_id).first()
