@@ -203,6 +203,7 @@ def find_free_time(all_events, group):
     n_days = len(days)
     n_minutes = toMinutes(group.to_time) - toMinutes(group.from_time)
     free_table = np.zeros((n_days, n_minutes))
+    meeting_length = toMinutes(group.meeting_length)
 
     for idx, day in enumerate(days):
         for event in event_on_days[str(day)]:
@@ -222,23 +223,28 @@ def find_free_time(all_events, group):
             if val >= 1 and free:
                 # 0 -> >1
                 free = False
-                primary[-1][1] = idx
+                if idx - primary[-1][0] >= meeting_length:
+                    primary[-1][1] = idx
+                else:
+                    primary.pop()
                 if val == 1:
                     secondary.append([idx, -1])
             elif val == 0 and not free:
                 # >1 | init -> 0
                 free = True
                 primary.append([idx, -1])
-                if len(secondary) > 0:
+                if len(secondary) > 0 and idx - secondary[-1][0] >= meeting_length:
                     secondary[-1][1] = idx
+                elif len(secondary) > 0:
+                    secondary.pop()
             elif idx == 0 and val == 1:
                 # init -> 1
                 secondary.append([idx, -1])
             elif idx == len(row) - 1:
                 # last
-                if free:
+                if free and idx + 1 - primary[-1][0] >= meeting_length:
                     primary[-1][1] = idx + 1
-                elif val == 1:
+                elif val == 1 and idx + 1 - secondary[-1][0] >= meeting_length:
                     secondary[-1][1] = idx + 1
         for i in range(len(primary)):
             from_time = primary[i][0] + day_start
