@@ -5,23 +5,39 @@ import api from '../api/api';
 type SiderbarProps = GetGroupCalendarResponse & { className?: string } & {group_str_id: string}
 
 const userDisplay = (user: DBUser, owner_id: number, your_id: number) => (
-    <div key={user.id} className="text-center">
-        <h4 className="py-1 px-1 mx-1 text-center">{user.name}
-            {showUserIcons(user, owner_id, your_id)}
-        </h4>
+    <div key={user.id}>
+
+        <div className="px-2 text-center">
+            <h4>{user.name}{showPersonIcon(user, your_id)}{showOwnerIcon(user, owner_id)}{showRefreshIcon(user, your_id)}</h4>
+         
+        </div>
+            
+
         
     </div>
 )
 
-const showUserIcons = (user: DBUser, owner_id: number, your_id: number) => {
-    if(user.valid && (user.id == your_id)){
-        return(<i className="material-icons pl-1 text-xs text-grey-light">refresh</i>)
+const showOwnerIcon = (user: DBUser, owner_id: number) => {
+    if(user.id == owner_id){
+        return(<i className="material-icons px-1 text-xs text-yellow-light">star</i>)
     }
-    else if(user.valid){
-        return(<i className="material-icons pl-1 text-xs text-yellow-dark">warning</i>)
+}
+
+const showPersonIcon = (user: DBUser, your_id: number) => {
+    if(your_id == user.id){
+        return(<i className="material-icons px-1 text-xs text-blue-dark">accessibility</i>)
     }
+}
 
-
+const showRefreshIcon = (user: DBUser, your_id: number) => {
+    if(user.valid){
+        if(your_id == user.id){
+            return(<i className="material-icons pl-1 text-xs text-grey-lighter">refresh</i>)
+        }
+        else{
+            return(<i className="material-icons pl-1 text-xs text-grey-lighter">warning</i>)
+        }
+    }
 }
 
 const leaveGroup = (your_id: number, owner_id: number, group_str_id: string) => {
