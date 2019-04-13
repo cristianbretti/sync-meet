@@ -66,11 +66,23 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                 history.push('/group/' + createGroupResponse.group_str_id, true)
             })
             .catch((error: ErrorResponse) => {
+                history.push({
+                    pathname: '/error',
+                    state: {
+                      errorMessage: error.error,
+                    }
+                  })
                 console.error(error)
             })
     }
 
     const onGoogleFailure = (error: any) => {
+        history.push({
+            pathname: '/error',
+            state: {
+              errorMessage: error.error || "",
+            }
+          })
         console.log('BAD google reponse from create group')
         console.log(error)
     }
@@ -116,7 +128,6 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
         validTimes &&
         validUserName &&
         validMeetingName
-
     return (
         <div className="min-h-screen flex flex-col overflow-hidden bg-white">
             <form

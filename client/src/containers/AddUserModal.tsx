@@ -1,20 +1,23 @@
 import React, { useState } from 'react'
 import TextInput from '../components/TextInput'
+import { RouteComponentProps } from 'react-router'
 import GoogleLogin, {
     GoogleLoginResponse,
     GoogleLoginResponseOffline,
 } from 'react-google-login'
-import { AddUserBody, AddUserResponse } from '../api/models'
+import { AddUserBody, AddUserResponse, ErrorResponse } from '../api/models'
 import api from '../api/api'
 
 interface AddUserModalProps {
     group_str_id: string
     getCalendarData(group_str_id: string, google_id: string): void
+    addUserFailed(error: ErrorResponse): void
 }
 
 const AddUserModal: React.FC<AddUserModalProps> = ({
     group_str_id,
     getCalendarData,
+    addUserFailed,
 }) => {
     const [userName, setUserName] = useState('')
 
@@ -30,17 +33,19 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
             .then((resp: AddUserResponse) => {
                 getCalendarData(group_str_id, resp.google_id)
             })
-            .catch(badResp => {
-                // TODO
+            .catch((error: ErrorResponse) => {
+                addUserFailed(error)
                 console.log('ADD USER ERROR!')
-                console.log(badResp)
+                console.log(error)
             })
     }
 
     const onGoogleFailure = (badRepsonse: any) => {
+        addUserFailed(badRepsonse.error || "")
         console.log('BAD google reponse from modal')
         console.log(badRepsonse)
     }
+
     return (
         <div>
             <div className="absolute flex items-center justify-center pin bg-grey-darkest opacity-50 z-10" />
