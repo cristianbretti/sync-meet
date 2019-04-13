@@ -175,11 +175,20 @@ def toMinutes(time):
     return (time.hour * 60 + time.minute)
 
 
+def back_to_event(minute_interval, day_start, day):
+    from_time = minute_interval[0] + day_start
+    from_time = time(int(from_time / 60), from_time % 60)
+    to_time = minute_interval[1] + day_start
+    to_time = time(int(to_time / 60), to_time % 60)
+    return {
+        'date': str(day),
+        'from_time': str(from_time)[:-3],
+        'to_time': str(to_time)[:-3]
+    }
+
+
 def find_free_time(all_events, group):
-    """ Calculates all the free time slots
-    by taking the union of all events (B),
-    and then taking the complement A - B 
-    where A is the Interval of the whole day. 
+    """ Calculates all the free time slots.
     Return a list of free time slots on the form
     {
         date: YYYY-MM-DD,
@@ -250,25 +259,11 @@ def find_free_time(all_events, group):
                     primary[-1][1] = idx + 1
                 elif val == 1 and idx + 1 - secondary[-1][0] >= meeting_length:
                     secondary[-1][1] = idx + 1
-        for i in range(len(primary)):
-            from_time = primary[i][0] + day_start
-            from_time = time(int(from_time / 60), from_time % 60)
-            to_time = primary[i][1] + day_start
-            to_time = time(int(to_time / 60), to_time % 60)
-            result.append({
-                'date': str(day),
-                'from_time': str(from_time)[:-3],
-                'to_time': str(to_time)[:-3]
-            })
-        for i in range(len(secondary)):
-            from_time = secondary[i][0] + day_start
-            from_time = time(int(from_time / 60), from_time % 60)
-            to_time = secondary[i][1] + day_start
-            to_time = time(int(to_time / 60), to_time % 60)
-            secondary_result.append({
-                'date': str(day),
-                'from_time': str(from_time)[:-3],
-                'to_time': str(to_time)[:-3]
-            })
+
+        for minute_interval in primary:
+            result.append(back_to_event(minute_interval, day_start, day))
+        for minute_interval in secondary:
+            secondary_result.append(back_to_event(
+                minute_interval, day_start, day))
 
     return result, secondary_result
