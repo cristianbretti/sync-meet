@@ -102,6 +102,15 @@ class API {
         return fetch(baseURLEndpoint + '/api/' + endpoint, options)
             .then(handleErrors)
             .then(response => response.json())
+            .catch(err => {
+                if (err.message) {
+                    throw {
+                        status: 500,
+                        error: err.message,
+                    } as ErrorResponse
+                }
+                throw err
+            })
     }
 
     /**

@@ -9,6 +9,7 @@ import {
     Time,
     SocketENUM,
     DayToEventsMap,
+    ErrorResponse,
 } from '../api/models'
 import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
@@ -97,11 +98,20 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         }
     }
 
+    addUserFailed = (error: ErrorResponse) => {
+        this.props.history.push({
+            pathname: '/error',
+
+            state: {
+                errorMessage: error.error,
+            },
+        })
+    }
+
     getCalendarData = (group_str_id: string, google_id: string) => {
         this.setState({ status: LoginStatus.PENDING })
         api.getGroupCalendar(google_id, group_str_id)
             .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
-                console.log(getGroupCalendarResponse)
                 this.setState({
                     group: getGroupCalendarResponse.group,
                     events: getGroupCalendarResponse.events,
@@ -118,10 +128,13 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     getGroupCalendarResponse.group.to_date
                 )
             })
-            .catch((error: any) => {
-                // TODO: Error handeling
-                console.log('Error')
-                console.log(error)
+            .catch((error: ErrorResponse) => {
+                this.props.history.push({
+                    pathname: '/error',
+                    state: {
+                        errorMessage: error.error,
+                    },
+                })
             })
     }
 
@@ -168,6 +181,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     <AddUserModal
                         group_str_id={this.props.match.params.group_str_id}
                         getCalendarData={this.getCalendarData}
+                        addUserFailed={this.addUserFailed}
                     />
                 )}
                 {this.state.shouldShowLink &&

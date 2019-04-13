@@ -38,28 +38,7 @@ const Calendar: React.FC<CalendarProps> = ({
         return listOfDays
     }
 
-    // const matchEvents = (
-    //     days: DayObject[],
-    //     events: CalendarEvent[],
-    //     primary: boolean
-    // ) => {
-    //     events.forEach(event => {
-    //         // time difference
-    //         const timeDiff = Math.abs(
-    //             event.date.date.getTime() - group.from_date.date.getTime()
-    //         )
-    //         // days difference
-    //         const index = Math.ceil(timeDiff / (1000 * 3600 * 24))
-
-    //         primary
-    //             ? days[index].events.push(event)
-    //             : days[index].secondary.push(event)
-    //     })
-    // }
-
     const days = getDaysBetweenStartEnd(group.from_date, group.to_date)
-    // matchEvents(days, events, true)
-    // matchEvents(days, secondary, false)
     return (
         <div className="flex overflow-x-auto w-full">
             {days.map((day, idx) => (
