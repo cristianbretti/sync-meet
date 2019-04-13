@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from model import db, User, Planning_group
 import config
-from datetime import datetime, time
+from datetime import datetime, time, tzinfo
 from datetime import timedelta
 from contextlib import contextmanager
 from functools import wraps, cmp_to_key
@@ -10,6 +10,7 @@ from google.auth.transport import requests
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenCredentials
 import numpy as np
+import pytz
 import re
 
 """ HELPERS """
@@ -140,10 +141,11 @@ def get_events(access_token, group, user):
         calendar_ids = [cal['id'] for cal in all_calendars]
 
         # Find all events between timeMin and timeMax in timezone CET +01:00
-        timeMin = datetime.combine(
-            group.from_date, group.from_time).isoformat() + "+01:00"
-        timeMax = datetime.combine(
-            group.to_date, group.to_time).isoformat() + "+01:00"
+        tz = pytz.timezone('Europe/Stockholm')
+        timeMin = tz.localize(datetime.combine(
+            group.from_date, group.from_time)).astimezone(tz).isoformat()
+        timeMax = tz.localize(datetime.combine(
+            group.to_date, group.to_time)).astimezone(tz).isoformat()
 
         # For every calenderId, find all relevant events
         all_events = []
@@ -151,7 +153,7 @@ def get_events(access_token, group, user):
             events = service.events().list(calendarId=cal_id,
                                            timeMin=timeMin,
                                            timeMax=timeMax,
-                                           timeZone="CET"
+                                           timeZone=str(tz)
                                            ).execute()
             for event in events.get('items'):
                 if 'start' in event.keys() and 'end' in event.keys() and 'dateTime' in event['start'].keys():
@@ -164,20 +166,13 @@ def get_events(access_token, group, user):
                         'end': end,
                         'user_id': user.id,
                     })
-    except:
+    except Exception as e:
         return user.id, False
     return all_events, True
 
 
-def create_interval(event):
-    """ Convert an event dict 
-    {
-        start: datetime,
-        end: datetime
-    }
-    to an Interval
-    """
-    return I.closed(event['start'], event['end'])
+def toMinutes(time):
+    return (time.hour * 60 + time.minute)
 
 
 def find_free_time(all_events, group):
@@ -204,63 +199,60 @@ def find_free_time(all_events, group):
     for event in all_events:
         event_on_days[str(event['start'].date())].append(event)
 
-    day_start = (group.from_time.hour * 60 + group.from_time.minute)
-
+    day_start = toMinutes(group.from_time)
     n_days = len(days)
-    n_minutes = (group.to_time.hour - group.from_time.hour) * \
-        60 + (group.to_time.minute - group.from_time.minute)
+    n_minutes = toMinutes(group.to_time) - toMinutes(group.from_time)
     free_table = np.zeros((n_days, n_minutes))
 
     for idx, day in enumerate(days):
         for event in event_on_days[str(day)]:
-            start_idx = event['start'].hour * 60 + event['start'].minute - \
-                day_start
-            end_idx = event['end'].hour * 60 + event['end'].minute - \
-                day_start
+            start_idx = max(0, toMinutes(event['start']) - day_start)
+            end_idx = min(free_table.shape[1], toMinutes(
+                event['end']) - day_start)
             free_table[idx, start_idx:end_idx] += 1
 
     result = []
-    all_but_one = []
+    secondary_result = []
     for day_idx, day in enumerate(days):
-        free = True
+        free = False
         row = free_table[day_idx, :]
-        zeros = [[0, -1]]
-        zeros_ab1 = []
+        primary = []
+        secondary = []
         for min_idx, val in enumerate(row):
             if val >= 1 and free:
                 free = False
-                zeros[-1][1] = min_idx
+                primary[-1][1] = min_idx
                 if val == 1:
-                    zeros_ab1.append([min_idx, -1])
+                    secondary.append([min_idx, -1])
             elif val == 0 and not free:
                 free = True
-                zeros.append([min_idx, -1])
-                if len(zeros_ab1) > 0:
-                    zeros_ab1[-1][1] = min_idx
+                primary.append([min_idx, -1])
+                if len(secondary) > 0:
+                    secondary[-1][1] = min_idx
             elif min_idx == len(row) - 1:
                 if free:
-                    zeros[-1][1] = min_idx
+                    primary[-1][1] = min_idx + 1
                 elif val == 1:
-                    zeros_ab1[-1][1] = min_idx
-        for i in range(len(zeros)):
-            from_time = zeros[i][0] + day_start
+                    secondary[-1][1] = min_idx + 1
+        for i in range(len(primary)):
+            from_time = primary[i][0] + day_start
             from_time = time(int(from_time / 60), from_time % 60)
-            to_time = zeros[i][1] + day_start
+            to_time = primary[i][1] + day_start
             to_time = time(int(to_time / 60), to_time % 60)
             result.append({
                 'date': str(day),
                 'from_time': str(from_time)[:-3],
                 'to_time': str(to_time)[:-3]
             })
-        for i in range(len(zeros_ab1)):
-            from_time = zeros_ab1[i][0] + day_start
+        for i in range(len(secondary)):
+            from_time = secondary[i][0] + day_start
             from_time = time(int(from_time / 60), from_time % 60)
-            to_time = zeros_ab1[i][1] + day_start
+            to_time = secondary[i][1] + day_start
             to_time = time(int(to_time / 60), to_time % 60)
-            all_but_one.append({
+            secondary_result.append({
                 'date': str(day),
                 'from_time': str(from_time)[:-3],
                 'to_time': str(to_time)[:-3]
             })
 
-    return result, all_but_one
+    return result, secondary_result

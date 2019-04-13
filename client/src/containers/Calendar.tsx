@@ -4,19 +4,19 @@ import Day from './Day'
 
 interface CalendarProps {
     events: GetGroupCalendarResponse['events']
-    all_but_one: GetGroupCalendarResponse['all_but_one']
+    secondary: GetGroupCalendarResponse['secondary']
     group: GetGroupCalendarResponse['group']
 }
 
 interface DayObject {
     date: MyDate
     events: CalendarEvent[]
-    all_but_one: CalendarEvent[]
+    secondary: CalendarEvent[]
 }
 
 const Calendar: React.FC<CalendarProps> = ({
     events,
-    all_but_one,
+    secondary,
     group,
 }: CalendarProps) => {
     const getDaysBetweenStartEnd = (from: MyDate, to: MyDate): DayObject[] => {
@@ -26,14 +26,14 @@ const Calendar: React.FC<CalendarProps> = ({
             listOfDays.push({
                 date: new MyDate({ date: current }),
                 events: [],
-                all_but_one: [],
+                secondary: [],
             })
             current.setDate(current.getDate() + 1)
         }
         listOfDays.push({
             date: new MyDate({ date: current }),
             events: [],
-            all_but_one: [],
+            secondary: [],
         })
         return listOfDays
     }
@@ -57,13 +57,13 @@ const Calendar: React.FC<CalendarProps> = ({
             )
             // days difference
             const index = Math.ceil(timeDiff / (1000 * 3600 * 24))
-            days[index].all_but_one.push(event)
+            days[index].secondary.push(event)
         })
     }
 
     const days = getDaysBetweenStartEnd(group.from_date, group.to_date)
     matchEvents(days, events)
-    matchAllButOnes(days, all_but_one)
+    matchAllButOnes(days, secondary)
     return (
         <div className="flex overflow-x-auto w-full">
             {days.map((day, idx) => (
@@ -71,7 +71,7 @@ const Calendar: React.FC<CalendarProps> = ({
                     className={'min-w-1/7'}
                     key={idx}
                     events={day.events}
-                    all_but_one={day.all_but_one}
+                    secondary={day.secondary}
                     thisDay={day.date}
                     fromTime={group.from_time}
                     toTime={group.to_time}

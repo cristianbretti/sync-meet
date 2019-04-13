@@ -4,7 +4,7 @@ import { CalendarEvent, MyDate, Time } from '../api/models'
 
 interface DayProps {
     events: CalendarEvent[]
-    all_but_one: CalendarEvent[]
+    secondary: CalendarEvent[]
     thisDay: MyDate
     fromTime: Time
     toTime: Time
@@ -13,7 +13,7 @@ interface DayProps {
 
 const Day: React.FC<DayProps> = ({
     events,
-    all_but_one,
+    secondary,
     thisDay,
     fromTime,
     toTime,
@@ -47,6 +47,7 @@ const Day: React.FC<DayProps> = ({
                 )}
                 {events.map((event, idx) => (
                     <Event
+                        className="bg-green border-green-darker "
                         key={idx}
                         eventStart={event.from_time}
                         eventEnd={event.to_time}
@@ -54,9 +55,9 @@ const Day: React.FC<DayProps> = ({
                         toTime={toTime}
                     />
                 ))}
-                {all_but_one.map((event, idx) => (
+                {secondary.map((event, idx) => (
                     <Event
-                        className="bg-blue-dark"
+                        className="bg-yellow-dark border-yellow-darker"
                         key={idx}
                         eventStart={event.from_time}
                         eventEnd={event.to_time}

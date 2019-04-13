@@ -44,9 +44,9 @@ const Event: React.FC<EventProps> = ({
     return (
         <div
             className={
-                'absolute pin-x bg-green border border-green-darker rounded opacity-80 z-10 ml-px mr-1 -mt-px' +
+                className +
                 ' ' +
-                className
+                'absolute pin-x border rounded opacity-80 z-10 ml-px mr-1 -mt-px'
             }
             style={{
                 top: offset + '%',

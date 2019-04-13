@@ -165,7 +165,7 @@ class API {
                     to_time: new Time(ev.to_time),
                 })
             )
-            const all_but_one = resp.all_but_one.map(
+            const secondary = resp.secondary.map(
                 (ev: APICalendarEvent): CalendarEvent => ({
                     date: new MyDate({ date_str: ev.date }),
                     from_time: new Time(ev.from_time),
@@ -176,7 +176,7 @@ class API {
                 ...resp,
                 group,
                 events,
-                all_but_one,
+                secondary,
             } as GetGroupCalendarResponse
         })
     }
