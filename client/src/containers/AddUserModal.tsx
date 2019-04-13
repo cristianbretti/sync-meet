@@ -41,6 +41,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
     }
 
     const onGoogleFailure = (badRepsonse: any) => {
+        addUserFailed(badRepsonse.error || "")
         console.log('BAD google reponse from modal')
         console.log(badRepsonse)
     }
