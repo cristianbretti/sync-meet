@@ -225,10 +225,14 @@ def find_free_time(all_events, group):
                 free = False
                 if idx - primary[-1][0] >= meeting_length:
                     primary[-1][1] = idx
+                    if val == 1:
+                        secondary.append([idx, -1])
                 else:
-                    primary.pop()
-                if val == 1:
-                    secondary.append([idx, -1])
+                    discard = primary.pop()
+                    if val == 1:
+                        # new secondary from discard start
+                        # since we know its been all zeros up to here
+                        secondary.append(discard)
             elif val == 0 and not free:
                 # >1 | init -> 0
                 free = True
