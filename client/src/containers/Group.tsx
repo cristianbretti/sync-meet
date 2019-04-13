@@ -15,6 +15,7 @@ import AddUserModal from './AddUserModal'
 import SpinningModal from './SpinningModal'
 import SendLinkModal from './SendLinkModal'
 import { stat } from 'fs';
+import GroupDeletedModal from './GroupDeletedModal';
 
 enum LoginStatus {
     LOGGED_IN = 'logged_in',
@@ -25,6 +26,7 @@ enum LoginStatus {
 type GroupState = {
     status: LoginStatus
     shouldShowLink: boolean
+    groupDeleted: boolean
 } & GetGroupCalendarResponse
 
 const dayInOneWeek = new Date()
@@ -53,9 +55,9 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
             ...emptyGroupState,
             status: LoginStatus.PENDING,
             shouldShowLink: false,
+            groupDeleted: false,
         }
     }
-
     componentDidMount() {
         if (this.props.location.state) {
             //This is only true when redirected from /creategroup
@@ -80,8 +82,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                 }
                 break
             case SocketENUM.DELETE:
-                // TODO: deleted group
-                console.log('GROUP IS DELETED SHOW SOMETHING NICE')
+                this.setState({groupDeleted:true})
                 break
         }
     }
@@ -89,7 +90,6 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
     addUserFailed = (error: ErrorResponse) => {
         this.props.history.push({
             pathname: '/error',
-
             state: {
               errorMessage: error.error,
             }
@@ -131,6 +131,10 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         this.setState({ shouldShowLink: false })
     }
 
+    goBackToStartPage = () => {
+        this.props.history.push('/')
+    }
+
     render() {
         return (
             <div className="relative overflow-hidden">
@@ -140,7 +144,8 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         ' ' +
                         (this.state.status === LoginStatus.NOT_LOGGED_IN ||
                         this.state.status === LoginStatus.PENDING ||
-                        this.state.shouldShowLink
+                        this.state.shouldShowLink ||
+                        this.state.groupDeleted
                             ? 'blur'
                             : '')
                     }
@@ -176,6 +181,11 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     this.state.status !== LoginStatus.PENDING && (
                         <SendLinkModal
                             closeSendLinkModal={() => this.closeSendLinkModal()}
+                        />
+                    )}
+                {this.state.groupDeleted && (
+                        <GroupDeletedModal
+                            backToStartPage ={() => this.goBackToStartPage()}
                         />
                     )}
             </div>
