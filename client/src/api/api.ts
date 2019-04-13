@@ -137,7 +137,6 @@ class API {
             { group_str_id: group_str_id },
             user
         ).then((resp: AddUserResponse) => {
-            console.log('join called on add')
             this.join(group_str_id)
             return resp
         })
