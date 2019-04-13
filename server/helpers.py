@@ -218,22 +218,28 @@ def find_free_time(all_events, group):
         row = free_table[day_idx, :]
         primary = []
         secondary = []
-        for min_idx, val in enumerate(row):
+        for idx, val in enumerate(row):
             if val >= 1 and free:
+                # 0 -> >1
                 free = False
-                primary[-1][1] = min_idx
+                primary[-1][1] = idx
                 if val == 1:
-                    secondary.append([min_idx, -1])
+                    secondary.append([idx, -1])
             elif val == 0 and not free:
+                # >1 | init -> 0
                 free = True
-                primary.append([min_idx, -1])
+                primary.append([idx, -1])
                 if len(secondary) > 0:
-                    secondary[-1][1] = min_idx
-            elif min_idx == len(row) - 1:
+                    secondary[-1][1] = idx
+            elif idx == 0 and val == 1:
+                # init -> 1
+                secondary.append([idx, -1])
+            elif idx == len(row) - 1:
+                # last
                 if free:
-                    primary[-1][1] = min_idx + 1
+                    primary[-1][1] = idx + 1
                 elif val == 1:
-                    secondary[-1][1] = min_idx + 1
+                    secondary[-1][1] = idx + 1
         for i in range(len(primary)):
             from_time = primary[i][0] + day_start
             from_time = time(int(from_time / 60), from_time % 60)
