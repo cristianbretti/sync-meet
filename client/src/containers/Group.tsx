@@ -8,6 +8,7 @@ import {
     MyDate,
     Time,
     SocketENUM,
+    DayToEventsMap,
 } from '../api/models'
 import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
@@ -28,9 +29,21 @@ type GroupState = {
 const dayInOneWeek = new Date()
 dayInOneWeek.setDate(dayInOneWeek.getDate() + 7)
 
+const emptyHashMap: DayToEventsMap = {}
+const current = new Date()
+let count = 0
+while (current !== dayInOneWeek) {
+    emptyHashMap[new MyDate({ date: current }).toString()] = []
+    current.setDate(current.getDate() + 1)
+    if (count >= 7) {
+        break // safeguard
+    }
+    count++
+}
+
 const emptyGroupState: GetGroupCalendarResponse = {
-    events: [],
-    secondary: [],
+    events: emptyHashMap,
+    secondary: emptyHashMap,
     group: {
         meeting_length: new Time('01:00'),
         name: 'Empty',
@@ -88,6 +101,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         this.setState({ status: LoginStatus.PENDING })
         api.getGroupCalendar(google_id, group_str_id)
             .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
+                console.log(getGroupCalendarResponse)
                 this.setState({
                     group: getGroupCalendarResponse.group,
                     events: getGroupCalendarResponse.events,

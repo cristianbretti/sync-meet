@@ -175,13 +175,12 @@ def toMinutes(time):
     return (time.hour * 60 + time.minute)
 
 
-def back_to_event(minute_interval, day_start, day):
+def back_to_event(minute_interval, day_start):
     from_time = minute_interval[0] + day_start
     from_time = time(int(from_time / 60), from_time % 60)
     to_time = minute_interval[1] + day_start
     to_time = time(int(to_time / 60), to_time % 60)
     return {
-        'date': str(day),
         'from_time': str(from_time)[:-3],
         'to_time': str(to_time)[:-3]
     }
@@ -221,8 +220,8 @@ def find_free_time(all_events, group):
                 event['end']) - day_start)
             free_table[idx, start_idx:end_idx] += 1
 
-    result = []
-    secondary_result = []
+    result = dict()
+    secondary_result = dict()
     for day_idx, day in enumerate(days):
         free = False
         row = free_table[day_idx, :]
@@ -260,10 +259,13 @@ def find_free_time(all_events, group):
                 elif val == 1 and idx + 1 - secondary[-1][0] >= meeting_length:
                     secondary[-1][1] = idx + 1
 
+        result[str(day)] = []
+        secondary_result[str(day)] = []
         for minute_interval in primary:
-            result.append(back_to_event(minute_interval, day_start, day))
+            result[str(day)].append(back_to_event(
+                minute_interval, day_start))
         for minute_interval in secondary:
-            secondary_result.append(back_to_event(
-                minute_interval, day_start, day))
+            secondary_result[str(day)].append(back_to_event(
+                minute_interval, day_start))
 
     return result, secondary_result

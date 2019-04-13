@@ -117,13 +117,11 @@ export interface AddUserResponse {
 }
 
 export interface CalendarEvent {
-    date: MyDate
     from_time: Time
     to_time: Time
 }
 
 export interface APICalendarEvent {
-    date: string
     from_time: string
     to_time: string
 }
@@ -152,9 +150,16 @@ export interface APIGroup {
     meeting_length: string
 }
 
+export interface APIDayToEventsMap {
+    [date_str: string]: APICalendarEvent[]
+}
+export interface DayToEventsMap {
+    [date_str: string]: CalendarEvent[]
+}
+
 export interface APIGetGroupCalendarResponse {
-    events: APICalendarEvent[]
-    secondary: APICalendarEvent[]
+    events: APIDayToEventsMap
+    secondary: APIDayToEventsMap
     owner_id: number
     users: DBUser[]
     your_id: number
@@ -162,8 +167,8 @@ export interface APIGetGroupCalendarResponse {
 }
 
 export interface GetGroupCalendarResponse {
-    events: CalendarEvent[]
-    secondary: CalendarEvent[]
+    events: DayToEventsMap
+    secondary: DayToEventsMap
     owner_id: number
     users: DBUser[]
     your_id: number
