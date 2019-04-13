@@ -7,4 +7,5 @@ oauth2client
 Flask-Testing
 flask-socketio
 eventlet
-sympy
+pytz
+numpy

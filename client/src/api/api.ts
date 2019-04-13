@@ -18,6 +18,7 @@ import {
     CalendarEvent,
     APIGetGroupCalendarResponse,
     APICalendarEvent,
+    DayToEventsMap,
 } from './models'
 
 //Use this when running client served from server
@@ -145,7 +146,6 @@ class API {
             { group_str_id: group_str_id },
             user
         ).then((resp: AddUserResponse) => {
-            console.log('join called on add')
             this.join(group_str_id)
             return resp
         })
@@ -167,17 +167,25 @@ class API {
                 from_time: new Time(resp.group.from_time),
                 meeting_length: new Time(resp.group.meeting_length),
             } as Group
-            const events = resp.events.map(
-                (ev: APICalendarEvent): CalendarEvent => ({
-                    date: new MyDate({ date_str: ev.date }),
-                    from_time: new Time(ev.from_time),
-                    to_time: new Time(ev.to_time),
+            Object.keys(resp.events).forEach((date_str: string) => {
+                resp.events[date_str].forEach((ev: APICalendarEvent) => {
+                    const temp = ev as any
+                    temp.from_time = new Time(ev.from_time)
+                    temp.to_time = new Time(ev.to_time)
                 })
-            )
+            })
+            Object.keys(resp.secondary).forEach((date_str: string) => {
+                resp.secondary[date_str].forEach((ev: APICalendarEvent) => {
+                    const temp = ev as any
+                    temp.from_time = new Time(ev.from_time)
+                    temp.to_time = new Time(ev.to_time)
+                })
+            })
             return {
                 ...resp,
+                events: (resp.events as any) as DayToEventsMap,
+                secondary: (resp.secondary as any) as DayToEventsMap,
                 group,
-                events,
             } as GetGroupCalendarResponse
         })
     }
