@@ -160,7 +160,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                                 secondary={this.state.secondary}
                             />
                         </div>
-                        <div className="h-8 " />
+                        <div className="h-4 " />
                     </div>
                 </div>
                 {this.state.status === LoginStatus.PENDING && <SpinningModal />}
