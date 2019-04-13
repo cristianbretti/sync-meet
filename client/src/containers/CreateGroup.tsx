@@ -77,6 +77,12 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
     }
 
     const onGoogleFailure = (error: any) => {
+        history.push({
+            pathname: '/error',
+            state: {
+              errorMessage: error.error || "",
+            }
+          })
         console.log('BAD google reponse from create group')
         console.log(error)
     }
