@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
-import { DBUser, GetGroupCalendarResponse} from '../api/models'
+import { DBUser, GetGroupCalendarResponse, UpdateAccessTokenBody} from '../api/models'
 import api from '../api/api';
+import GoogleLogin from 'react-google-login';
+import { access } from 'fs';
 
 type SiderbarProps = GetGroupCalendarResponse & { className?: string } & {group_str_id: string}
 
@@ -29,10 +31,34 @@ const showPersonIcon = (user: DBUser, your_id: number) => {
     }
 }
 
+const refreshUserToken = (googleResponse: any) => {
+    console.log("refresh")
+    const update_access_token_body: UpdateAccessTokenBody = {
+        access_token:  googleResponse.getAuthResponse().access_token
+    }
+    const group_str_id = window.location.href.substr(window.location.href.lastIndexOf('/') + 1)
+    const loggedIn = api.isLoggedIn(group_str_id)
+    if (loggedIn.success) {
+        const google_id = loggedIn.google_id
+        api.updateAccessToken(update_access_token_body, google_id, group_str_id)
+    }
+}
+
 const showRefreshIcon = (user: DBUser, your_id: number) => {
-    if(user.valid){
+    if(!user.valid){
         if(your_id == user.id){
-            return(<i className="material-icons pl-1 text-xs text-grey-lighter">refresh</i>)
+            return(
+                <GoogleLogin 
+                    clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
+                    render={renderProps => (
+                    <button onClick={renderProps ? renderProps.onClick: () => console.log("undefined")}><i className="material-icons px-1 text-xs text-center text-grey-lightest">refresh</i></button>)}
+                    onFailure={() => console.log("failure")} 
+                    onSuccess={refreshUserToken} 
+                    scope={
+                        'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'
+                    }
+                />
+            )
         }
         else{
             return(<i className="material-icons pl-1 text-xs text-grey-lighter">warning</i>)
@@ -127,7 +153,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
             </div>
 
             <div className="text-center">
-                <h3 className="py-1 px-1 mx-1 text-center">Members</h3>
+                <h3 className="py-2 px-1 mx-1 text-center">Members</h3>
             </div>
 
             {users.map(user => userDisplay(user, owner_id, your_id))}
