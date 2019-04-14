@@ -57,6 +57,7 @@ const showRefreshIcon = (user: DBUser, your_id: number) => {
                     scope={
                         'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'
                     }
+                    cookiePolicy={'single_host_origin'}
                 />
             )
         }
