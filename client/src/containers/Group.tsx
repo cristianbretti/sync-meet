@@ -26,7 +26,7 @@ enum LoginStatus {
 type GroupState = {
     status: LoginStatus
     shouldShowLink: boolean
-    groupDeleted: boolean
+    shouldShowGroupDeleted: boolean
 } & GetGroupCalendarResponse
 
 const dayInOneWeek = new Date()
@@ -55,7 +55,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
             ...emptyGroupState,
             status: LoginStatus.PENDING,
             shouldShowLink: false,
-            groupDeleted: false,
+            shouldShowGroupDeleted: false,
         }
     }
     componentDidMount() {
@@ -82,7 +82,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                 }
                 break
             case SocketENUM.DELETE:
-                this.setState({groupDeleted:true})
+                this.setState({ shouldShowGroupDeleted:true })
                 break
         }
     }
@@ -131,8 +131,8 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         this.setState({ shouldShowLink: false })
     }
 
-    goBackToStartPage = () => {
-        this.props.history.push('/')
+    closeGroupDeletedModal = () => {
+        this.setState({ shouldShowGroupDeleted: false })
     }
 
     render() {
@@ -145,7 +145,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         (this.state.status === LoginStatus.NOT_LOGGED_IN ||
                         this.state.status === LoginStatus.PENDING ||
                         this.state.shouldShowLink ||
-                        this.state.groupDeleted
+                        this.state.shouldShowGroupDeleted
                             ? 'blur'
                             : '')
                     }
@@ -183,9 +183,9 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                             closeSendLinkModal={() => this.closeSendLinkModal()}
                         />
                     )}
-                {this.state.groupDeleted && (
+                {this.state.shouldShowGroupDeleted && (
                         <GroupDeletedModal
-                            backToStartPage ={() => this.goBackToStartPage()}
+                            closeGroupDeletedModal ={() => this.closeGroupDeletedModal()}
                         />
                     )}
             </div>

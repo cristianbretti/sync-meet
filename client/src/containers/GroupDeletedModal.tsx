@@ -9,17 +9,17 @@ import api from '../api/api'
 import LinkButton from '../components/LinkButton';
 
 interface GroupDeletedModal {
-    backToStartPage(): void
+    closeGroupDeletedModal(): void
 }
 
 const GroupDeletedModal: React.FC<GroupDeletedModal> = ({
-    backToStartPage,
+    closeGroupDeletedModal,
 }) => {
     return (
         <div>
             <div className="absolute flex items-center justify-center pin bg-grey-darkest opacity-50 z-10" />
             <div
-                onClick={() => backToStartPage()}
+                onClick={() => closeGroupDeletedModal()}
                 className="absolute flex flex-col items-center justify-center pin z-20 "
             >
                 <div
@@ -28,19 +28,32 @@ const GroupDeletedModal: React.FC<GroupDeletedModal> = ({
                     }}
                     className="bg-grey-darkest text-white rounded shadow mx-8"
                 >
-                <div className="m-8 text-lg">
-                    This group has been deleted!
+                    <div className="flex justify-end m-8 mt-2 mr-2">
+                        <i
+                            className={
+                                'text-3xl material-icons text-white cursor-pointer'
+                            }
+                            onClick={() => closeGroupDeletedModal()}
+                        >
+                            close
+                        </i>
+                    </div>
+
+                    <div className="m-8 text-lg">
+                        This group has been deleted!
+                    </div>
+                    <div className="flex m-8 items-center justify-center">
+                    <LinkButton
+                        to="/"
+                        text="Back to Start Page"
+                        className=""
+                        />
+                    </div>
                 </div>
-                <div className="flex" />
-                </div>
-                <LinkButton
-                    to="/"
-                    text="Back to Start Page"
-                    className=""
-                />
             </div>
         </div>
     )
 }
 
 export default GroupDeletedModal
+
