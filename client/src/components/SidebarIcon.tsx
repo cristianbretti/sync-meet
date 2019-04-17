@@ -6,6 +6,8 @@ interface SidebarIconProps {
     text: string
     invisible?: boolean
     onClick?(): void
+    floatRight?: boolean
+    iconClassName?: string
 }
 
 const SidebarIcon: FC<SidebarIconProps> = ({
@@ -14,6 +16,8 @@ const SidebarIcon: FC<SidebarIconProps> = ({
     text,
     invisible,
     onClick,
+    floatRight,
+    iconClassName,
 }) => {
     const [hover, setHover] = useState(false)
     return (
@@ -29,19 +33,24 @@ const SidebarIcon: FC<SidebarIconProps> = ({
                 className={
                     'material-icons px-1 text-sm' +
                     ' ' +
-                    (invisible ? 'invisible' : ' ')
+                    (invisible ? 'invisible' : ' ') +
+                    (iconClassName ? iconClassName : ' ')
                 }
             >
                 {icon}
             </i>
             <div
                 className={
-                    'absolute pin-b pin-r mr-6 -mb-1 pointer-events-none  z-10 bg-grey p-2 rounded-sm text-xs shadow-md min-w-32 text-white'
+                    'absolute pin-b pointer-events-none -mb-1 z-10 bg-grey p-2 rounded-sm text-xs shadow-md min-w-32 text-white' +
+                    ' ' +
+                    (floatRight ? 'ml-6 pin-l' : 'mr-6 pin-r ')
                 }
                 style={{
                     transition: '.25s ease all',
                     transitionDelay: '.1s',
-                    transformOrigin: 'right center',
+                    transformOrigin: floatRight
+                        ? 'left center'
+                        : 'right center',
                     transform: hover ? 'scale(1)' : 'scale(0)',
                 }}
             >

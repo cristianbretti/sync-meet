@@ -33,7 +33,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
     const userDisplay = (user: DBUser) => (
         <div
             key={user.id}
-            className="flex text-xl my-2 p-1 rounded bg-grey-dark shadow-inner"
+            className="flex text-l my-2 p-1 rounded bg-grey-dark shadow-inner"
         >
             {user.name}
             <div className="flex-1" />
@@ -93,15 +93,15 @@ const Sidebar: React.FC<SiderbarProps> = ({
     }
 
     const displayRow = (icon: string, first: string, second: string) => (
-        <div className="py-3 my-3 flex">
+        <div className="my-2 flex">
             <div className="flex justify-center items-center">
-                <i className={'text-3xl material-icons pr-4'}>{icon}</i>
+                <i className={'text-xl material-icons pr-4'}>{icon}</i>
             </div>
             <div className="text-md flex justify-center items-center">
                 <div>{first}</div>
             </div>
             <div className="flex justify-center items-center">
-                <i key="arrow" className="material-icons px-4">
+                <i key="arrow" className="text-sm material-icons px-2">
                     arrow_forward
                 </i>
             </div>
@@ -116,21 +116,14 @@ const Sidebar: React.FC<SiderbarProps> = ({
     return (
         <div
             className={
-                'flex flex-col bg-grey-darkest text-white p-6' + ' ' + className
+                'flex flex-col bg-grey-darkest text-white px-6 pt-2' +
+                ' ' +
+                className
             }
         >
-            <div className="py-3 text-center text-4xl font-semibold uppercase">
+            <div className="text-center text-4xl font-semibold uppercase">
                 {group.name}
             </div>
-
-            <button
-                onClick={copyLink}
-                className="no-underline text-inherit p-2 rounded bg-green-darker hover:bg-green-dark hover:shadow-inner shadow outline-none focus:outline-none
-                focus:bg-green-darkest"
-            >
-                copy invitation link
-                <i className="material-icons pl-2 text-xs"> file_copy </i>
-            </button>
 
             {displayRow(
                 'calendar_today',
@@ -143,25 +136,56 @@ const Sidebar: React.FC<SiderbarProps> = ({
                 group.to_time.toString()
             )}
 
-            <div className="py-3 my-3 flex">
+            <div className="my-2 flex">
                 <div className="flex justify-center items-center">
-                    <i className={'text-3xl material-icons pr-4'}>
+                    <i className={'text-xl material-icons pr-4'}>
                         hourglass_full
                     </i>
                 </div>
                 <div className="text-md flex justify-center items-center">
                     <div>{group.meeting_length.toString()}</div>
                 </div>
+                <div className="flex-1" />
             </div>
-
-            <div className="pt-4 text-2xl font-semibold uppercase">Members</div>
+            <div className="flex">
+                <button onClick={copyLink} className="">
+                    <SidebarIcon
+                        className="text-white select-none"
+                        icon="file_copy"
+                        text="Copy the link to send to a friend"
+                        floatRight
+                        iconClassName="text-lg"
+                    />
+                </button>
+                <button onClick={() => leaveGroup()} className=" ">
+                    {owner_id === your_id && (
+                        <SidebarIcon
+                            className="text-red select-none"
+                            icon="delete"
+                            text="Delete the group"
+                            floatRight
+                            iconClassName="text-lg"
+                        />
+                    )}
+                    {owner_id !== your_id && (
+                        <SidebarIcon
+                            className="text-red select-none"
+                            icon="exit_to_app"
+                            text="Leave the group"
+                            floatRight
+                            iconClassName="text-lg"
+                        />
+                    )}
+                </button>
+            </div>
+            <div className="pt-2 text-l font-semibold uppercase">Members</div>
 
             <div className="flex-1 overflow-y-scroll my-2 pt-2 invisible-scrollbar">
                 {users.map(user => userDisplay(user))}
             </div>
             {users.filter(u => !u.valid).length !== 0 && (
-                <div className="bg-orange-dark shadow-inner rounded flex  items-center py-2 my-6">
-                    <i className="material-icons text-red text-3xl px-2">
+                <div className="bg-orange-dark shadow-inner rounded flex text-sm items-center py-1 my-3">
+                    <i className="material-icons text-red text-xl px-2">
                         warning
                     </i>{' '}
                     One or more users need to update their access to Google!
@@ -175,10 +199,10 @@ const Sidebar: React.FC<SiderbarProps> = ({
                             onClick={
                                 renderProps ? renderProps.onClick : undefined
                             }
-                            className="flex  items-center py-2 mb-6 no-underline text-inherit rounded bg-green-darker hover:bg-green-dark hover:shadow-inner shadow outline-none focus:outline-none
+                            className="flex text-sm items-center py-1 mb-6 no-underline text-inherit rounded bg-green-darker hover:bg-green-dark hover:shadow-inner shadow outline-none focus:outline-none
                 focus:bg-green-darkest"
                         >
-                            <i className="material-icons text-white text-3xl px-2">
+                            <i className="material-icons text-white text-xl px-2">
                                 refresh
                             </i>{' '}
                             Refresh your access to Google
@@ -201,13 +225,8 @@ const Sidebar: React.FC<SiderbarProps> = ({
                 />
             )}
             {status === LoginStatus.UPDATING && <SpinnerComponent />}
-            <div className="text-center pin-b pin-r flex ">
-                <button
-                    onClick={() => leaveGroup()}
-                    className="no-underline text-inherit p-2 rounded bg-red-dark hover:bg-red-darker hover:shadow-inner shadow"
-                >
-                    {owner_id == your_id ? 'Delete group' : 'Leave group'}
-                </button>
+            <div className="bg-grey h-1/3">
+                <div>Chat</div>
             </div>
             <Chat users={users} your_id={your_id} group_str_id={group_str_id} />
         </div>
