@@ -54,7 +54,7 @@ class API {
             group_str_id +
             '=' +
             google_id +
-            ';expires=Thu, 01 Jan 1970 00:00:00 UTC;'
+            ';expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/'
     }
 
     isLoggedIn = (group_str_id: string): LoggedIn | LoggedOut => {
