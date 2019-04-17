@@ -18,6 +18,11 @@ export enum SocketEvents {
     ADMIN = 'admin',
 }
 
+export interface SocketMessage {
+    message: string
+    id: number
+}
+
 export enum LoginStatus {
     LOGGED_IN = 'logged_in',
     NOT_LOGGED_IN = 'not_logged_in',

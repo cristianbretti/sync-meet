@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { DBUser } from '../api/models'
+import { DBUser, SocketMessage } from '../api/models'
 import api from '../api/api'
 
 interface ChatProps {
@@ -9,40 +9,53 @@ interface ChatProps {
 }
 
 interface ChatState {
-    messages: string[]
+    messages: SocketMessage[]
     input: string
+    users: { [id: number]: string }
 }
 
 export default class Chat extends Component<ChatProps, ChatState> {
     constructor(props: ChatProps) {
         super(props)
-        this.state = { messages: [], input: '' }
+        this.state = { messages: [], input: '', users: {} }
     }
 
     componentDidMount() {
-        api.setMessageEventCallback((msg: string) => {
-            const newMessages = this.state.messages.concat(msg)
-            this.setState({ messages: newMessages })
+        api.setMessageEventCallback((msg: SocketMessage) => {
+            this.setState({ messages: this.state.messages.concat(msg) })
         })
     }
 
+    componentWillReceiveProps(nextProps: ChatProps) {
+        const users: { [id: number]: string } = {}
+        nextProps.users.forEach(u => {
+            if (u.id === nextProps.your_id) {
+                users[u.id] = 'You'
+            } else {
+                users[u.id] = u.name
+            }
+        })
+        this.setState({ users: users })
+    }
+
     render() {
-        const { users, your_id, group_str_id } = this.props
+        const { your_id, group_str_id } = this.props
+        const { users, messages, input } = this.state
         return (
             <div>
-                {this.state.messages.map((msg, idx) => (
-                    <div key={idx}>{msg}</div>
+                {messages.map((msg, idx) => (
+                    <div key={idx}>{users[msg.id] + ': ' + msg.message}</div>
                 ))}
                 <form
                     onSubmit={e => {
                         e.preventDefault()
-                        api.send(this.state.input, group_str_id)
+                        api.send(input, your_id, group_str_id)
                         this.setState({ input: '' })
                     }}
                 >
                     <input
                         type="text"
-                        value={this.state.input}
+                        value={input}
                         onChange={e => this.setState({ input: e.target.value })}
                     />
                     <input type="submit" value="Send" />

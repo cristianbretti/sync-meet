@@ -34,4 +34,5 @@ def on_update(group_str_id):
 
 @sio.on('message')
 def on_message(message, group_str_id):
+    print(message)
     send(message, room=group_str_id)

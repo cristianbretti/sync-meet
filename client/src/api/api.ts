@@ -19,6 +19,7 @@ import {
     APICalendarEvent,
     DayToEventsMap,
     SocketEvents,
+    SocketMessage,
 } from './models'
 
 //Use this when running client served from server
@@ -35,7 +36,7 @@ class API {
         this.socket.on(SocketEvents.ADMIN, (msg: SocketAdminENUM) => {
             console.log(msg)
         })
-        this.socket.on(SocketEvents.MESSAGE, (msg: string) => {
+        this.socket.on(SocketEvents.MESSAGE, (msg: SocketMessage) => {
             console.log(msg)
         })
     }
@@ -45,7 +46,7 @@ class API {
         this.socket.on(SocketEvents.ADMIN, callback)
     }
 
-    setMessageEventCallback = (callback: (msg: string) => void) => {
+    setMessageEventCallback = (callback: (msg: SocketMessage) => void) => {
         this.socket.off(SocketEvents.MESSAGE)
         this.socket.on(SocketEvents.MESSAGE, callback)
     }
@@ -134,8 +135,8 @@ class API {
         this.socket.emit(SocketAdminENUM.DELETE, group_str_id)
     update = (group_str_id: string) =>
         this.socket.emit(SocketAdminENUM.UPDATE, group_str_id)
-    send = (message: string, group_str_id: string) =>
-        this.socket.emit(SocketEvents.MESSAGE, message, group_str_id)
+    send = (message: string, id: number, group_str_id: string) =>
+        this.socket.emit(SocketEvents.MESSAGE, { message, id }, group_str_id)
 
     createGroup = (group: CreateGroupBody): Promise<CreateGroupResponse> => {
         return this.request('creategroup', HTTPMethod.POST, {}, group).then(
