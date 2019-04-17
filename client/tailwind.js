@@ -620,6 +620,7 @@ module.exports = {
         '0': '0',
         full: '100%',
         screen: '100vh',
+        '32': '8rem',
     },
 
     /*
@@ -669,6 +670,7 @@ module.exports = {
     maxHeight: {
         full: '100%',
         screen: '100vh',
+        '64': '16rem',
     },
 
     /*

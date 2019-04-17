@@ -3817,6 +3817,10 @@ table {
   margin-left: 1px;
 }
 
+.max-h-64 {
+  max-height: 16rem;
+}
+
 .max-h-full {
   max-height: 100%;
 }
@@ -3867,6 +3871,10 @@ table {
 
 .min-h-0 {
   min-height: 0;
+}
+
+.min-h-32 {
+  min-height: 8rem;
 }
 
 .min-h-full {
@@ -10031,6 +10039,10 @@ code {
     margin-left: 1px;
   }
 
+  .sm\:max-h-64 {
+    max-height: 16rem;
+  }
+
   .sm\:max-h-full {
     max-height: 100%;
   }
@@ -10081,6 +10093,10 @@ code {
 
   .sm\:min-h-0 {
     min-height: 0;
+  }
+
+  .sm\:min-h-32 {
+    min-height: 8rem;
   }
 
   .sm\:min-h-full {
@@ -15965,6 +15981,10 @@ code {
     margin-left: 1px;
   }
 
+  .md\:max-h-64 {
+    max-height: 16rem;
+  }
+
   .md\:max-h-full {
     max-height: 100%;
   }
@@ -16015,6 +16035,10 @@ code {
 
   .md\:min-h-0 {
     min-height: 0;
+  }
+
+  .md\:min-h-32 {
+    min-height: 8rem;
   }
 
   .md\:min-h-full {
@@ -21899,6 +21923,10 @@ code {
     margin-left: 1px;
   }
 
+  .lg\:max-h-64 {
+    max-height: 16rem;
+  }
+
   .lg\:max-h-full {
     max-height: 100%;
   }
@@ -21949,6 +21977,10 @@ code {
 
   .lg\:min-h-0 {
     min-height: 0;
+  }
+
+  .lg\:min-h-32 {
+    min-height: 8rem;
   }
 
   .lg\:min-h-full {
@@ -27833,6 +27865,10 @@ code {
     margin-left: 1px;
   }
 
+  .xl\:max-h-64 {
+    max-height: 16rem;
+  }
+
   .xl\:max-h-full {
     max-height: 100%;
   }
@@ -27883,6 +27919,10 @@ code {
 
   .xl\:min-h-0 {
     min-height: 0;
+  }
+
+  .xl\:min-h-32 {
+    min-height: 8rem;
   }
 
   .xl\:min-h-full {

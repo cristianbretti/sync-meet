@@ -44,13 +44,15 @@ const TextInput: React.FC<TextInputProps> = ({
                     // Make Enter act like tab
                     const e2 = e as any
                     if (e.keyCode === 13) {
-                        const form = e2.target.form
-                        const index = Array.prototype.indexOf.call(
-                            form,
-                            e2.target
-                        )
-                        form.elements[index + 1].focus()
-                        e2.preventDefault()
+                        try {
+                            const form = e2.target.form
+                            const index = Array.prototype.indexOf.call(
+                                form,
+                                e2.target
+                            )
+                            form.elements[index + 1].focus()
+                            e2.preventDefault()
+                        } catch (err) {}
                     }
                 }}
             />

@@ -6,7 +6,7 @@ sio = SocketIO()
 @sio.on('join')
 def on_join(group_str_id):
     emit('admin', "join", room=group_str_id)
-    send('A user has joined', room=group_str_id)
+    send({'message': 'A user has joined', 'id': -1}, room=group_str_id)
     join_room(group_str_id)
 
 

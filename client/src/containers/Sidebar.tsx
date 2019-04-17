@@ -33,7 +33,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
     const userDisplay = (user: DBUser) => (
         <div
             key={user.id}
-            className="flex text-l my-2 p-1 rounded bg-grey-dark shadow-inner"
+            className="flex text-l my-2 mx-1 p-1 rounded bg-grey-darker shadow"
         >
             {user.name}
             <div className="flex-1" />
@@ -116,14 +116,48 @@ const Sidebar: React.FC<SiderbarProps> = ({
     return (
         <div
             className={
-                'flex flex-col bg-grey-darkest text-white px-6 pt-2' +
+                'flex flex-col bg-grey-darkest text-white px-6 pt-2 pb-4' +
                 ' ' +
                 className
             }
         >
-            <div className="text-center text-4xl font-semibold uppercase">
-                {group.name}
+            <div className="flex justify-between align-start">
+                <div className="text-3xl font-semibold uppercase">
+                    {group.name}
+                </div>
+                <div>
+                    <div
+                        onClick={() => leaveGroup()}
+                        className="cursor-pointer "
+                    >
+                        <SidebarIcon
+                            className="text-red select-none hover:bg-red hover:text-grey-darkest rounded"
+                            icon={
+                                owner_id === your_id ? 'delete' : 'exit_to_app'
+                            }
+                            text={
+                                owner_id === your_id
+                                    ? 'Delete the group'
+                                    : 'Leave the group'
+                            }
+                            iconClassName="text-3xl"
+                        />
+                    </div>
+                </div>
             </div>
+            {/* TODO: Might add later if feeling groovy */}
+            {/* <div className="bg-white text-grey-darkest">
+                Copy invitation link:
+                <button onClick={copyLink} className="">
+                    <SidebarIcon
+                        className="text-grey-darkest select-none"
+                        icon="file_copy"
+                        text="Copy the link to send to a friend"
+                        floatRight
+                        iconClassName="text-lg"
+                    />
+                </button>
+            </div> */}
 
             {displayRow(
                 'calendar_today',
@@ -147,40 +181,12 @@ const Sidebar: React.FC<SiderbarProps> = ({
                 </div>
                 <div className="flex-1" />
             </div>
-            <div className="flex">
-                <button onClick={copyLink} className="">
-                    <SidebarIcon
-                        className="text-white select-none"
-                        icon="file_copy"
-                        text="Copy the link to send to a friend"
-                        floatRight
-                        iconClassName="text-lg"
-                    />
-                </button>
-                <button onClick={() => leaveGroup()} className=" ">
-                    {owner_id === your_id && (
-                        <SidebarIcon
-                            className="text-red select-none"
-                            icon="delete"
-                            text="Delete the group"
-                            floatRight
-                            iconClassName="text-lg"
-                        />
-                    )}
-                    {owner_id !== your_id && (
-                        <SidebarIcon
-                            className="text-red select-none"
-                            icon="exit_to_app"
-                            text="Leave the group"
-                            floatRight
-                            iconClassName="text-lg"
-                        />
-                    )}
-                </button>
-            </div>
-            <div className="pt-2 text-l font-semibold uppercase">Members</div>
 
-            <div className="flex-1 overflow-y-scroll my-2 pt-2 invisible-scrollbar">
+            <div className="pt-2 -mb-4 text-l font-semibold uppercase z-30 bg-grey-darkest">
+                Members
+            </div>
+
+            <div className="max-h-64 min-h-32 overflow-y-scroll my-2 pt-3 invisible-scrollbar rounded bg-grey-dark">
                 {users.map(user => userDisplay(user))}
             </div>
             {users.filter(u => !u.valid).length !== 0 && (
