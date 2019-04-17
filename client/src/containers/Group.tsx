@@ -44,14 +44,17 @@ const emptyGroupState: GetGroupCalendarResponse = {
     secondary: emptyHashMap,
     group: {
         meeting_length: new Time('01:00'),
-        name: 'Empty',
+        name: 'Assignment 3 deep learning work',
         from_date: new MyDate({ date: new Date() }),
         to_date: new MyDate({ date: dayInOneWeek }),
         from_time: new Time('09:00'),
         to_time: new Time('17:00'),
     },
     owner_id: 0,
-    users: [],
+    users: [
+        { id: 0, name: 'Anton', valid: false },
+        { id: 1, name: 'Crillz', valid: false },
+    ], // TODO []
     your_id: 0,
 }
 
@@ -60,18 +63,18 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         super(props)
         this.state = {
             ...emptyGroupState,
-            status: LoginStatus.INITIAL_LOAD,
+            status: LoginStatus.LOGGED_IN, // TODO SET INITAL
             shouldShowLink: false,
             shouldShowGroupDeleted: false,
         }
     }
     componentDidMount() {
-        if (this.props.location.state) {
-            //This is only true when redirected from /creategroup
-            this.setState({ shouldShowLink: true })
-        }
-        api.setReceiveCallback(this.handleSocketIO)
-        this.handleSocketIO(SocketENUM.JOIN)
+        // if (this.props.location.state) {
+        //     //This is only true when redirected from /creategroup
+        //     this.setState({ shouldShowLink: true })
+        // }
+        // api.setReceiveCallback(this.handleSocketIO)
+        // this.handleSocketIO(SocketENUM.JOIN)
     }
 
     handleSocketIO = (message: SocketENUM) => {
