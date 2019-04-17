@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     DBUser,
     GetGroupCalendarResponse,
@@ -10,6 +10,7 @@ import api from '../api/api'
 import GoogleLogin from 'react-google-login'
 import { LocationDescriptorObject } from 'history'
 import SidebarIcon from '../components/SidebarIcon'
+import Chat from './Chat'
 
 type SiderbarProps = GetGroupCalendarResponse & {
     className?: string
@@ -208,6 +209,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
                     {owner_id == your_id ? 'Delete group' : 'Leave group'}
                 </button>
             </div>
+            <Chat users={users} your_id={your_id} group_str_id={group_str_id} />
         </div>
     )
 }

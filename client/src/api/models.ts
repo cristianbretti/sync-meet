@@ -5,12 +5,17 @@ export enum HTTPMethod {
     DELETE = 'DELETE',
 }
 
-export enum SocketENUM {
+export enum SocketAdminENUM {
     JOIN = 'join',
     REJOIN = 'rejoin',
     LEAVE = 'leave',
     DELETE = 'delete',
     UPDATE = 'update',
+}
+
+export enum SocketEvents {
+    MESSAGE = 'message',
+    ADMIN = 'admin',
 }
 
 export enum LoginStatus {

@@ -11,14 +11,14 @@ import {
     EmptyResponse,
     UpdateAccessTokenBody,
     HTTPMethod,
-    SocketENUM,
+    SocketAdminENUM,
     LoggedIn,
     LoggedOut,
     Group,
-    CalendarEvent,
     APIGetGroupCalendarResponse,
     APICalendarEvent,
     DayToEventsMap,
+    SocketEvents,
 } from './models'
 
 //Use this when running client served from server
@@ -32,14 +32,22 @@ class API {
     private socket: SocketIOClient.Socket
     constructor() {
         this.socket = io.connect(baseURLEndpoint)
-        this.socket.on('message', (msg: SocketENUM) => {
+        this.socket.on(SocketEvents.ADMIN, (msg: SocketAdminENUM) => {
+            console.log(msg)
+        })
+        this.socket.on(SocketEvents.MESSAGE, (msg: string) => {
             console.log(msg)
         })
     }
 
-    setReceiveCallback = (callback: (msg: SocketENUM) => void) => {
-        this.socket.off('message') // remove all other listeners
-        this.socket.on('message', callback)
+    setAdminEventCallback = (callback: (msg: SocketAdminENUM) => void) => {
+        this.socket.off(SocketEvents.ADMIN)
+        this.socket.on(SocketEvents.ADMIN, callback)
+    }
+
+    setMessageEventCallback = (callback: (msg: string) => void) => {
+        this.socket.off(SocketEvents.MESSAGE)
+        this.socket.on(SocketEvents.MESSAGE, callback)
     }
 
     login = (group_str_id: string, google_id: string, expires: MyDate) => {
@@ -117,15 +125,17 @@ class API {
      * Socket-io event emitters
      */
     join = (group_str_id: string) =>
-        this.socket.emit(SocketENUM.JOIN, group_str_id)
+        this.socket.emit(SocketAdminENUM.JOIN, group_str_id)
     rejoin = (group_str_id: string) =>
-        this.socket.emit(SocketENUM.REJOIN, group_str_id)
+        this.socket.emit(SocketAdminENUM.REJOIN, group_str_id)
     leave = (group_str_id: string) =>
-        this.socket.emit(SocketENUM.LEAVE, group_str_id)
+        this.socket.emit(SocketAdminENUM.LEAVE, group_str_id)
     delete = (group_str_id: string) =>
-        this.socket.emit(SocketENUM.DELETE, group_str_id)
+        this.socket.emit(SocketAdminENUM.DELETE, group_str_id)
     update = (group_str_id: string) =>
-        this.socket.emit(SocketENUM.UPDATE, group_str_id)
+        this.socket.emit(SocketAdminENUM.UPDATE, group_str_id)
+    send = (message: string, group_str_id: string) =>
+        this.socket.emit(SocketEvents.MESSAGE, message, group_str_id)
 
     createGroup = (group: CreateGroupBody): Promise<CreateGroupResponse> => {
         return this.request('creategroup', HTTPMethod.POST, {}, group).then(

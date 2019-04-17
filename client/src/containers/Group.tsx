@@ -7,7 +7,7 @@ import {
     GetGroupCalendarResponse,
     MyDate,
     Time,
-    SocketENUM,
+    SocketAdminENUM,
     LoginStatus,
     DayToEventsMap,
     ErrorResponse,
@@ -70,15 +70,15 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
             //This is only true when redirected from /creategroup
             this.setState({ shouldShowLink: true })
         }
-        api.setReceiveCallback(this.handleSocketIO)
-        this.handleSocketIO(SocketENUM.JOIN)
+        api.setAdminEventCallback(this.handleSocketIO)
+        this.handleSocketIO(SocketAdminENUM.JOIN)
     }
 
-    handleSocketIO = (message: SocketENUM) => {
+    handleSocketIO = (message: SocketAdminENUM) => {
         switch (message) {
-            case SocketENUM.JOIN:
-            case SocketENUM.LEAVE:
-            case SocketENUM.UPDATE:
+            case SocketAdminENUM.JOIN:
+            case SocketAdminENUM.LEAVE:
+            case SocketAdminENUM.UPDATE:
                 const group_str_id = this.props.match.params.group_str_id
                 const loggedIn = api.isLoggedIn(group_str_id)
                 if (!loggedIn.success) {
@@ -88,7 +88,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     this.getCalendarData(group_str_id, google_id)
                 }
                 break
-            case SocketENUM.DELETE:
+            case SocketAdminENUM.DELETE:
                 this.setState({ shouldShowGroupDeleted: true })
                 break
         }
@@ -113,7 +113,6 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
 
         api.getGroupCalendar(google_id, group_str_id)
             .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
-                console.log('NEW CAL RESP')
                 this.setState({
                     group: getGroupCalendarResponse.group,
                     events: getGroupCalendarResponse.events,
