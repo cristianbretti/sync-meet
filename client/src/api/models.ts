@@ -13,6 +13,13 @@ export enum SocketENUM {
     UPDATE = 'update',
 }
 
+export enum LoginStatus {
+    LOGGED_IN = 'logged_in',
+    NOT_LOGGED_IN = 'not_logged_in',
+    UPDATING = 'updating',
+    INITIAL_LOAD = ' initial_load',
+}
+
 export class MyDate {
     public date: Date
     constructor(init: { date_str?: string; date?: Date }) {

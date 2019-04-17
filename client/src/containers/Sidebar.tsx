@@ -3,12 +3,15 @@ import {
     DBUser,
     GetGroupCalendarResponse,
     UpdateAccessTokenBody,
+    LoginStatus,
 } from '../api/models'
+import SpinnerComponent from '../components/SpinnerComponent'
 import api from '../api/api'
 import GoogleLogin from 'react-google-login'
-import { access } from 'fs'
 
-type SiderbarProps = GetGroupCalendarResponse & { className?: string } & {
+type SiderbarProps = GetGroupCalendarResponse & {
+    className?: string
+    status: LoginStatus
     group_str_id: string
 }
 
@@ -123,6 +126,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
     your_id,
     owner_id,
     className,
+    status,
     group_str_id,
 }: SiderbarProps) => {
     return (
@@ -192,7 +196,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
             </div>
 
             {users.map(user => userDisplay(user, owner_id, your_id))}
-
+            {status === LoginStatus.UPDATING && <SpinnerComponent />}
             <div className="text-center absolute pin-b pin-r flex ">
                 <button
                     onClick={copyLink}
