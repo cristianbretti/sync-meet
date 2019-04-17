@@ -204,6 +204,7 @@ class API {
             } else {
                 this.leave(group_str_id)
             }
+            this.logout(group_str_id, google_id)
             return resp
         })
     }

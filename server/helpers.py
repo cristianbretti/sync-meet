@@ -153,7 +153,8 @@ def get_events(access_token, group, user):
             events = service.events().list(calendarId=cal_id,
                                            timeMin=timeMin,
                                            timeMax=timeMax,
-                                           timeZone=str(tz)
+                                           timeZone=str(tz),
+                                           singleEvents=True
                                            ).execute()
             for event in events.get('items'):
                 if 'start' in event.keys() and 'end' in event.keys() and 'dateTime' in event['start'].keys():
