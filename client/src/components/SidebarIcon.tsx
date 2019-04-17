@@ -36,7 +36,7 @@ const SidebarIcon: FC<SidebarIconProps> = ({
             </i>
             <div
                 className={
-                    'absolute pin-b pin-r mr-6 pointer-events-none  z-10 bg-grey p-2 rounded-sm text-xs shadow-md min-w-32 text-white'
+                    'absolute pin-b pin-r mr-6 -mb-1 pointer-events-none  z-10 bg-grey p-2 rounded-sm text-xs shadow-md min-w-32 text-white'
                 }
                 style={{
                     transition: '.25s ease all',

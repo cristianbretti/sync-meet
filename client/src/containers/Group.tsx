@@ -51,10 +51,7 @@ const emptyGroupState: GetGroupCalendarResponse = {
         to_time: new Time('17:00'),
     },
     owner_id: 0,
-    users: [
-        { id: 0, name: 'Anton', valid: false },
-        { id: 1, name: 'Crillz', valid: false },
-    ], // TODO []
+    users: [],
     your_id: 0,
 }
 
@@ -63,18 +60,18 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         super(props)
         this.state = {
             ...emptyGroupState,
-            status: LoginStatus.LOGGED_IN, // TODO SET INITAL
+            status: LoginStatus.INITIAL_LOAD,
             shouldShowLink: false,
             shouldShowGroupDeleted: false,
         }
     }
     componentDidMount() {
-        // if (this.props.location.state) {
-        //     //This is only true when redirected from /creategroup
-        //     this.setState({ shouldShowLink: true })
-        // }
-        // api.setReceiveCallback(this.handleSocketIO)
-        // this.handleSocketIO(SocketENUM.JOIN)
+        if (this.props.location.state) {
+            //This is only true when redirected from /creategroup
+            this.setState({ shouldShowLink: true })
+        }
+        api.setReceiveCallback(this.handleSocketIO)
+        this.handleSocketIO(SocketENUM.JOIN)
     }
 
     handleSocketIO = (message: SocketENUM) => {
@@ -159,8 +156,9 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         'flex' +
                         ' ' +
                         (this.state.status === LoginStatus.NOT_LOGGED_IN ||
+                        this.state.status === LoginStatus.INITIAL_LOAD ||
                         this.state.shouldShowLink ||
-                        this.state.shouldShowGroupDeleted //TODO: Might need to add more here
+                        this.state.shouldShowGroupDeleted
                             ? 'blur'
                             : '')
                     }

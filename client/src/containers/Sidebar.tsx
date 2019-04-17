@@ -42,56 +42,15 @@ const Sidebar: React.FC<SiderbarProps> = ({
                 invisible={user.id !== owner_id}
                 text="This is the group owner"
             />
-            {showRefreshIcon(user)}
+            {!user.valid && (
+                <SidebarIcon
+                    className="text-orange select-none"
+                    icon="warning"
+                    text="This user need to update their google login"
+                />
+            )}
         </div>
     )
-
-    const showRefreshIcon = (user: DBUser) => {
-        if (!user.valid) {
-            if (your_id == user.id) {
-                return (
-                    <GoogleLogin
-                        clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
-                        render={renderProps => (
-                            <SidebarIcon
-                                className="text-grey-lighest cursor-pointer hover:bg-grey-lightest hover:text-grey-dark rounded"
-                                onClick={
-                                    renderProps
-                                        ? renderProps.onClick
-                                        : undefined
-                                }
-                                icon="refresh"
-                                invisible={user.id !== owner_id}
-                                text="Refresh your google access"
-                            />
-                        )}
-                        onFailure={() => {
-                            redirect({
-                                pathname: '/error',
-                                state: {
-                                    errorMessage:
-                                        'Could not authenticate google user',
-                                },
-                            })
-                        }}
-                        onSuccess={refreshUserToken}
-                        scope={
-                            'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'
-                        }
-                        cookiePolicy={'single_host_origin'}
-                    />
-                )
-            } else {
-                return (
-                    <SidebarIcon
-                        className="text-orange select-none"
-                        icon="warning"
-                        text="This user need to update their google login"
-                    />
-                )
-            }
-        }
-    }
 
     const refreshUserToken = (googleResponse: any) => {
         const update_access_token_body: UpdateAccessTokenBody = {
@@ -151,6 +110,8 @@ const Sidebar: React.FC<SiderbarProps> = ({
         </div>
     )
 
+    const you = users.find(u => u.id === your_id)
+
     return (
         <div
             className={
@@ -194,9 +155,50 @@ const Sidebar: React.FC<SiderbarProps> = ({
 
             <div className="pt-4 text-2xl font-semibold uppercase">Members</div>
 
-            <div className="flex-1 overflow-y-scroll pt-2">
+            <div className="flex-1 overflow-y-scroll my-2 pt-2 invisible-scrollbar">
                 {users.map(user => userDisplay(user))}
             </div>
+            {users.filter(u => !u.valid).length !== 0 && (
+                <div className="bg-orange-dark shadow-inner rounded flex  items-center py-2 my-6">
+                    <i className="material-icons text-red text-3xl px-2">
+                        warning
+                    </i>{' '}
+                    One or more users need to update their access to Google!
+                </div>
+            )}
+            {you && !you.valid && (
+                <GoogleLogin
+                    clientId="486151037791-q5avgjf6pc73d39v1uaalta9h3i0ha2d.apps.googleusercontent.com"
+                    render={renderProps => (
+                        <button
+                            onClick={
+                                renderProps ? renderProps.onClick : undefined
+                            }
+                            className="flex  items-center py-2 mb-6 no-underline text-inherit rounded bg-green-darker hover:bg-green-dark hover:shadow-inner shadow outline-none focus:outline-none
+                focus:bg-green-darkest"
+                        >
+                            <i className="material-icons text-white text-3xl px-2">
+                                refresh
+                            </i>{' '}
+                            Refresh your access to Google
+                        </button>
+                    )}
+                    onFailure={() => {
+                        redirect({
+                            pathname: '/error',
+                            state: {
+                                errorMessage:
+                                    'Could not authenticate google user',
+                            },
+                        })
+                    }}
+                    onSuccess={refreshUserToken}
+                    scope={
+                        'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'
+                    }
+                    cookiePolicy={'single_host_origin'}
+                />
+            )}
             {status === LoginStatus.UPDATING && <SpinnerComponent />}
             <div className="text-center pin-b pin-r flex ">
                 <button
