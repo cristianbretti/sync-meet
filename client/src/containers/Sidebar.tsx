@@ -225,9 +225,6 @@ const Sidebar: React.FC<SiderbarProps> = ({
                 />
             )}
             {status === LoginStatus.UPDATING && <SpinnerComponent />}
-            <div className="bg-grey h-1/3">
-                <div>Chat</div>
-            </div>
             <Chat users={users} your_id={your_id} group_str_id={group_str_id} />
         </div>
     )

@@ -54,6 +54,7 @@ export default class Chat extends Component<ChatProps, ChatState> {
                     }}
                 >
                     <input
+                        className=""
                         type="text"
                         value={input}
                         onChange={e => this.setState({ input: e.target.value })}
