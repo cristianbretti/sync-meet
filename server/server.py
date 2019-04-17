@@ -187,8 +187,8 @@ def get_group_calendar(user=None, group=None):
                 if success:
                     all_events += resp
                 users.append(
-                    {'name': user.name, 'id': g_user.id, 'valid': success})
-            free_times, secondary_events = find_free_time(all_events, group)
+                    {'name': g_user.name, 'id': g_user.id, 'valid': success})
+            free_times = find_free_time(all_events, group)
             return jsonify({
                 'group': group.to_json(),
                 'events': free_times,
@@ -250,6 +250,7 @@ def update_access_token(user=None):
             if payload is None:
                 raise ValueError("Missing json body in post")
             user.access_token = payload['access_token']
+            db.session.commit()
             return jsonify({}), 200
     except APIError as e:
         return e.response, e.code
