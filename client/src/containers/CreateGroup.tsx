@@ -69,10 +69,9 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                 history.push({
                     pathname: '/error',
                     state: {
-                      errorMessage: error.error,
-                    }
-                  })
-                console.error(error)
+                        errorMessage: error.error,
+                    },
+                })
             })
     }
 
@@ -80,11 +79,9 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
         history.push({
             pathname: '/error',
             state: {
-              errorMessage: error.error || "",
-            }
-          })
-        console.log('BAD google reponse from create group')
-        console.log(error)
+                errorMessage: error.error || '',
+            },
+        })
     }
 
     const rowWrapper = (

@@ -1,10 +1,6 @@
 import React, { useState } from 'react'
 import TextInput from '../components/TextInput'
-import { RouteComponentProps } from 'react-router'
-import GoogleLogin, {
-    GoogleLoginResponse,
-    GoogleLoginResponseOffline,
-} from 'react-google-login'
+import GoogleLogin from 'react-google-login'
 import { AddUserBody, AddUserResponse, ErrorResponse } from '../api/models'
 import api from '../api/api'
 
@@ -35,15 +31,11 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
             })
             .catch((error: ErrorResponse) => {
                 addUserFailed(error)
-                console.log('ADD USER ERROR!')
-                console.log(error)
             })
     }
 
     const onGoogleFailure = (badRepsonse: any) => {
-        addUserFailed(badRepsonse.error || "")
-        console.log('BAD google reponse from modal')
-        console.log(badRepsonse)
+        addUserFailed(badRepsonse.error || '')
     }
 
     return (

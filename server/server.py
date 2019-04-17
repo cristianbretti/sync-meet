@@ -188,10 +188,11 @@ def get_group_calendar(user=None, group=None):
                     all_events += resp
                 users.append(
                     {'name': user.name, 'id': g_user.id, 'valid': success})
-            free_times = find_free_time(all_events, group)
+            free_times, secondary_events = find_free_time(all_events, group)
             return jsonify({
                 'group': group.to_json(),
                 'events': free_times,
+                'secondary': secondary_events,
                 'users': users,
                 'owner_id': group.owner.id,
                 'your_id': user.id,

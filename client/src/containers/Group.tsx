@@ -8,14 +8,14 @@ import {
     MyDate,
     Time,
     SocketENUM,
+    DayToEventsMap,
     ErrorResponse,
 } from '../api/models'
 import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
 import SpinningModal from './SpinningModal'
 import SendLinkModal from './SendLinkModal'
-import { stat } from 'fs';
-import GroupDeletedModal from './GroupDeletedModal';
+import GroupDeletedModal from './GroupDeletedModal'
 
 enum LoginStatus {
     LOGGED_IN = 'logged_in',
@@ -32,8 +32,21 @@ type GroupState = {
 const dayInOneWeek = new Date()
 dayInOneWeek.setDate(dayInOneWeek.getDate() + 7)
 
+const emptyHashMap: DayToEventsMap = {}
+const current = new Date()
+let count = 0
+while (current !== dayInOneWeek) {
+    emptyHashMap[new MyDate({ date: current }).toString()] = []
+    current.setDate(current.getDate() + 1)
+    if (count >= 7) {
+        break // safeguard
+    }
+    count++
+}
+
 const emptyGroupState: GetGroupCalendarResponse = {
-    events: [],
+    events: emptyHashMap,
+    secondary: emptyHashMap,
     group: {
         meeting_length: new Time('01:00'),
         name: 'Empty',
@@ -50,7 +63,6 @@ const emptyGroupState: GetGroupCalendarResponse = {
 class Group extends Component<RouteComponentProps<any>, GroupState> {
     constructor(props: RouteComponentProps<any>) {
         super(props)
-        console.log(props)
         this.state = {
             ...emptyGroupState,
             status: LoginStatus.PENDING,
@@ -82,7 +94,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                 }
                 break
             case SocketENUM.DELETE:
-                this.setState({ shouldShowGroupDeleted:true })
+                this.setState({ shouldShowGroupDeleted: true })
                 break
         }
     }
@@ -91,9 +103,9 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         this.props.history.push({
             pathname: '/error',
             state: {
-              errorMessage: error.error,
-            }
-          })
+                errorMessage: error.error,
+            },
+        })
     }
 
     getCalendarData = (group_str_id: string, google_id: string) => {
@@ -103,6 +115,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                 this.setState({
                     group: getGroupCalendarResponse.group,
                     events: getGroupCalendarResponse.events,
+                    secondary: getGroupCalendarResponse.secondary,
                     owner_id: getGroupCalendarResponse.owner_id,
                     users: getGroupCalendarResponse.users,
                     your_id: getGroupCalendarResponse.your_id,
@@ -119,11 +132,9 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                 this.props.history.push({
                     pathname: '/error',
                     state: {
-                      errorMessage: error.error,
-                    }
-                  })
-                console.log('Error')
-                console.log(error)
+                        errorMessage: error.error,
+                    },
+                })
             })
     }
 
@@ -164,9 +175,10 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                             <Calendar
                                 events={this.state.events}
                                 group={this.state.group}
+                                secondary={this.state.secondary}
                             />
                         </div>
-                        <div className="h-8 " />
+                        <div className="h-4 " />
                     </div>
                 </div>
                 {this.state.status === LoginStatus.PENDING && <SpinningModal />}
@@ -184,10 +196,12 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         />
                     )}
                 {this.state.shouldShowGroupDeleted && (
-                        <GroupDeletedModal
-                            closeGroupDeletedModal ={() => this.closeGroupDeletedModal()}
-                        />
-                    )}
+                    <GroupDeletedModal
+                        closeGroupDeletedModal={() =>
+                            this.closeGroupDeletedModal()
+                        }
+                    />
+                )}
             </div>
         )
     }
