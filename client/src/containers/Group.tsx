@@ -44,7 +44,7 @@ const emptyGroupState: GetGroupCalendarResponse = {
     secondary: emptyHashMap,
     group: {
         meeting_length: new Time('01:00'),
-        name: 'Assignment 3 deep learning work',
+        name: 'Meeting title',
         from_date: new MyDate({ date: new Date() }),
         to_date: new MyDate({ date: dayInOneWeek }),
         from_time: new Time('09:00'),
