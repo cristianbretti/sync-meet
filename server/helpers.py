@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from model import db, User, Planning_group
 import config
-from datetime import datetime
+from datetime import datetime, time, tzinfo
 from datetime import timedelta
 from contextlib import contextmanager
 from functools import wraps, cmp_to_key
@@ -9,8 +9,8 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport import requests
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenCredentials
-from sympy import Interval, Union, Complement
-import sympy as sp
+import numpy as np
+import pytz
 import re
 
 """ HELPERS """
@@ -83,7 +83,7 @@ def require_group_str_id(func):
             if group is None:
                 raise Exception
         except Exception:
-            return (jsonify({'error': "Invalid group_str_id header"}), 403)
+            return (jsonify({'error': "This group does not exist"}), 403)
         return func(*args, **kwargs, group=group)
     return check_group_str_id
 
@@ -112,7 +112,7 @@ def create_or_find_user(id_token, name, access_token):
         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
             raise ValueError('Wrong issuer.')
     except:
-        raise ValueError('Could not authenticate id_token')
+        raise ValueError('Could not authenticate google account')
     google_id = idinfo['sub']
     # Check if user exists
     new_user = User.query.filter_by(google_id=google_id).first()
@@ -141,10 +141,11 @@ def get_events(access_token, group, user):
         calendar_ids = [cal['id'] for cal in all_calendars]
 
         # Find all events between timeMin and timeMax in timezone CET +01:00
-        timeMin = datetime.combine(
-            group.from_date, group.from_time).isoformat() + "+01:00"
-        timeMax = datetime.combine(
-            group.to_date, group.to_time).isoformat() + "+01:00"
+        tz = pytz.timezone('Europe/Stockholm')
+        timeMin = tz.localize(datetime.combine(
+            group.from_date, group.from_time)).astimezone(tz).isoformat()
+        timeMax = tz.localize(datetime.combine(
+            group.to_date, group.to_time)).astimezone(tz).isoformat()
 
         # For every calenderId, find all relevant events
         all_events = []
@@ -152,7 +153,7 @@ def get_events(access_token, group, user):
             events = service.events().list(calendarId=cal_id,
                                            timeMin=timeMin,
                                            timeMax=timeMax,
-                                           timeZone="CET"
+                                           timeZone=str(tz)
                                            ).execute()
             for event in events.get('items'):
                 if 'start' in event.keys() and 'end' in event.keys() and 'dateTime' in event['start'].keys():
@@ -163,46 +164,30 @@ def get_events(access_token, group, user):
                     all_events.append({
                         'start': start,
                         'end': end,
+                        'user_id': user.id,
                     })
-    except:
+    except Exception as e:
         return user.id, False
     return all_events, True
 
 
-def create_interval(event):
-    """ Convert an event dict 
-    {
-        start: datetime,
-        end: datetime
-    }
-    to an Sympy Interval
-    """
-    start_str = str(event['start'])
-    end_str = str(event['end'])
-    start_str = re.sub("[-\s:]", "", start_str)[:-2]
-    end_str = re.sub("[-\s:]", "", end_str)[:-2]
-    return Interval(int(start_str), int(end_str))
+def toMinutes(time):
+    return (time.hour * 60 + time.minute)
 
 
-def interval_to_datetime(interval):
-    """ Convert a Sympy Inverval 
-    to an dict 
-    {
-        start: datetime,
-        end: datetime
-    }
-    """
+def back_to_event(minute_interval, day_start):
+    from_time = minute_interval[0] + day_start
+    from_time = time(int(from_time / 60), from_time % 60)
+    to_time = minute_interval[1] + day_start
+    to_time = time(int(to_time / 60), to_time % 60)
     return {
-        'start': datetime.strptime(str(interval.start), "%Y%m%d%H%M"),
-        'end': datetime.strptime(str(interval.end), "%Y%m%d%H%M")
+        'from_time': str(from_time)[:-3],
+        'to_time': str(to_time)[:-3]
     }
 
 
 def find_free_time(all_events, group):
-    """ Calculates all the free time slots
-    by taking the union of all events (B),
-    and then taking the complement A - B 
-    where A is the Interval of the whole day. 
+    """ Calculates all the free time slots.
     Return a list of free time slots on the form
     {
         date: YYYY-MM-DD,
@@ -210,44 +195,77 @@ def find_free_time(all_events, group):
         to_time: HH:MM
     }
     """
-    intervals = [create_interval(event) for event in all_events]
-
-    # Take the union of all events
-    event_union = Union(intervals)
-
+    event_on_days = dict()
+    days = []
     # Create one whole interval for each day
-    whole_day_intervals = []
     current_day = group.from_date
     while current_day != group.to_date + timedelta(days=1):
-        start = datetime.combine(current_day, group.from_time)
-        end = datetime.combine(current_day, group.to_time)
-        whole_day_intervals.append(
-            create_interval({'start': start, 'end': end}))
+        days.append(current_day)
+        event_on_days[str(current_day)] = []
         current_day = current_day + timedelta(days=1)
 
-    # The free time is A - B where A is the whole day and B are the events
-    free_time_intervals = Complement(Union(whole_day_intervals), event_union)
+    for event in all_events:
+        event_on_days[str(event['start'].date())].append(event)
 
-    # If only one interval, convert to list
-    free_time_list = []
-    if len(free_time_intervals.args) > 0 and isinstance(free_time_intervals.args[0], sp.numbers.Integer):
-        free_time_list.append(
-            Interval(free_time_intervals.args[0], free_time_intervals.args[1]))
-    else:
-        for interval in free_time_intervals.args:
-            free_time_list.append(interval)
+    day_start = toMinutes(group.from_time)
+    n_days = len(days)
+    n_minutes = toMinutes(group.to_time) - toMinutes(group.from_time)
+    free_table = np.zeros((n_days, n_minutes))
+    meeting_length = toMinutes(group.meeting_length)
 
-    result = []
-    for time_slot in free_time_list:
-        free_event = interval_to_datetime(time_slot)
-        diff = free_event['end'] - free_event['start']
-        meeting_len = timedelta(
-            hours=group.meeting_length.hour, minutes=group.meeting_length.minute)
-        # Check that the free interval is long enought for the meeting
-        if diff >= meeting_len:
-            result.append({
-                'date': str(free_event['start'].date()),
-                'from_time': str(free_event['start'].time())[:-3],
-                'to_time': str(free_event['end'].time())[:-3]
-            })
-    return result
+    for idx, day in enumerate(days):
+        for event in event_on_days[str(day)]:
+            start_idx = max(0, toMinutes(event['start']) - day_start)
+            end_idx = min(free_table.shape[1], toMinutes(
+                event['end']) - day_start)
+            free_table[idx, start_idx:end_idx] += 1
+
+    result = dict()
+    secondary_result = dict()
+    for day_idx, day in enumerate(days):
+        free = False
+        row = free_table[day_idx, :]
+        primary = []
+        secondary = []
+        for idx, val in enumerate(row):
+            if val >= 1 and free:
+                # 0 -> >1
+                free = False
+                if idx - primary[-1][0] >= meeting_length:
+                    primary[-1][1] = idx
+                    if val == 1:
+                        secondary.append([idx, -1])
+                else:
+                    discard = primary.pop()
+                    if val == 1:
+                        # new secondary from discard start
+                        # since we know its been all zeros up to here
+                        secondary.append(discard)
+            elif val == 0 and not free:
+                # >1 | init -> 0
+                free = True
+                primary.append([idx, -1])
+                if len(secondary) > 0 and idx - secondary[-1][0] >= meeting_length:
+                    secondary[-1][1] = idx
+                elif len(secondary) > 0:
+                    secondary.pop()
+            elif idx == 0 and val == 1:
+                # init -> 1
+                secondary.append([idx, -1])
+            elif idx == len(row) - 1:
+                # last
+                if free and idx + 1 - primary[-1][0] >= meeting_length:
+                    primary[-1][1] = idx + 1
+                elif val == 1 and idx + 1 - secondary[-1][0] >= meeting_length:
+                    secondary[-1][1] = idx + 1
+
+        result[str(day)] = []
+        secondary_result[str(day)] = []
+        for minute_interval in primary:
+            result[str(day)].append(back_to_event(
+                minute_interval, day_start))
+        for minute_interval in secondary:
+            secondary_result[str(day)].append(back_to_event(
+                minute_interval, day_start))
+
+    return result, secondary_result

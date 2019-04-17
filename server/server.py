@@ -192,6 +192,7 @@ def get_group_calendar(user=None, group=None):
             return jsonify({
                 'group': group.to_json(),
                 'events': free_times,
+                'secondary': secondary_events,
                 'users': users,
                 'owner_id': group.owner.id,
                 'your_id': user.id,

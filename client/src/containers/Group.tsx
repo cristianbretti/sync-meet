@@ -8,11 +8,14 @@ import {
     MyDate,
     Time,
     SocketENUM,
+    DayToEventsMap,
+    ErrorResponse,
 } from '../api/models'
 import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
 import SpinningModal from './SpinningModal'
 import SendLinkModal from './SendLinkModal'
+import GroupDeletedModal from './GroupDeletedModal'
 
 enum LoginStatus {
     LOGGED_IN = 'logged_in',
@@ -23,13 +26,27 @@ enum LoginStatus {
 type GroupState = {
     status: LoginStatus
     shouldShowLink: boolean
+    shouldShowGroupDeleted: boolean
 } & GetGroupCalendarResponse
 
 const dayInOneWeek = new Date()
 dayInOneWeek.setDate(dayInOneWeek.getDate() + 7)
 
+const emptyHashMap: DayToEventsMap = {}
+const current = new Date()
+let count = 0
+while (current !== dayInOneWeek) {
+    emptyHashMap[new MyDate({ date: current }).toString()] = []
+    current.setDate(current.getDate() + 1)
+    if (count >= 7) {
+        break // safeguard
+    }
+    count++
+}
+
 const emptyGroupState: GetGroupCalendarResponse = {
-    events: [],
+    events: emptyHashMap,
+    secondary: emptyHashMap,
     group: {
         meeting_length: new Time('01:00'),
         name: 'Empty',
@@ -50,9 +67,9 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
             ...emptyGroupState,
             status: LoginStatus.PENDING,
             shouldShowLink: false,
+            shouldShowGroupDeleted: false,
         }
     }
-
     componentDidMount() {
         if (this.props.location.state) {
             //This is only true when redirected from /creategroup
@@ -80,10 +97,18 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                 }
                 break
             case SocketENUM.DELETE:
-                // TODO: deleted group
-                console.log('GROUP IS DELETED SHOW SOMETHING NICE')
+                this.setState({ shouldShowGroupDeleted: true })
                 break
         }
+    }
+
+    addUserFailed = (error: ErrorResponse) => {
+        this.props.history.push({
+            pathname: '/error',
+            state: {
+                errorMessage: error.error,
+            },
+        })
     }
 
     getCalendarData = (group_str_id: string, google_id: string) => {
@@ -94,6 +119,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                 this.setState({
                     group: getGroupCalendarResponse.group,
                     events: getGroupCalendarResponse.events,
+                    secondary: getGroupCalendarResponse.secondary,
                     owner_id: getGroupCalendarResponse.owner_id,
                     users: getGroupCalendarResponse.users,
                     your_id: getGroupCalendarResponse.your_id,
@@ -106,15 +132,22 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     getGroupCalendarResponse.group.to_date
                 )
             })
-            .catch((error: any) => {
-                // TODO: Error handeling
-                console.log('Error')
-                console.log(error)
+            .catch((error: ErrorResponse) => {
+                this.props.history.push({
+                    pathname: '/error',
+                    state: {
+                        errorMessage: error.error,
+                    },
+                })
             })
     }
 
     closeSendLinkModal = () => {
         this.setState({ shouldShowLink: false })
+    }
+
+    closeGroupDeletedModal = () => {
+        this.setState({ shouldShowGroupDeleted: false })
     }
 
     render() {
@@ -126,7 +159,8 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         ' ' +
                         (this.state.status === LoginStatus.NOT_LOGGED_IN ||
                         this.state.status === LoginStatus.PENDING ||
-                        this.state.shouldShowLink
+                        this.state.shouldShowLink ||
+                        this.state.shouldShowGroupDeleted
                             ? 'blur'
                             : '')
                     }
@@ -146,9 +180,10 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                             <Calendar
                                 events={this.state.events}
                                 group={this.state.group}
+                                secondary={this.state.secondary}
                             />
                         </div>
-                        <div className="h-8 " />
+                        <div className="h-4 " />
                     </div>
                 </div>
                 {this.state.status === LoginStatus.PENDING && <SpinningModal />}
@@ -156,6 +191,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     <AddUserModal
                         group_str_id={this.props.match.params.group_str_id}
                         getCalendarData={this.getCalendarData}
+                        addUserFailed={this.addUserFailed}
                     />
                 )}
                 {this.state.shouldShowLink &&
@@ -164,6 +200,13 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                             closeSendLinkModal={() => this.closeSendLinkModal()}
                         />
                     )}
+                {this.state.shouldShowGroupDeleted && (
+                    <GroupDeletedModal
+                        closeGroupDeletedModal={() =>
+                            this.closeGroupDeletedModal()
+                        }
+                    />
+                )}
             </div>
         )
     }
