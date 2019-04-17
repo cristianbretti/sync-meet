@@ -8,17 +8,12 @@ import {
     MyDate,
     Time,
     SocketENUM,
+    LoginStatus,
 } from '../api/models'
 import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
 import SpinningModal from './SpinningModal'
 import SendLinkModal from './SendLinkModal'
-
-enum LoginStatus {
-    LOGGED_IN = 'logged_in',
-    NOT_LOGGED_IN = 'not_logged_in',
-    PENDING = 'pending',
-}
 
 type GroupState = {
     status: LoginStatus
@@ -48,7 +43,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         super(props)
         this.state = {
             ...emptyGroupState,
-            status: LoginStatus.PENDING,
+            status: LoginStatus.INITIAL_LOAD,
             shouldShowLink: false,
         }
     }
@@ -84,7 +79,13 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
     }
 
     getCalendarData = (group_str_id: string, google_id: string) => {
-        this.setState({ status: LoginStatus.PENDING })
+        if (this.state.status === LoginStatus.NOT_LOGGED_IN) {
+            this.setState({ status: LoginStatus.INITIAL_LOAD })
+        }
+        if (this.state.status !== LoginStatus.INITIAL_LOAD) {
+            this.setState({ status: LoginStatus.UPDATING })
+        }
+
         api.getGroupCalendar(google_id, group_str_id)
             .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
                 this.setState({
@@ -121,7 +122,6 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         'flex' +
                         ' ' +
                         (this.state.status === LoginStatus.NOT_LOGGED_IN ||
-                        this.state.status === LoginStatus.PENDING ||
                         this.state.shouldShowLink
                             ? 'blur'
                             : '')
@@ -146,7 +146,9 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         <div className="h-8 " />
                     </div>
                 </div>
-                {this.state.status === LoginStatus.PENDING && <SpinningModal />}
+                {this.state.status === LoginStatus.INITIAL_LOAD && (
+                    <SpinningModal />
+                )}
                 {this.state.status === LoginStatus.NOT_LOGGED_IN && (
                     <AddUserModal
                         group_str_id={this.props.match.params.group_str_id}
@@ -154,7 +156,8 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     />
                 )}
                 {this.state.shouldShowLink &&
-                    this.state.status !== LoginStatus.PENDING && (
+                    this.state.status !== LoginStatus.UPDATING &&
+                    this.state.status !== LoginStatus.INITIAL_LOAD && (
                         <SendLinkModal
                             closeSendLinkModal={() => this.closeSendLinkModal()}
                         />

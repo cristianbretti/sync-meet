@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
-import { DBUser, GetGroupCalendarResponse } from '../api/models'
+import { DBUser, GetGroupCalendarResponse, LoginStatus } from '../api/models'
+import SpinnerComponent from '../components/SpinnerComponent'
 
-type SiderbarProps = GetGroupCalendarResponse & { className?: string }
+type SiderbarProps = GetGroupCalendarResponse & { className?: string } & {
+    status: LoginStatus
+}
 
 const userDisplay = (user: DBUser) => (
     <div key={user.id} className="text-center">
@@ -15,6 +18,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
     your_id,
     owner_id,
     className,
+    status,
 }: SiderbarProps) => {
     return (
         <div className={'bg-grey-darkest text-white' + ' ' + className}>
@@ -81,6 +85,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
             </div>
 
             {users.map(user => userDisplay(user))}
+            {status === LoginStatus.UPDATING && <SpinnerComponent />}
         </div>
     )
 }
