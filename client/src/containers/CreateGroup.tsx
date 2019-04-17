@@ -151,16 +151,13 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             changed={formChanged.groupName}
                             onChange={handleChange}
                             valid={
-                                formValues.groupName !== '' &&
-                                formValues.groupName.length <= groupNameMaxLenght &&
+                                validMeetingName &&
                                 formChanged.groupName
                             }
-                            maxLenght={groupNameMaxLenght}
-                            onInvalidMessage={"Title too long"}
                         />
                         <HelpHover
                             className="pl-4 pt-1"
-                            text="This is the name this meeting will be represented with."
+                            text="This is the name this meeting will be represented with. Max 30 characters."
                         />
                     </div>
                 </div>
@@ -184,17 +181,14 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             changed={formChanged.userName}
                             onChange={handleChange}
                             valid={
-                                formValues.userName !== '' &&
-                                formValues.userName.length <= userNameMaxLength &&
+                                validUserName &&
                                 formChanged.userName
                             }
-                            maxLenght={userNameMaxLength}
-                            onInvalidMessage={"Name too long"}
                         />,
                         <HelpHover
                             className="pl-4 pt-1"
                             key="help"
-                            text="This is the name that you will be represented with to your colleagues."
+                            text="This is the name that you will be represented with to your colleagues. Max 30 characters."
                         />,
                     ]
                 )}

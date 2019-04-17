@@ -59,8 +59,6 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
                                 setUserName(value)
                             }
                             valid={userName !== '' && userName.length <= userNameMaxLength}
-                            maxLenght={userNameMaxLength}
-                            onInvalidMessage={"Name too long"}
                         />
                         <div className="flex-1" />
                     </div>
