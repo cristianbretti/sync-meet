@@ -1,25 +1,24 @@
 import React, { useState } from 'react'
-import TextInput from '../components/TextInput'
-import GoogleLogin, {
-    GoogleLoginResponse,
-    GoogleLoginResponseOffline,
-} from 'react-google-login'
-import { AddUserBody, AddUserResponse } from '../api/models'
-import api from '../api/api'
 import LinkButton from '../components/LinkButton';
 
-interface GroupDeletedModal {
-    closeGroupDeletedModal(): void
+interface WarningPopupModal {
+    closeModal(): void,
+    title: string,
+    buttonText: string,
+    buttonClicked(): void
 }
 
-const GroupDeletedModal: React.FC<GroupDeletedModal> = ({
-    closeGroupDeletedModal,
+const WarningPopupModal: React.FC<WarningPopupModal> = ({
+    closeModal,
+    title,
+    buttonText,
+    buttonClicked
 }) => {
     return (
         <div>
             <div className="absolute flex items-center justify-center pin bg-grey-darkest opacity-50 z-10" />
             <div
-                onClick={() => closeGroupDeletedModal()}
+                onClick={() => closeModal()}
                 className="absolute flex flex-col items-center justify-center pin z-20 "
             >
                 <div
@@ -33,21 +32,21 @@ const GroupDeletedModal: React.FC<GroupDeletedModal> = ({
                             className={
                                 'text-3xl material-icons text-white cursor-pointer'
                             }
-                            onClick={() => closeGroupDeletedModal()}
+                            onClick={() => closeModal()}
                         >
                             close
                         </i>
                     </div>
 
                     <div className="m-8 text-lg">
-                        This group has been deleted!
+                        {title}
                     </div>
                     <div className="flex m-8 items-center justify-center">
-                    <LinkButton
-                        to="/"
-                        text="Back to Start Page"
-                        className=""
-                        />
+                    <button 
+                        onClick={()=> buttonClicked()} 
+                        className={ 'no-underline text-inherit p-2 block rounded bg-green-dark hover:bg-green-darker hover:shadow-inner shadow focus:outline-none'}>
+                        {buttonText}
+                    </button>
                     </div>
                 </div>
             </div>
@@ -55,5 +54,5 @@ const GroupDeletedModal: React.FC<GroupDeletedModal> = ({
     )
 }
 
-export default GroupDeletedModal
+export default WarningPopupModal
 

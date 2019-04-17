@@ -4,9 +4,10 @@ import {
     GetGroupCalendarResponse,
     UpdateAccessTokenBody,
     LoginStatus,
+    ErrorResponse,
 } from '../api/models'
 import SpinnerComponent from '../components/SpinnerComponent'
-import api from '../api/api'
+import api  from '../api/api'
 import GoogleLogin from 'react-google-login'
 import { LocationDescriptorObject } from 'history'
 import SidebarIcon from '../components/SidebarIcon'
@@ -15,6 +16,8 @@ type SiderbarProps = GetGroupCalendarResponse & {
     className?: string
     status: LoginStatus
     group_str_id: string
+    shouldDeleteGroup: boolean
+    showDeleteGroupWarning(): void
     redirect(path: string, state?: any): void
     redirect(location: LocationDescriptorObject<any>): void
 }
@@ -28,6 +31,8 @@ const Sidebar: React.FC<SiderbarProps> = ({
     status,
     group_str_id,
     redirect,
+    showDeleteGroupWarning,
+    shouldDeleteGroup,
 }: SiderbarProps) => {
     const userDisplay = (user: DBUser) => (
         <div
@@ -68,6 +73,14 @@ const Sidebar: React.FC<SiderbarProps> = ({
         }
     }
 
+    const leaveGroupPressed = () => {
+        if (owner_id == your_id) {
+            showDeleteGroupWarning()
+        } else {
+            leaveGroup()
+        }
+    }
+
     const leaveGroup = () => {
         const loggedIn = api.isLoggedIn(group_str_id)
         if (loggedIn.success) {
@@ -77,6 +90,9 @@ const Sidebar: React.FC<SiderbarProps> = ({
                 group_str_id
             ).then(resp => {
                 redirect('/')
+            })
+            .catch((error: ErrorResponse) => {
+                redirect('/error', {state: {errorMessage: error.error}})
             })
         }
     }
@@ -111,6 +127,10 @@ const Sidebar: React.FC<SiderbarProps> = ({
     )
 
     const you = users.find(u => u.id === your_id)
+
+    if (shouldDeleteGroup) {
+        leaveGroup()
+    }
 
     return (
         <div
@@ -202,7 +222,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
             {status === LoginStatus.UPDATING && <SpinnerComponent />}
             <div className="text-center pin-b pin-r flex ">
                 <button
-                    onClick={() => leaveGroup()}
+                    onClick={() => leaveGroupPressed()}
                     className="no-underline text-inherit p-2 rounded bg-red-dark hover:bg-red-darker hover:shadow-inner shadow"
                 >
                     {owner_id == your_id ? 'Delete group' : 'Leave group'}
