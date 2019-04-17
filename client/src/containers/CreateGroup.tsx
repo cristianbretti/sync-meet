@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import GoogleLogin, { GoogleLoginResponse } from 'react-google-login'
 import TextInput from '../components/TextInput'
 import api from '../api/api'
+import {userNameMaxLength,groupNameMaxLenght} from '../constants'
 import {
     ErrorResponse,
     CreateGroupBody,
@@ -117,8 +118,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
         formChanged.meetingLength &&
         timeInMin(formValues.meetingLength) <=
             timeInMin(formValues.toTime) - timeInMin(formValues.fromTime)
-    const validUserName = formValues.userName !== ''
-    const validMeetingName = formValues.groupName !== ''
+    const validUserName = formValues.userName !== '' && formValues.userName.length <= userNameMaxLength
+    const validMeetingName = formValues.groupName !== '' && formValues.groupName.length <= groupNameMaxLenght
     const allValid =
         validDates &&
         validMeetingLength &&
@@ -151,8 +152,11 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             onChange={handleChange}
                             valid={
                                 formValues.groupName !== '' &&
+                                formValues.groupName.length <= groupNameMaxLenght &&
                                 formChanged.groupName
                             }
+                            maxLenght={groupNameMaxLenght}
+                            onInvalidMessage={"Title too long"}
                         />
                         <HelpHover
                             className="pl-4 pt-1"
@@ -181,8 +185,11 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             onChange={handleChange}
                             valid={
                                 formValues.userName !== '' &&
+                                formValues.userName.length <= userNameMaxLength &&
                                 formChanged.userName
                             }
+                            maxLenght={userNameMaxLength}
+                            onInvalidMessage={"Name too long"}
                         />,
                         <HelpHover
                             className="pl-4 pt-1"
