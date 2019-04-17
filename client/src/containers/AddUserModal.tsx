@@ -3,6 +3,7 @@ import TextInput from '../components/TextInput'
 import GoogleLogin from 'react-google-login'
 import { AddUserBody, AddUserResponse, ErrorResponse } from '../api/models'
 import api from '../api/api'
+import {userNameMaxLength} from '../constants'
 
 interface AddUserModalProps {
     group_str_id: string
@@ -57,7 +58,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
                             onChange={(name: string, value: string) =>
                                 setUserName(value)
                             }
-                            valid={userName !== ''}
+                            valid={userName !== '' && userName.length <= userNameMaxLength}
                         />
                         <div className="flex-1" />
                     </div>
@@ -71,7 +72,7 @@ const AddUserModal: React.FC<AddUserModalProps> = ({
                         scope={
                             'https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events'
                         }
-                        disabled={userName === ''}
+                        disabled={userName === '' || userName.length > userNameMaxLength}
                     />
                 </div>
             </div>

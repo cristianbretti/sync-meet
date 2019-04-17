@@ -4,6 +4,7 @@ import {
     GetGroupCalendarResponse,
     UpdateAccessTokenBody,
     LoginStatus,
+    ErrorResponse,
 } from '../api/models'
 import SpinnerComponent from '../components/SpinnerComponent'
 import api from '../api/api'
@@ -16,6 +17,8 @@ type SiderbarProps = GetGroupCalendarResponse & {
     className?: string
     status: LoginStatus
     group_str_id: string
+    shouldDeleteGroup: boolean
+    showDeleteGroupWarning(): void
     redirect(path: string, state?: any): void
     redirect(location: LocationDescriptorObject<any>): void
 }
@@ -29,6 +32,8 @@ const Sidebar: React.FC<SiderbarProps> = ({
     status,
     group_str_id,
     redirect,
+    showDeleteGroupWarning,
+    shouldDeleteGroup,
 }: SiderbarProps) => {
     const userDisplay = (user: DBUser) => (
         <div
@@ -69,16 +74,24 @@ const Sidebar: React.FC<SiderbarProps> = ({
         }
     }
 
+    const leaveGroupPressed = () => {
+        if (owner_id == your_id) {
+            showDeleteGroupWarning()
+        } else {
+            leaveGroup()
+        }
+    }
+
     const leaveGroup = () => {
         const loggedIn = api.isLoggedIn(group_str_id)
         if (loggedIn.success) {
-            api.remove(
-                your_id == owner_id,
-                loggedIn.google_id,
-                group_str_id
-            ).then(resp => {
-                redirect('/')
-            })
+            api.remove(your_id == owner_id, loggedIn.google_id, group_str_id)
+                .then(resp => {
+                    redirect('/')
+                })
+                .catch((error: ErrorResponse) => {
+                    redirect('/error', { state: { errorMessage: error.error } })
+                })
         }
     }
 
@@ -113,6 +126,10 @@ const Sidebar: React.FC<SiderbarProps> = ({
 
     const you = users.find(u => u.id === your_id)
 
+    if (shouldDeleteGroup) {
+        leaveGroup()
+    }
+
     return (
         <div
             className={
@@ -127,7 +144,7 @@ const Sidebar: React.FC<SiderbarProps> = ({
                 </div>
                 <div>
                     <div
-                        onClick={() => leaveGroup()}
+                        onClick={() => leaveGroupPressed()}
                         className="cursor-pointer "
                     >
                         <SidebarIcon

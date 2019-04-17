@@ -16,12 +16,14 @@ import Calendar from './Calendar'
 import AddUserModal from './AddUserModal'
 import SpinningModal from './SpinningModal'
 import SendLinkModal from './SendLinkModal'
-import GroupDeletedModal from './GroupDeletedModal'
+import WarningPopupModal from './WarningPopupModal';
 
 type GroupState = {
     status: LoginStatus
     shouldShowLink: boolean
     shouldShowGroupDeleted: boolean
+    shouldShowDeleteGroupWarning: boolean
+    shouldDeleteGroup: boolean
 } & GetGroupCalendarResponse
 
 const dayInOneWeek = new Date()
@@ -63,6 +65,8 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
             status: LoginStatus.INITIAL_LOAD,
             shouldShowLink: false,
             shouldShowGroupDeleted: false,
+            shouldShowDeleteGroupWarning: false,
+            shouldDeleteGroup: false,
         }
     }
     componentDidMount() {
@@ -147,6 +151,21 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         this.setState({ shouldShowGroupDeleted: false })
     }
 
+    closeDeleteGroupWarning = () => {
+        this.setState({shouldShowDeleteGroupWarning: false})
+    }
+
+    goToStartPage = () => {
+        this.props.history.push({
+            pathname: '/',
+        })
+    }
+
+    deleteGroupPressed = () => {
+        this.closeDeleteGroupWarning()
+        this.setState({shouldDeleteGroup:true})
+    }
+
     render() {
         return (
             <div className="relative overflow-hidden">
@@ -167,6 +186,8 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         className="flex-1 h-screen border border-black"
                         group_str_id={this.props.match.params.group_str_id}
                         redirect={this.props.history.push}
+                        showDeleteGroupWarning={() => this.setState({shouldShowDeleteGroupWarning: true})}
+                        shouldDeleteGroup={this.state.shouldDeleteGroup}
                     />
 
                     <div className="flex-3 flex flex-col h-screen">
@@ -202,9 +223,26 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                         />
                     )}
                 {this.state.shouldShowGroupDeleted && (
-                    <GroupDeletedModal
-                        closeGroupDeletedModal={() =>
+                    <WarningPopupModal
+                        closeModal={() =>
                             this.closeGroupDeletedModal()
+                        }
+                        title = "This group has been deleted!"
+                        buttonText="Back to Start Page"
+                        buttonClicked={() =>
+                            this.goToStartPage()
+                        }
+                    />
+                )}
+                {this.state.shouldShowDeleteGroupWarning && (
+                    <WarningPopupModal
+                        closeModal={() =>
+                            this.closeDeleteGroupWarning()
+                        }
+                        title = "You are about to delete your group. If you do so all data will be lost."
+                        buttonText="Delete"
+                        buttonClicked={() => 
+                            this.deleteGroupPressed()
                         }
                     />
                 )}

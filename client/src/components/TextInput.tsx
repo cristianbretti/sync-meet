@@ -19,6 +19,7 @@ const TextInput: React.FC<TextInputProps> = ({
     changed,
     valid,
     onChange,
+
 }) => {
     const [active, setActive] = useState(false)
     return (

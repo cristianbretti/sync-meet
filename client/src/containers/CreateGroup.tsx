@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import GoogleLogin, { GoogleLoginResponse } from 'react-google-login'
 import TextInput from '../components/TextInput'
 import api from '../api/api'
+import {userNameMaxLength,groupNameMaxLenght} from '../constants'
 import {
     ErrorResponse,
     CreateGroupBody,
@@ -117,8 +118,8 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
         formChanged.meetingLength &&
         timeInMin(formValues.meetingLength) <=
             timeInMin(formValues.toTime) - timeInMin(formValues.fromTime)
-    const validUserName = formValues.userName !== ''
-    const validMeetingName = formValues.groupName !== ''
+    const validUserName = formValues.userName !== '' && formValues.userName.length <= userNameMaxLength
+    const validMeetingName = formValues.groupName !== '' && formValues.groupName.length <= groupNameMaxLenght
     const allValid =
         validDates &&
         validMeetingLength &&
@@ -150,13 +151,13 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             changed={formChanged.groupName}
                             onChange={handleChange}
                             valid={
-                                formValues.groupName !== '' &&
+                                validMeetingName &&
                                 formChanged.groupName
                             }
                         />
                         <HelpHover
                             className="pl-4 pt-1"
-                            text="This is the name this meeting will be represented with."
+                            text="This is the name this meeting will be represented with. Max 30 characters."
                         />
                     </div>
                 </div>
@@ -180,14 +181,14 @@ const CreateGroup: React.FC<RouteComponentProps<any>> = ({ history }) => {
                             changed={formChanged.userName}
                             onChange={handleChange}
                             valid={
-                                formValues.userName !== '' &&
+                                validUserName &&
                                 formChanged.userName
                             }
                         />,
                         <HelpHover
                             className="pl-4 pt-1"
                             key="help"
-                            text="This is the name that you will be represented with to your colleagues."
+                            text="This is the name that you will be represented with to your colleagues. Max 30 characters."
                         />,
                     ]
                 )}
