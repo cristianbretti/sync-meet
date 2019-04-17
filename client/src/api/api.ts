@@ -197,7 +197,7 @@ class API {
         group_str_id: string
     ): Promise<EmptyResponse> => {
         return this.request(
-            'remove',
+            'updateaccesstoken',
             HTTPMethod.PUT,
             { google_id: google_id, group_str_id: group_str_id },
             access_token_body

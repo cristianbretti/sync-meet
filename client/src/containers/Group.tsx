@@ -63,6 +63,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
     }
 
     handleSocketIO = (message: SocketENUM) => {
+        console.log(message)
         switch (message) {
             case SocketENUM.JOIN:
             case SocketENUM.LEAVE:
@@ -70,8 +71,10 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                 const group_str_id = this.props.match.params.group_str_id
                 const loggedIn = api.isLoggedIn(group_str_id)
                 if (!loggedIn.success) {
+                    console.log('NOT LOGGED IN')
                     this.setState({ status: LoginStatus.NOT_LOGGED_IN })
                 } else {
+                    console.log('LOGGED IN')
                     const google_id = loggedIn.google_id
                     this.getCalendarData(group_str_id, google_id)
                 }
@@ -87,6 +90,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
         this.setState({ status: LoginStatus.PENDING })
         api.getGroupCalendar(google_id, group_str_id)
             .then((getGroupCalendarResponse: GetGroupCalendarResponse) => {
+                console.log('NEW CAL RESP')
                 this.setState({
                     group: getGroupCalendarResponse.group,
                     events: getGroupCalendarResponse.events,
@@ -130,7 +134,7 @@ class Group extends Component<RouteComponentProps<any>, GroupState> {
                     <Sidebar
                         {...this.state}
                         className="flex-1 h-screen border border-black"
-                        group_str_id = {this.props.match.params.group_str_id}
+                        group_str_id={this.props.match.params.group_str_id}
                     />
 
                     <div className="flex-3 flex flex-col h-screen">
