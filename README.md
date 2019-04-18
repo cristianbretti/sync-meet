@@ -54,3 +54,5 @@ In this folder, the different python files needed for our back-end exists. We us
 `socket-io.py` creates the socket events used for when users join and leave and for when groups are deleted and updated.
 
 `model.py` contains the database models for our SQLite database.
+
+# How to setup
