@@ -101,7 +101,7 @@ class API {
         let options: RequestInit = {
             method: method,
             headers: headers,
-            mode: 'cors', //TODO: dev only, delete otherwise
+            // mode: 'cors', //TODO: dev only, delete otherwise
         }
 
         if (body !== undefined) {

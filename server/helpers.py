@@ -37,8 +37,9 @@ def handle_exceptions():
         raise APIError(jsonify({'error': str(e)}), 400)
     except KeyError as e:
         raise APIError(jsonify({'error': "Missing parameter: " + str(e)}), 400)
-    # except:
-    #     raise APIError(jsonify({'error': "Internal server error"}), 500) #TODO: uncomment!!
+    except:
+        # TODO: uncomment!!
+        raise APIError(jsonify({'error': "Internal server error"}), 500)
 
 
 def attempt_delete_user(user):
