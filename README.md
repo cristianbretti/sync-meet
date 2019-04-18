@@ -5,7 +5,7 @@ Sync-Meet is a meeting scheduler that utilizes Google calendar. By synchronizing
 1. A user goes to the homepage of sync-meet and clicks on create new meeting. 
 
 2. The user inputs the following:
-  * Group name: The name of the group for the meeting.
+  * Meeting title: The name of the meeting.
   * Name: The name that this user will have in the group.
   * Start date: The start date from where the calendar should find a meeting. 
   * End date: The end date to where the calendar should find a meeting.
@@ -13,24 +13,25 @@ Sync-Meet is a meeting scheduler that utilizes Google calendar. By synchronizing
   * End time: The latest possible time of day a meeting can end.
   * Meeting time: How long the meeting should be in hours and minutes.
  
-The user is now the owner of the group/meeting and gets redirected to the calendar page. The owner can now invite other people to the meeting scheduler by sending them a link. Every user that receives the link will have to accept access to their Google calendar before joining. 
+The user is now the owner of the meeting and gets redirected to the calendar page. The owner can now invite other people to the meeting scheduler by sending them a link. Every user that receives the link will have to accept access to their Google calendar before joining. 
 
-3. As more users join the group, Sync-Meet will update the available meeting time and create events. An event will show the start time, end time, meeting time and a colour. The colour of the event is green if every member of the group is available for the event and blue of the majority is available. 
+3. As more users join the group, Sync-Meet will update the available meeting time and create events. An event will show the start time, end time, meeting time and a colour. The colour of the event is green if every member of the group is available for the event and yellow if everyone except one can join. There is also a chat for the users in the sidebar of the calendar page. 
 
 4. The owner finds a suitable time for the meeting and Sync-Meet is closed. 
 
 # What has been done
-  1. Backend server is set up with the basic support of creating an event, finding all empty time intervalls for a user and removing the event afterwards.
-  2. O-Auth 2 authentication protocol is set up on the client side for Google authentication.
-  3. Support for creating an event within the specified date and time interval on the client side.
-  4. Basic layout for the calendar/event page where all possible time slots will be shown.
-  5. Socket I/O for notifying the client that another user has joined the event.
+  1. Users can create meetings. 
+  2. Users can join other existing meetings. 
+  3. Users can leave meetings. If the owner leaves the meeting, the meeting is deleted. 
+  4. Google authentication is implemented. If a users token has expired, they will have to authenticate again.
+  5. A calendar view which shows possible events for meetings. Green if all can attend and yellow if one person can't attend. 
+  6. A sidebar with information about the meeting next to calendar is implemtend. Has information about the users and a chat. 
+
 
 # Future plans
-  1. Add support for adding another user into an already created event.
-  2. Create a separate homepage before a page for event creation.
-  3. Display all available time slots in a UI friendly way.
-  4. Potentially add support for adding an event to all users calendar.
+  1. Add the possibility to drag the width of the sidebar.
+  2. Potentially add support for adding an event to all users calendar.
+  3. Make the website mobile friendly. 
 
 # Project file structure
 The root folder contains three folders; `db`, `client` and `server`.
