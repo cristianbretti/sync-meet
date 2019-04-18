@@ -25,7 +25,7 @@ The user is now the owner of the meeting and gets redirected to the calendar pag
   3. Users can leave meetings. If the owner leaves the meeting, the meeting is deleted. 
   4. Google authentication is implemented. If a users token has expired, they will have to authenticate again.
   5. A calendar view which shows possible events for meetings. Green if all can attend and yellow if one person can't attend. 
-  6. A sidebar with information about the meeting next to calendar is implemtend. Has information about the users and a chat. 
+  6. A sidebar next to calendar is implementend. It contains information about the users, the meeting and a chat. 
 
 
 # Future plans
