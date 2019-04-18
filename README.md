@@ -58,9 +58,6 @@ In this folder, the different python files needed for our back-end exists. We us
 # How to setup
 The program is live at http://sync-meet.osoriobretti.com/ for anyone to use. 
 
-However, if you want to try it locally, complete the following steps:
+You can't try it locally, since that would require api-keys. 
 
-1. Clone this repository.  
-2. Go to root/client. 
-3. Run `npm install` to install dependencies. 
-4. Run `npm start` to start a local server at port 3000. 
+
