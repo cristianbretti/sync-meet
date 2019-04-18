@@ -56,3 +56,11 @@ In this folder, the different python files needed for our back-end exists. We us
 `model.py` contains the database models for our SQLite database.
 
 # How to setup
+The program is live at http://sync-meet.osoriobretti.com/ for anyone to use. 
+
+However, if you want to try it locally, complete the following steps:
+
+1. Dowload or clone the repo with all the code. 
+2. Go to the client folder which is located in the root folder.
+3. Run `npm install` in the client folder to install dependencies. 
+4. Run `npm start` to start a local server at port 3000. 
